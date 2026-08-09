@@ -1,0 +1,529 @@
+<!doctype html>
+<!--
+  ══════════════════════════════════════════════════════════════════════════
+  HeedVision project page — static, single page, no build step.
+  Styled after Acadeck (elevendeck) `src/index.njk` + `src/styles/core.css`.
+
+  ▸ BEFORE PUBLISHING, fill in one thing:
+      1. ARXIV_URL below — search for "ARXIV_URL" (appears twice).
+         Until then the arXiv button is hidden automatically.
+
+  Everything else works as-is. Just upload this folder.
+  ══════════════════════════════════════════════════════════════════════════
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments — IEEE VIS 2026</title>
+<meta name="description" content="We introduce collaborative attention-aware visualizations (CAAVs) that track, record, and revisualize the collective attention of multiple users over time, implemented in HeedVision, a WebXR system for AR/VR headsets.">
+<meta name="author" content="Arvind Srinivasan, Niklas Elmqvist">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments">
+<meta property="og:description" content="Collaborative attention-aware visualizations (CAAVs) that track, record, and revisualize the collective attention of multiple users over time. IEEE VIS 2026 / TVCG.">
+<meta property="og:image" content="assets/teaser.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Set theme before paint to avoid a flash of the wrong mode -->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("heedvision-theme");
+      var d = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.classList.toggle("dark", d);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+/* ─── Fonts (Acadeck stack) ─────────────────────────────────────────────── */
+@font-face {
+  font-family: "AU Passata";
+  src: url("assets/fonts/AUPassata_Regular.ttf") format("truetype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "AU Passata";
+  src: url("assets/fonts/AUPassata_Bold.ttf") format("truetype");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("assets/fonts/Fraunces.ttf") format("truetype");
+  font-optical-sizing: auto;
+  font-weight: 100 900; font-style: normal; font-display: swap;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+
+/* ─── Design tokens (Acadeck theme.css, resolved to literal values so the
+       page renders identically without relative-color-syntax support) ───── */
+:root {
+  --surface-deep: #e8e8ee;
+  --card:         #f7f8fa;
+  --soft:         #f4f4f5;
+
+  --foreground:       #09090b;
+  --muted-foreground: #6b7280;
+  --strong:           #0f1626;
+
+  --primary:            #2f6df6;
+  --primary-foreground: #f7f8fa;
+  --accent-2:           #14b8a6;
+
+  --border: #e4e4e7;
+  --shadow-tint: rgba(9, 9, 11, 0.07);
+  --shadow-tint-strong: rgba(9, 9, 11, 0.18);
+
+  --chrome-bg: rgba(247, 248, 250, 0.72);
+  --chrome-fg: #1f2330;
+
+  --radius: 0.75rem;
+  --font-ui:      "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+  --font-heading: "AU Passata", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+.dark {
+  --surface-deep: #0c1017;
+  --card:         #151a24;
+  --soft:         #1b212c;
+
+  --foreground:       #f5f7fa;
+  --muted-foreground: #949cab;
+  --strong:           #f8fafc;
+
+  --primary:            #5b8cff;
+  --primary-foreground: #0a0d14;
+  --accent-2:           #2dd4bf;
+
+  --border: #2a2f3a;
+  --shadow-tint: rgba(0, 0, 0, 0.4);
+  --shadow-tint-strong: rgba(0, 0, 0, 0.55);
+
+  --chrome-bg: rgba(21, 26, 36, 0.72);
+  --chrome-fg: #e6e9ef;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--surface-deep);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: var(--primary); }
+
+/* ─── Theme toggle ──────────────────────────────────────────────────────── */
+.theme-btn {
+  position: fixed; top: 14px; right: 16px; z-index: 50;
+  border: none; background: var(--chrome-bg); backdrop-filter: blur(8px);
+  color: var(--chrome-fg);
+  cursor: pointer;
+  display: inline-grid; place-items: center;
+  width: 36px; height: 36px;
+  border-radius: calc(var(--radius) - 2px);
+  transition: background 0.15s, color 0.15s;
+}
+.theme-btn:hover { background: var(--primary); color: var(--primary-foreground); }
+.theme-btn svg { width: 18px; height: 18px; }
+.theme-icon-dark { display: none; }
+.dark .theme-icon-light { display: none; }
+.dark .theme-icon-dark { display: block; }
+
+/* ─── Layout ────────────────────────────────────────────────────────────── */
+.paper-main { max-width: 780px; margin: 0 auto; padding: 64px 32px 96px; }
+.paper { display: flex; flex-direction: column; }
+
+/* Venue chip */
+.paper-venue {
+  display: inline-flex; align-self: flex-start; align-items: center; gap: 10px;
+  padding: 7px 14px; margin-bottom: 22px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--card);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--foreground);
+}
+.paper-venue .venue-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent-2); flex: 0 0 auto;
+}
+.paper-venue .venue-sub { color: var(--muted-foreground); font-weight: 500; }
+
+/* Title + subtitle */
+.paper-title {
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 6vw, 60px);
+  font-weight: 700; line-height: 1.1; letter-spacing: -0.025em;
+  color: var(--strong); margin: 0 0 14px;
+}
+.paper-subtitle {
+  font-family: var(--font-heading);
+  font-size: clamp(17px, 2.5vw, 22px);
+  color: var(--muted-foreground);
+  margin: 0 0 36px; font-weight: 400; line-height: 1.45;
+}
+
+/* Authors */
+.paper-authors {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 10px; margin-bottom: 36px;
+}
+.author-item {
+  display: flex; align-items: center; gap: 11px;
+  text-decoration: none; padding: 8px 14px 8px 8px;
+  border: 1px solid transparent; border-radius: 999px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.author-item:hover { border-color: var(--border); background: var(--card); }
+.author-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  overflow: hidden; flex: 0 0 auto;
+  background: var(--soft);
+  display: grid; place-items: center;
+}
+.author-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.author-info { display: flex; flex-direction: column; gap: 2px; }
+.author-name { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.author-affil { font-size: 13px; color: var(--muted-foreground); line-height: 1.3; }
+
+/* Buttons */
+.paper-actions {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 52px;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 18px;
+  border-radius: calc(var(--radius) - 2px);
+  font-size: 14px; font-weight: 600; font-family: inherit; line-height: 1;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s, opacity 0.15s;
+}
+.btn svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-primary:hover { box-shadow: 0 4px 18px var(--shadow-tint-strong); opacity: 0.92; }
+.btn-outline { background: var(--card); color: var(--foreground); border-color: var(--border); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Teaser */
+.paper-teaser {
+  margin: 0 0 52px;
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 32px var(--shadow-tint);
+  background: var(--card);
+}
+.paper-teaser img { width: 100%; height: auto; display: block; }
+.paper-teaser figcaption {
+  padding: 12px 18px; font-size: 13px; line-height: 1.55;
+  color: var(--muted-foreground);
+  background: var(--card); border-top: 1px solid var(--border);
+}
+
+/* Sections */
+.paper-section { margin-bottom: 52px; }
+.paper-section-title {
+  font-family: var(--font-ui);
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  margin: 0 0 18px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.paper-abstract {
+  font-family: var(--font-body); font-weight: 300;
+  font-size: 17px; line-height: 1.75;
+  color: var(--foreground); margin: 0;
+}
+.paper-abstract em { font-style: italic; }
+
+/* Keyword chips */
+.keywords { display: flex; flex-wrap: wrap; gap: 8px; }
+.keyword {
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: 12.5px; color: var(--muted-foreground);
+}
+
+/* Resource list */
+.resources { display: grid; gap: 10px; }
+.resource {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--card); text-decoration: none; color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.resource:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 18px var(--shadow-tint);
+  transform: translateY(-1px);
+}
+.resource-icon {
+  display: grid; place-items: center; flex: 0 0 auto;
+  width: 38px; height: 38px; border-radius: calc(var(--radius) - 4px);
+  background: var(--soft); color: var(--primary);
+}
+.resource-icon svg { width: 19px; height: 19px; }
+.resource-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.resource-name { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.resource-desc { font-size: 13px; color: var(--muted-foreground); line-height: 1.4; }
+.resource-arrow { margin-left: auto; color: var(--muted-foreground); flex: 0 0 auto; }
+.resource:hover .resource-arrow { color: var(--primary); }
+
+/* BibTeX */
+.bibtex-block {
+  position: relative;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; background: var(--card);
+}
+.bibtex-code {
+  margin: 0; padding: 22px 24px;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.75;
+  color: var(--foreground); overflow-x: auto; background: transparent; white-space: pre;
+}
+.bibtex-copy {
+  position: absolute; top: 12px; right: 12px;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) - 4px);
+  background: var(--chrome-bg); backdrop-filter: blur(8px);
+  color: var(--chrome-fg);
+  font-size: 12px; font-weight: 600; font-family: var(--font-ui);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.bibtex-copy:hover { border-color: var(--primary); color: var(--primary); }
+.bibtex-copy.is-copied { color: var(--accent-2); border-color: var(--accent-2); }
+.bibtex-copy svg { width: 14px; height: 14px; display: block; }
+
+/* Footer */
+.paper-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+}
+.footer-seals { display: flex; align-items: center; gap: 18px; }
+.footer-seals img { height: 34px; width: auto; display: block; opacity: 0.75; }
+.dark .footer-seals img { filter: invert(1) brightness(1.6); opacity: 0.7; }
+.footer-note { font-size: 12.5px; color: var(--muted-foreground); line-height: 1.5; }
+
+/* Mobile */
+@media (max-width: 600px) {
+  .paper-main { padding: 40px 20px 72px; }
+  .paper-actions { flex-direction: column; }
+  .btn { justify-content: center; }
+  .paper-footer { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+
+<body>
+
+<button class="theme-btn" id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+  <span class="theme-icon-light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></svg></span>
+  <span class="theme-icon-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/></svg></span>
+</button>
+
+<main class="paper-main">
+<article class="paper">
+
+  <div class="paper-venue">
+    <span class="venue-dot" aria-hidden="true"></span>
+    <span>IEEE VIS 2026</span>
+    <span class="venue-sub">· TVCG Special Issue</span>
+  </div>
+
+  <h1 class="paper-title">HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</h1>
+
+  <p class="paper-subtitle">Tracking, recording, and revisualizing the collective attention of collaborators in shared immersive environments.</p>
+
+  <div class="paper-authors">
+    <a class="author-item" href="https://orcid.org/0000-0002-3409-6077" target="_blank" rel="noopener">
+      <span class="author-avatar"><img src="assets/arvind-srinivasan.png" alt="" loading="lazy"></span>
+      <span class="author-info">
+        <span class="author-name">Arvind Srinivasan</span>
+        <span class="author-affil">Aarhus University</span>
+      </span>
+    </a>
+    <a class="author-item" href="https://orcid.org/0000-0001-5805-5301" target="_blank" rel="noopener">
+      <span class="author-avatar"><img src="assets/niklas-elmqvist.png" alt="" loading="lazy"></span>
+      <span class="author-info">
+        <span class="author-name">Niklas Elmqvist</span>
+        <span class="author-affil">Aarhus University</span>
+      </span>
+    </a>
+  </div>
+
+  <div class="paper-actions">
+    <!-- ARXIV_URL — replace the href below once the preprint is posted.
+         While it still says ARXIV_URL, the script at the bottom hides this button. -->
+    <a class="btn btn-primary" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg>
+      arXiv
+    </a>
+    <a class="btn btn-outline" id="pdf-btn" href="heedvision.pdf" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg>
+      PDF
+    </a>
+    <a class="btn btn-outline" href="https://osf.io/frsp8/" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg>
+      OSF
+    </a>
+  </div>
+
+  <figure class="paper-teaser">
+    <picture>
+      <source srcset="assets/teaser.webp" type="image/webp">
+      <img src="assets/teaser.png"
+           alt="Three-panel overview. Panel A shows the collaborative attention-aware visualization design space as a two-by-two grid crossing world space against camera space with embedded against separated presentation, plus always-on, explicit, and implicit triggering options; the world-space embedded quadrant is marked as evaluated and the other three as implemented. Panel B shows two co-located users in a mixed reality environment viewing a terrain visualization overlaid with voxel attention cues, coloured blue for User A, gold for User B, and pink where both users attended. Panel C shows the treasure hunt evaluation across a terrain visualization and a 3D scatterplot, with and without attention cues."
+           width="1584" height="415">
+    </picture>
+    <figcaption>
+      <strong>HeedVision overview.</strong>
+      (A) A Collaborative Attention-Aware Visualization design space covering attention capture, presentation, situatedness, and triggering.
+      (B) HeedVision implements this in a co-located mixed reality setting using voxel-based coverage maps for shared attention.
+      (C) We evaluate it through a treasure hunt task across terrain and scatterplot visualizations with and without attention cues, revealing context-dependent benefits in abstract environments lacking natural reference points.
+    </figcaption>
+  </figure>
+
+  <section class="paper-section">
+    <h2 class="paper-section-title">Abstract</h2>
+    <p class="paper-abstract">
+      <em>Group awareness</em>, the ability to perceive the activities of collaborators in a shared space, is a vital mechanism to support effective coordination and joint data analysis in collaborative visualization.
+      We introduce <em>collaborative attention-aware visualizations</em> (CAAVs) that track, record, and revisualize the collective attention of multiple users over time.
+      We implement this concept in HeedVision, a standards-compliant WebXR system built with React Three Fiber that runs on modern AR/VR headsets, and complement it with proof-of-concept implementations covering the remaining three quadrants of our design space, varying presentation (embedded vs. separated) and situatedness (world space vs. camera space).
+      Through a mixed-methods exploratory study where pairs of co-located analysts performed visual search tasks in a shared immersive AR environment, we investigate how attention revisualization affects collaborative coordination in immersive analytics.
+      Our results show that CAAVs can improve spatial coordination, search efficiency, and task load distribution in collaborative visual search tasks among collaborators, though benefits vary by context, favoring abstract environments lacking natural landmarks.
+      This work extends attention awareness to multi-user settings and provides empirical evidence for its context-dependent benefits in collaborative visual search tasks within immersive analytics environments.
+    </p>
+  </section>
+
+  <section class="paper-section">
+    <h2 class="paper-section-title">Keywords</h2>
+    <div class="keywords">
+      <span class="keyword">Attention tracking</span>
+      <span class="keyword">Eyetracking</span>
+      <span class="keyword">Immersive analytics</span>
+      <span class="keyword">Ubiquitous analytics</span>
+      <span class="keyword">Post-WIMP interaction</span>
+    </div>
+  </section>
+
+  <section class="paper-section">
+    <h2 class="paper-section-title">Materials</h2>
+    <div class="resources">
+      <a class="resource" id="arxiv-resource" href="ARXIV_URL" target="_blank" rel="noopener">
+        <span class="resource-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg></span>
+        <span class="resource-body">
+          <span class="resource-name">arXiv preprint</span>
+          <span class="resource-desc">Open-access author version, including appendices</span>
+        </span>
+        <span class="resource-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></span>
+      </a>
+
+      <a class="resource" href="heedvision.pdf" target="_blank" rel="noopener">
+        <span class="resource-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg></span>
+        <span class="resource-body">
+          <span class="resource-name">Paper (PDF)</span>
+          <span class="resource-desc">Full text with appendices — quotes and bootstrap analysis</span>
+        </span>
+        <span class="resource-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></span>
+      </a>
+
+      <a class="resource" href="https://osf.io/frsp8/" target="_blank" rel="noopener">
+        <span class="resource-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg></span>
+        <span class="resource-body">
+          <span class="resource-name">OSF repository</span>
+          <span class="resource-desc">Data, analysis code, study materials, and source code (CC BY 4.0)</span>
+        </span>
+        <span class="resource-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="paper-section">
+    <h2 class="paper-section-title">Citation</h2>
+    <div class="bibtex-block">
+<pre class="bibtex-code"><code id="bibtex-text">@article{srinivasan2026heedvision,
+  author  = {Srinivasan, Arvind and Elmqvist, Niklas},
+  title   = {{HeedVision}: Attention Awareness in Collaborative
+             Immersive Analytics Environments},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  year    = {2026},
+  note    = {To appear. Presented at IEEE VIS 2026.},
+}</code></pre>
+      <button class="bibtex-copy" id="bibtex-copy" aria-label="Copy BibTeX to clipboard">
+        <span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/></svg></span>
+        <span class="bibtex-copy-label">Copy BibTeX</span>
+      </button>
+    </div>
+  </section>
+
+  <footer class="paper-footer">
+    <div class="footer-seals">
+      <img src="assets/au_logo.svg" alt="Aarhus University">
+      <img src="assets/au_ca3.svg" alt="Center for Anytime Anywhere Analytics">
+    </div>
+    <p class="footer-note">
+      © 2026 the authors. Paper © IEEE.<br>
+      Supplemental materials released under CC BY 4.0.
+    </p>
+  </footer>
+
+</article>
+</main>
+
+<script>
+  // Theme toggle — persists across visits.
+  document.getElementById('theme-btn').addEventListener('click', function () {
+    var dark = document.documentElement.classList.toggle('dark');
+    try { localStorage.setItem('heedvision-theme', dark ? 'dark' : 'light'); } catch (e) {}
+  });
+
+  // Hide the arXiv entries until a real URL is filled in, so the page never
+  // ships a dead link. With arXiv gone, PDF takes over as the primary action.
+  (function () {
+    var pending = false;
+    ['arxiv-btn', 'arxiv-resource'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.getAttribute('href') === 'ARXIV_URL') { el.style.display = 'none'; pending = true; }
+    });
+    if (pending) {
+      var pdf = document.getElementById('pdf-btn');
+      if (pdf) pdf.className = 'btn btn-primary';
+    }
+  })();
+
+  // Copy BibTeX.
+  document.getElementById('bibtex-copy').addEventListener('click', function () {
+    var btn = this;
+    var text = document.getElementById('bibtex-text');
+    var label = btn.querySelector('.bibtex-copy-label');
+    navigator.clipboard.writeText(text.textContent || '').then(function () {
+      label.textContent = 'Copied!';
+      btn.classList.add('is-copied');
+      setTimeout(function () {
+        label.textContent = 'Copy BibTeX';
+        btn.classList.remove('is-copied');
+      }, 2000);
+    });
+  });
+</script>
+
+</body>
+</html>
