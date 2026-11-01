@@ -142,6 +142,8 @@
 .c-demo { display: grid; grid-template-columns: 1fr 470px; gap: 28px; min-height: 0; }
 .c-demo canvas { width: 100%; height: 100%; display: block; }
 .c-demo .tag { left: auto; right: 18px; top: 18px; bottom: auto; }
+.c-demo.bare { grid-template-columns: 1fr; }
+.c-demo.bare .seg-ctl { display: none; }
 .seg-ctl { display: flex; flex-direction: column; gap: 12px; }
 .seg-ctl button {
   all: unset;
@@ -179,6 +181,8 @@
 .c-ds.picked .quad:not(.hv), .c-ds[data-picked] .quad:not(.hv), .c-ds.picked .trig-item:not(.hv), .c-ds[data-picked] .trig-item:not(.hv) { opacity: 0.35; }
 .c-ds.picked .hv, .c-ds[data-picked] .hv { border-color: color-mix(in oklab, var(--both) 60%, transparent); box-shadow: 0 0 70px -24px var(--both); }
 .c-ds.picked .badge, .c-ds[data-picked] .badge { opacity: 1; }
+.c-ds.picked .quad.done, .c-ds[data-picked] .quad.done { opacity: 0.6; }
+.c-ds .quad.done .badge { background: rgba(255, 255, 255, 0.1); color: var(--fg-2); }
 
 /* questions (live board, or the fallback written in talk.md) */
 .c-questions { display: flex; flex-direction: column; }

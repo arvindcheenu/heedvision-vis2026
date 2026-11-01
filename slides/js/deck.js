@@ -103,7 +103,7 @@
 
   // ---------------------------------------------------------- voxel fields
   const fields = new Map();
-  const SWATCH = { who: "linear-gradient(135deg,var(--you),var(--both),var(--partner))", sum: "#e9e6ff", max: "linear-gradient(90deg,var(--you) 50%,var(--partner) 50%)", diff: "linear-gradient(90deg,var(--you),#1b1d26,var(--partner))", count: "linear-gradient(90deg,rgba(255,255,255,.35) 50%,var(--both) 50%)" };
+  const SWATCH = { none: "rgba(255,255,255,.06)", count: "linear-gradient(90deg,#767886 50%,#dedee6 50%)", sum: "linear-gradient(90deg,rgba(222,222,230,.2),#dedee6)", max: "linear-gradient(90deg,rgba(222,222,230,.45),#dedee6)", diff: "linear-gradient(90deg,#dedee6,rgba(222,222,230,.1),#dedee6)", who: "linear-gradient(135deg,var(--you),var(--both),var(--partner))" };
   function initFields() {
     document.querySelectorAll("canvas[data-field]").forEach((cv) => {
       fields.set(cv, new VoxelField(cv, { ambient: cv.dataset.field === "ambient", scale: () => deck.getScale() }));
@@ -122,7 +122,8 @@
         const shown = demo.querySelectorAll(".fragment.step.visible");
         setMode(shown.length ? shown[shown.length - 1].dataset.mode : buttons[0].dataset.mode);
       };
-      ["fragmentshown", "fragmenthidden"].forEach((t) => deck.on(t, sync));
+      ["fragmentshown", "fragmenthidden", "slidechanged"].forEach((t) => deck.on(t, sync));
+      sync();
     });
   }
   const runFields = (cur) => fields.forEach((f, cv) => (cur.contains(cv) ? f.start() : f.stop()));

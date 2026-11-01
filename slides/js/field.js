@@ -1,13 +1,14 @@
 // VoxelField: a 2D stand-in for HeedVision's voxel grid.
 // Two simulated gazes wander over a grid; each cell keeps one accumulator per
 // person that grows while looked at and decays over time. The display mode
-// picks the aggregation (who / sum / max / difference / count).
+// picks the aggregation (count / sum / max / difference / who), or none.
 (function () {
   const COLORS = {
     you: [61, 155, 255],
     partner: [255, 138, 42],
     both: [255, 95, 180],
-    neutral: [233, 230, 255],
+    grey: [222, 222, 230],
+    greyLow: [118, 120, 134],
   };
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -121,21 +122,21 @@
     target(i) {
       const A = this.a[i], B = this.b[i];
       const mix = (c1, c2, t) => [0, 1, 2].map((k) => c1[k] + (c2[k] - c1[k]) * t);
+      // Only "who" uses colour. The aggregations before it are grey, so each one
+      // adds a single idea: count (solid steps), then opacity for sum/max/difference.
       switch (this.mode) {
-        case "sum": {
-          const s = Math.min(1, (A + B) * 0.75);
-          return [...COLORS.neutral, s];
-        }
-        case "max":
-          return A >= B ? [...COLORS.you, A] : [...COLORS.partner, B];
-        case "diff": {
-          const d = A - B;
-          return d >= 0 ? [...COLORS.you, Math.min(1, d * 1.6)] : [...COLORS.partner, Math.min(1, -d * 1.6)];
-        }
+        case "none":
+          return [...COLORS.grey, 0];
         case "count": {
           const n = (A > 0.12) + (B > 0.12);
-          return n === 2 ? [...COLORS.both, 0.9] : n === 1 ? [...COLORS.neutral, 0.35] : [...COLORS.neutral, 0];
+          return n === 2 ? [...COLORS.grey, 0.9] : n === 1 ? [...COLORS.greyLow, 0.9] : [...COLORS.grey, 0];
         }
+        case "sum":
+          return [...COLORS.grey, Math.min(1, (A + B) * 0.75)];
+        case "max":
+          return [...COLORS.grey, Math.max(A, B)];
+        case "diff":
+          return [...COLORS.grey, Math.min(1, Math.abs(A - B) * 1.6)];
         default: {
           const both = Math.min(A, B);
           const oa = A - both, ob = B - both;

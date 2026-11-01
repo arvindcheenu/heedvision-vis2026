@@ -40,7 +40,7 @@ Everything about the talk lives in **`slides/talk.md`**: settings, slides, scrip
 ---
 title: HeedVision
 url: https://heedvision.arvindchee.nu/talk/   # QR code target
-duration: 9                                   # minutes, for the speaker view
+duration: 9.5                                 # minutes, for the speaker view
 questions: on      # on | off | a link to the venue's own Q&A tool
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
@@ -71,6 +71,8 @@ What you say. [click] marks where you advance.
 :::
 ```
 
+Slides after the end slide with `time: 0` (chapter *Backup*) are spare answers for Q&A.
+
 There are four layouts: `title`, `section`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence.
 
 ### Components
@@ -85,7 +87,9 @@ There are four layouts: `title`, `section`, `content` (the default) and `end`. T
 | `:::quote who=` | participant quote |
 | `:::steps reveal tones=` | numbered stages from a list |
 | `:::row` / `:::stack` | put components beside or under each other |
-| `::glyph type=` `::demo` `::designspace` `::caveat` `::qr` `::logos` | talk-specific pieces |
+| `::demo modes= steps bare` | attention simulation; modes (`none count sum max diff who`) step in the order given |
+| `::designspace highlight= badge= done= trigger=` | the 2×2 design space; highlight one or more corners |
+| `::glyph type=` `::caveat` `::qr` `::logos` | talk-specific pieces |
 | `:::questions` | live question board; shows its own content when questions are off |
 
 Any component takes `step` (appear on a click), `wide` (span all columns), `tall` (span two rows) and `tone=you|partner|both|brand`. You can make your own in the file:

@@ -210,18 +210,27 @@
 
     glyph: (a) => `<div class="c-glyph">${GLYPHS[a.type] || ""}</div>`,
 
+    // modes are shown in the order given; `steps` moves to the next one on each
+    // click (`steps=3` starts at fragment 3), `bare` hides the mode buttons.
     demo(a) {
-      const all = { who: ["Who", "blue you · orange partner · pink both"], sum: ["Sum", "total collective attention"], max: ["Max", "strongest individual focus"], diff: ["Difference", "balance between partners"], count: ["Count", "how many people were here"] };
-      const modes = (a.modes || "who,sum,max,diff,count").split(/[\s,]+/).filter((m) => all[m]);
+      const all = { none: ["Nothing", "no one can see the trail"], count: ["Count", "how many people looked here"], sum: ["Sum", "how much attention in total"], max: ["Max", "the strongest single focus"], diff: ["Difference", "one person, or shared?"], who: ["Who", "blue you · orange partner · pink both"] };
+      const modes = (a.modes || "count,sum,max,diff,who").split(/[\s,]+/).filter((m) => all[m]);
       const btn = modes.map((m, i) => `<button type="button" data-mode="${m}" aria-pressed="${i === 0}"><i data-swatch="${m}"></i><b>${all[m][0]}</b><span>${all[m][1]}</span></button>`).join("");
-      const steps = a.steps ? modes.slice(1).concat(modes[0]).map((m) => `<span class="fragment step" data-mode="${m}"></span>`).join("") : "";
-      return wrap("div", a, "c-demo",
-        `<div class="tile flush"><canvas data-field="demo" aria-label="Simulation of two people's attention"></canvas><span class="tag">Simulation</span></div><div class="seg-ctl" role="group" aria-label="Aggregation">${btn}</div>${steps}`);
+      const from = a.steps && a.steps !== true ? +a.steps : null;
+      const steps = a.steps ? modes.slice(1).map((m, i) => `<span class="fragment step" data-mode="${m}"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("") : "";
+      return wrap("div", a, `c-demo${a.bare ? " bare" : ""}`,
+        `<div class="tile flush"><canvas data-field="demo" aria-label="Simulation of two people's attention"></canvas><span class="tag">${esc(a.tag || "Simulation")}</span></div><div class="seg-ctl" role="group" aria-label="Aggregation">${btn}</div>${steps}`);
     },
 
+    // highlight / done take one or more quadrant ids: world-embedded world-separated camera-embedded camera-separated
     designspace(a) {
-      const hl = a.highlight || "world-embedded";
-      const q = (id, label, svg, f) => `<div class="tile quad${id === hl ? " hv" : ""}${a.steps ? ` fragment rise" data-fragment-index="${f}` : ""}"><span class="q-label">${label}</span>${id === hl && a.badge ? `<span class="badge">${esc(a.badge)}</span>` : ""}${svg}</div>`;
+      const list = (v) => String(v || "").split(/[\s,]+/).filter(Boolean);
+      const hl = list(a.highlight || "world-embedded"), done = list(a.done);
+      const q = (id, label, svg, f) => {
+        const on = hl.includes(id), was = done.includes(id);
+        const badge = on && a.badge ? a.badge : was && a["done-badge"] ? a["done-badge"] : "";
+        return `<div class="tile quad${on ? " hv" : ""}${was ? " done" : ""}${a.steps ? ` fragment rise" data-fragment-index="${f}` : ""}"><span class="q-label">${label}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ""}${svg}</div>`;
+      };
       const trig = (id, label, sub, icon) => `<div class="tile trig-item${id === (a.trigger || "explicit") ? " hv" : ""}"><svg><use href="#i-${icon}"/></svg><div><b>${label}</b><span>${sub}</span></div></div>`;
       return wrap("div", a, "c-ds", `
         <div></div><div class="axis-x">Embedded in the vis</div><div class="axis-x">Separate view</div><div class="axis-x${a.steps ? ' fragment rise" data-fragment-index="3' : ""}">Triggering</div>
