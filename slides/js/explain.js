@@ -5,7 +5,7 @@
 //   bvh   0 a chart's geometry and the bounding volume hierarchy built around it
 //         1 voxelization: the BVH rules out empty cells, cells touching geometry stay
 //         2 capture: a ray from each head at 10 Hz hits the nearest voxel, which gains
-//           that person's attention and slowly decays
+//           that person's attention and slowly decays (the BVH is only used to voxelize)
 //   hunt  0 two people search a scatterplot with a 10-minute clock
 //         1 the hidden targets (5% of voxels), shown here for the audience
 //         2 a target lights up only up close and from the right side
@@ -186,14 +186,14 @@
       }
       this.kept = this.cells.filter((c) => c.kept);
       this.eyes = [
-        { x: pad + w * 0.035, y: sy0 + (sy1 - sy0) * 0.12, color: "you", key: "a", aim: 0.3, v: 0, tick: 0, ray: null, seen: new Map() },
-        { x: w - pad - w * 0.035, y: sy0 + (sy1 - sy0) * 0.02, color: "partner", key: "b", aim: 0.7, v: 0, tick: 0.05, ray: null, seen: new Map() },
+        { x: pad + w * 0.035, y: sy0 + (sy1 - sy0) * 0.12, color: "you", key: "a", aim: 0.3, v: 0, tick: 0, ray: null },
+        { x: w - pad - w * 0.035, y: sy0 + (sy1 - sy0) * 0.02, color: "partner", key: "b", aim: 0.7, v: 0, tick: 0.05, ray: null },
       ];
     }
     reset() {
       this.random = rng(5);
       this.cells && this.cells.forEach((c) => { c.a = 0; c.b = 0; });
-      this.eyes && this.eyes.forEach((e, i) => { e.aim = i ? 0.68 : 0.32; e.v = 0; e.tick = i * 0.05; e.ray = null; e.seen.clear(); });
+      this.eyes && this.eyes.forEach((e, i) => { e.aim = i ? 0.68 : 0.32; e.v = 0; e.tick = i * 0.05; e.ray = null; });
     }
     update(dt) {
       if (this.step < 2) return;
@@ -204,26 +204,18 @@
         e.v += ((this.random() - 0.5) * 1.6 - e.v * 0.9) * dt;
         e.aim = clamp(e.aim + e.v * dt * 0.6, e.color === "you" ? 0.04 : 0.3, e.color === "you" ? 0.7 : 0.96);
         e.tick -= dt;
-        for (const [id, t] of e.seen) if (t - dt <= 0) e.seen.delete(id); else e.seen.set(id, t - dt);
         if (e.tick > 0) continue;
         e.tick += 0.1; // 10 Hz
         const i = Math.round(e.aim * (this.pts.length - 1));
         const [tx, ty] = this.pts[i];
         const dx = tx - e.x, dy = ty + this.cs * 0.6 - e.y, len = Math.hypot(dx, dy);
         const ux = dx / len, uy = dy / len;
-        // walk the hierarchy: only boxes the ray enters are opened
+        // the nearest voxel along the ray
         let best = null;
-        const visit = (n) => {
-          if (rayBox(e.x, e.y, ux, uy, n.box) == null) return;
-          e.seen.set(n.id, 0.35);
-          if (n.kids.length) { n.kids.forEach(visit); return; }
-          for (const c of this.kept) {
-            if (c.r.x1 < n.box.x0 || c.r.x0 > n.box.x1 || c.r.y1 < n.box.y0 || c.r.y0 > n.box.y1) continue;
-            const t = rayBox(e.x, e.y, ux, uy, c.r);
-            if (t != null && (!best || t < best.t)) best = { t, c };
-          }
-        };
-        visit(this.root);
+        for (const c of this.kept) {
+          const t = rayBox(e.x, e.y, ux, uy, c.r);
+          if (t != null && (!best || t < best.t)) best = { t, c };
+        }
         if (best) {
           best.c[e.key] = Math.min(1, best.c[e.key] + 0.24);
           e.ray = { x: e.x + ux * best.t, y: e.y + uy * best.t, age: 0 };
@@ -236,7 +228,8 @@
       g.clearRect(0, 0, w, h);
       const T = this.step === 0 ? this.phaseT : 99;
       const levelIn = (d) => (this.step > 0 ? 1 : ease((T - 0.4 - d * 0.55) / 0.5));
-      const dimBoxes = this.step >= 1 ? 0.45 : 1;
+      // the hierarchy's job is done once the voxels exist
+      const dimBoxes = this.step >= 2 ? 0.2 : this.step >= 1 ? 0.45 : 1;
 
       // tree
       this.text("Bounding volume hierarchy", this.tree.x0, this.tree.y0 - 14, { size: 19, weight: 650 });
@@ -249,8 +242,7 @@
       for (const n of this.nodes) {
         const a = levelIn(n.depth);
         if (a <= 0) continue;
-        const hot = this.eyes.find((e) => e.seen.has(n.id));
-        g.fillStyle = hot ? rgba(C[hot.color], 0.9) : rgba(C.line, (n.kids.length ? 0.55 : 0.85) * a);
+        g.fillStyle = rgba(C.line, (n.kids.length ? 0.55 : 0.85) * a * (this.step >= 2 ? 0.5 : 1));
         g.beginPath(); g.arc(n.tx, n.ty, n.kids.length ? 6 : 5, 0, Math.PI * 2); g.fill();
       }
 
@@ -270,10 +262,9 @@
       for (const n of this.nodes) {
         const a = levelIn(n.depth) * dimBoxes;
         if (a <= 0) continue;
-        const hot = this.eyes.find((e) => e.seen.has(n.id));
         const b = n.box;
-        g.strokeStyle = hot ? rgba(C[hot.color], 0.95) : rgba(C.line, (0.35 + 0.12 * (this.maxDepth - n.depth)) * a);
-        g.lineWidth = hot ? 2.5 : n.depth === 0 ? 2 : 1.4;
+        g.strokeStyle = rgba(C.line, (0.35 + 0.12 * (this.maxDepth - n.depth)) * a);
+        g.lineWidth = n.depth === 0 ? 2 : 1.4;
         g.setLineDash(n.kids.length ? [] : [5, 4]);
         g.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0);
       }
