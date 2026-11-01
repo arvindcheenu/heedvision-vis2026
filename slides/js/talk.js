@@ -20,10 +20,10 @@
   let entries = [];
   let following = true;
 
-  fetch("../index.html")
+  fetch("../slides/index.html")
     .then((r) => r.text())
     .then((html) => build(new DOMParser().parseFromString(html, "text/html")))
-    .catch(() => { root.innerHTML = `<p class="loading">Couldn't load the slides. <a href="../">Open them directly</a>.</p>`; });
+    .catch(() => { root.innerHTML = `<p class="loading">Couldn't load the slides. <a href="../slides/">Open them directly</a>.</p>`; });
 
   function build(doc) {
     const sections = [...doc.querySelectorAll(".reveal .slides > section")];
@@ -51,8 +51,8 @@
       art.innerHTML = `
         <span class="live-tag">● On screen now</span>
         <h3><span class="n">${String(n).padStart(2, "0")}</span>${esc(title)}</h3>
-        <a class="slide-card" href="../#/${encodeURIComponent(id)}" target="_blank" rel="noopener" aria-label="Open slide ${n}: ${esc(title)}">
-          <img loading="lazy" decoding="async" src="../assets/posters/${encodeURIComponent(id)}.jpg" alt="Slide ${n}: ${esc(title)}">
+        <a class="slide-card" href="../slides/#/${encodeURIComponent(id)}" target="_blank" rel="noopener" aria-label="Open slide ${n}: ${esc(title)}">
+          <img loading="lazy" decoding="async" src="../slides/assets/posters/${encodeURIComponent(id)}.jpg" alt="Slide ${n}: ${esc(title)}">
           <span class="open">Open slide ↗</span>
         </a>
         <div class="script">${script}</div>
@@ -70,7 +70,7 @@
       // poster missing? show a live, non-interactive render of the slide instead
       art.querySelector("img").addEventListener("error", (e) => {
         const f = document.createElement("iframe");
-        f.src = `../?poster#/${encodeURIComponent(id)}`;
+        f.src = `../slides/?poster#/${encodeURIComponent(id)}`;
         f.loading = "lazy";
         f.tabIndex = -1;
         f.title = `Slide ${n}`;

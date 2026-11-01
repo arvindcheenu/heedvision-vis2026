@@ -301,7 +301,7 @@
     fab.innerHTML = `
       <button type="button" class="follow" aria-pressed="true" title="Follow the presenter's slide"><span class="dot"></span><span class="lbl">Following</span></button>
       <button type="button" class="ask" aria-expanded="false" title="Questions on this slide (Q)">Ask <span class="badge" hidden>0</span></button>
-      <a class="script" href="talk/" title="Slides with the full script">Script</a>`;
+      <a class="script" href="../talk/" title="Slides with the full script">Script</a>`;
     document.body.appendChild(fab);
     sheet = document.createElement("section");
     sheet.className = "hv-sheet";
@@ -352,7 +352,7 @@
       sheet.querySelector(".note").textContent = "Live questions are not connected for this copy of the slides.";
     }
     const scriptLink = fab.querySelector(".script");
-    const syncScript = () => (scriptLink.href = `talk/#s-${deck.getCurrentSlide().id}`);
+    const syncScript = () => (scriptLink.href = `../talk/#s-${deck.getCurrentSlide().id}`);
     deck.on("slidechanged", syncScript);
     syncScript();
     live.on("slide", (s) => { if (following) goTo(s); });

@@ -10,7 +10,7 @@
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
   "vars": {
-    "ALLOWED_ORIGINS": "https://arvindchee.nu,https://arvindcheenu.github.io,http://localhost:8000,http://127.0.0.1:8000"
+    "ALLOWED_ORIGINS": "https://heedvision.arvindchee.nu,https://arvindchee.nu,https://arvindcheenu.github.io,http://localhost:8000,http://127.0.0.1:8000"
   },
   "observability": { "enabled": true }
 }
