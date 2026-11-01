@@ -205,7 +205,6 @@ a { color: var(--accent); }
 .chapter .section-title { margin-bottom: 0; }
 .chapter .section-title .sub { font-weight: 550; letter-spacing: 0.02em; text-transform: none; margin-left: 8px; }
 .entry { padding: 26px 0 6px; scroll-margin-top: calc(var(--stage-h, 0px) + 24px); cursor: pointer; }
-.entry h3 { transition: color 300ms var(--ease); }
 /* the entry you're reading (or the one being presented) takes the accent in its title */
 .entry.reading h3, .entry.live h3 { color: var(--accent); }
 .entry h3 { font-size: 24px; font-weight: 560; margin-bottom: 10px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }

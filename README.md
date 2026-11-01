@@ -75,7 +75,7 @@ What you say. [click] marks where you advance.
 
 A slide with `backup: yes` is a spare answer for Q&A: it is listed in the script under *Backup*, and skipped when presenting (the talk stops at the end slide; open backups from the presenter view or with **B**).
 
-There are five layouts: `title`, `section`, `photo`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence. `section` and `photo` take `image:` (a section's photo is toned to the brand colours; a photo slide shows it full-bleed, with `credit:` as a source line). `align: center` keeps tiles at their natural height, centred on the slide.
+There are five layouts: `title`, `section`, `photo`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence. `section` and `photo` take `image:` (a section's photo is toned to the brand colours; a photo slide shows it full-bleed, with `credit:` as a source line and `cite:` for the paper behind its example). `align: center` keeps tiles at their natural height, centred on the slide.
 
 Keep `kicker:` (the running head over the headline) for wayfinding only, such as `RQ2 · Record`, `Result 1 · Scatterplot` or `Backup · …`; most slides don't need one.
 
@@ -91,7 +91,7 @@ Keep `kicker:` (the running head over the headline) for wayfinding only, such as
 | `:::quote who=` | participant quote |
 | `:::steps reveal tones= icons=` | stages from a list; end an item with `{RQ1}` for a corner label |
 | `::clip src= poster= title= caption= ratio=` | looping video with its caption underneath |
-| `::live steps` | live 3D demo of the study's scatterplot (drag, scroll); builds show the targets, then the cues |
+| `::live tag="…"` | the HeedVision demo, forked: two headsets side by side over one shared voxel store (drag a view, scroll, click the sphere to hide or show voxels) |
 | `::venn a= b= a-label= b-label=` | what a pair gain means, as overlapping finds |
 | `::art name=split` | line illustration in the text colour |
 | `:::row` / `:::stack` | put components beside or under each other |

@@ -239,13 +239,11 @@
       `<div class="tile flush clip-v" style="aspect-ratio:${esc(a.ratio || "16/10")}"><div class="embed" data-video="${esc(a.src)}" data-poster="${esc(a.poster || "")}" data-label="${esc(strip(mdi(a.title || a.caption || "Recording")))}" data-quiet></div></div>` +
       `<figcaption>${a.title ? `<b>${mdi(a.title)}</b>` : ""}${a.caption ? `<span>${mdi(a.caption)}</span>` : ""}</figcaption>`),
 
-    // live 3D demo of the study's scatterplot (js/voxdemo.js); `steps`: 1 shows the targets, 2 turns the cues on
-    live: (a) => wrap("div", a, "c-live tile flush",
-      `<canvas aria-label="${esc(a.alt || "Live demo: drag to look around the study's scatterplot; voxels colour where you and a simulated partner look")}"></canvas>` +
-      `<span class="tag">${esc(a.tag || "Live")}</span><span class="hint">Drag to look around · scroll to move closer</span><i class="reticle" aria-hidden="true"></i>` +
-      `<div class="live-bar"><span class="legend"><i class="you"></i>You<i class="both"></i>Both<i class="partner"></i>Partner</span><span class="found" data-found></span>` +
-      `<button type="button" data-act="targets" aria-pressed="false">Targets</button><button type="button" data-act="cues" aria-pressed="false">Cues</button><button type="button" data-act="reset">Reset</button></div>${stepSpans(a, 2)}`,
-      ` data-voxdemo data-stepper data-at="0"${a.src ? ` data-src="${esc(a.src)}"` : ""}`),
+    // the HeedVision demo, forked: two headsets side by side over one shared voxel store (js/hvdemo.js)
+    live: (a) => wrap("div", a, "c-live",
+      `<div class="hvd-panes">${["A", "B"].map((u, i) => `<div class="hvd-pane tile flush"><canvas data-user="${i}" aria-label="User ${u}'s headset: drag to move them, click the sphere to hide or show their voxels"></canvas><span class="who">User ${u}'s headset</span></div>`).join("")}</div>` +
+      `<div class="live-bar"><span class="tag">${esc(a.tag || "Live")}</span><span class="hint">${mdi(a.hint || "Drag a view to move that person · click the sphere to hide or show their voxels")}</span><button type="button" data-act="reset">Reset</button></div>`,
+      ` data-voxdemo data-stepper data-at="0"`),
 
     // what pair gain means: two people's finds as circles, overlapping less when gain is higher.
     // ::venn a=1.19 b=1.46 a-label="Cues off" b-label="Cues on"  (gain = finds together ÷ average member)
@@ -432,7 +430,7 @@
       } else if (layout === "photo") {
         // a full-bleed image with the headline over it; credit: a small source line
         inner = `<figure class="photo-panel">${sm.image ? `<img src="${esc(sm.image)}" alt="${esc(sm.alt || "")}">` : ""}</figure>
-          <div class="photo-text">${headline ? `<h2>${mdi(headline)}</h2>` : ""}${dek ? `<p>${mdi(dek)}</p>` : ""}</div>${sm.credit ? `<p class="photo-credit">${mdi(sm.credit)}</p>` : ""}${items.join("")}`;
+          <div class="photo-text">${headline ? `<h2>${mdi(headline)}</h2>` : ""}${dek ? `<p>${mdi(dek)}</p>` : ""}${sm.cite ? `<p class="photo-cite">${mdi(sm.cite)}</p>` : ""}</div>${sm.credit ? `<p class="photo-credit">${mdi(sm.credit)}</p>` : ""}${items.join("")}`;
       } else if (layout === "end") {
         inner = `<div class="end-panel"><h1>${mdi(headline || "Thank you")}</h1>${dek ? `<p class="dek">${mdi(dek)}</p>` : ""}<p class="talk-url" data-talk-url></p>
             <div class="end-qr"><div class="qr" data-qr="talk"></div></div><p class="contacts">${(m.contacts || "").split(";").map((c) => mdi(c.trim())).join("<br>")}</p></div>

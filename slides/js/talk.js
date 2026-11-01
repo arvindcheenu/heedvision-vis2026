@@ -154,8 +154,17 @@
         else break;
       }
       best = best || { id: entries[0].id, f: -1 };
-      if (!shown || best.id !== shown.id || best.f !== shown.f) show(best.id, best.f);
+      if (!shown || best.id !== shown.id || best.f !== shown.f) settleOn(best);
     });
+  }
+  // A fast scroll passes many slides; change the pinned one only once the reading
+  // position rests (or every 400 ms while it keeps moving), so it doesn't strobe.
+  let settleTimer = 0, lastShow = 0;
+  function settleOn(b) {
+    clearTimeout(settleTimer);
+    const go = () => { lastShow = performance.now(); show(b.id, b.f); };
+    if (performance.now() - lastShow > 400) go();
+    else settleTimer = setTimeout(go, 140);
   }
   addEventListener("scroll", onScroll, { passive: true });
 

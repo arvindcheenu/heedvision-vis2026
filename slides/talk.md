@@ -8,10 +8,10 @@ venue: IEEE VIS 2026 · Boston · November 9–13
 contacts: **Arvind Srinivasan** · arvind@cs.au.dk; Niklas Elmqvist · elm@cs.au.dk
 url: https://heedvision.arvindchee.nu/talk/
 site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
-duration: 9.6     # minutes, for presenter-view pacing; the slot allows 10 at most
+duration: 9.7     # minutes, for presenter-view pacing; the slot allows 10 at most
 
 # Live layer. Turn these off if the venue runs its own Q&A.
-questions: on      # on | off | a link to the venue's Q&A tool (the presenter view can also switch it off)
+questions: off     # on | off | a link to the venue's Q&A tool (the presenter view can also switch it off)
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
 room: vis2026
@@ -23,7 +23,8 @@ HOW THIS FILE WORKS
 Each slide starts with `---`. Optional settings go between two `---` lines:
   id        stable name (used in links and questions)
   layout    title | section | photo | content (default) | end
-  image     section and photo: the picture behind the slide (credit: a source line)
+  image     section and photo: the picture behind the slide (credit: a source line;
+            cite: on a photo slide, the paper behind its example)
   chapter   label in the footer band
   kicker    running head, for wayfinding only: `RQ2 · Record`, `Result 1 · Scatterplot`
   columns   body split, e.g. `7 5` or `1 1 1`
@@ -58,7 +59,7 @@ its click number, `wide` to span all columns, `tall` to span two rows, and
   ::layers src="a.png, b.png, c.png" captions="A | B | C" steps
         (images that build one over the other)
   ::bvh steps   ::hunt steps   ::hv steps   (explainer animations; `steps=2` starts at click 2)
-  ::live steps  (live 3D demo of the study's scatterplot: drag, scroll; steps show targets, then cues)
+  ::live tag="…"  (the HeedVision demo, forked: two headsets side by side; drag a view, scroll, click the sphere)
   ::clip src="…" poster="…" title="…" caption="…" ratio=8/5   (looping video, caption below)
   ::venn a=1.19 b=1.46 a-label="…" b-label="…"   (what a pair gain means, as overlapping finds)
   ::art name=split   (line illustration)
@@ -84,31 +85,32 @@ Make your own with :::define, then use it like any other component.
 id: title
 layout: title
 chapter: Motivation
-time: 15
+time: 13
 ---
 
 :::notes
 Hi, I'm Arvind Srinivasan, and this is joint work with Niklas Elmqvist.
 
-HeedVision shows people analyzing data together in mixed reality where each of them has looked. Scan the code to follow along or ask questions.
+HeedVision shows people analyzing data together in mixed reality where each of them has looked. Scan the code to follow along.
 :::
 
 ---
 id: hook-up
 layout: photo
 chapter: Motivation
-image: assets/fig/hook-embedding.jpg
-alt: Thousands of grey spheres float in clusters against a dark background, seen from inside.
-credit: 3D t-SNE of the scikit-learn digits, standing in for a cell atlas
+image: assets/fig/hook-cells.jpg
+alt: A UMAP of single-cell RNA-seq data on black: thousands of cells in coloured clusters, with a few green cells scattered between them.
+credit: UMAP of single-cell data · NIAID, public domain
+cite: Legetth et al., CellexalVR, iScience 2021
 time: 8
 ---
 
 # Some data has no up,
 
-## A biologist steps inside an embedding of thousands of cells, hunting for a rare type.
+## A biologist searches an embedding of thousands of cells for one rare type.
 
 :::notes
-Picture a biologist inside a 3D embedding of thousands of cells, hunting for a rare type. There's no up.
+Picture a biologist searching an embedding of thousands of cells for one rare type, in VR. Nothing in it is up or down.
 :::
 
 ---
@@ -116,17 +118,18 @@ id: hook-landmarks
 layout: photo
 chapter: Motivation
 image: assets/fig/hook-molecule.jpg
-alt: A DNA double helix of grey spheres runs diagonally across a dark background.
-credit: B-DNA, drawn from its helix geometry
+alt: The grey molecular surface of the CHK2 kinase on black, with a small red inhibitor sitting in a pocket.
+credit: CHK2 kinase with an inhibitor in its pocket · BaptisteGrandGrand, CC BY-SA 4.0
+cite: O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018
 time: 7
 ---
 
 # no landmarks,
 
-## A chemist circles a molecule, looking for the one place a drug could bind.
+## A chemist searches a protein's surface for the pocket where a drug fits.
 
 :::notes
-A chemist circling a molecule, looking for where a drug could bind. No landmarks.
+A chemist searching a protein's surface for the pocket where a drug fits. Every bump looks like the next.
 :::
 
 ---
@@ -134,17 +137,18 @@ id: hook-alone
 layout: photo
 chapter: Motivation
 image: assets/fig/hook-network.jpg
-alt: A dense 3D network of grey nodes and faint edges against a dark background.
-credit: A generated 3D network
+alt: The Opte Project's map of the Internet: a dense web of coloured lines between hosts, with one hub magnified.
+credit: Partial map of the Internet, 2005 · The Opte Project, CC BY 2.5
+cite: Cordeil et al., collaborative network analysis in VR, TVCG 2017
 time: 9
 ---
 
 # and too much to search alone.
 
-## An analyst flies through a network of thousands of hosts, looking for the one that shouldn't be talking.
+## An analyst searches thousands of hosts for the one that's been compromised.
 
 :::notes
-An analyst in a network of thousands of hosts, looking for the one that shouldn't be talking. Too much for one person.
+And an analyst searching thousands of hosts for the one that's been compromised. Too much for one person.
 :::
 
 ---
@@ -290,7 +294,7 @@ We capture it through proxies like pointing, head direction or eye tracking, eac
 id: record
 chapter: Idea
 kicker: RQ2 · Record
-time: 38
+time: 36
 ---
 
 # One recorded session, combined five ways: each way shows a different pattern
@@ -298,11 +302,11 @@ time: 38
 ::demo steps snapshot tag="One recorded session"
 
 :::notes
-Recording: one session of two people. Each spot keeps one value per person that grows while someone looks, and fades. Same data, five ways.
+One session of two people. Each spot keeps one value per person that grows while someone looks, and fades.
 
-Count: how many people looked here. Just grey squares.
+Count: how many people looked here.
 
-[click] Sum: faint where attention was brief, solid where heavy. That shows coverage.
+[click] Sum: faint where brief, solid where heavy. That shows coverage.
 
 [click] Max: the stronger of the two.
 
@@ -383,7 +387,7 @@ HeedVision runs in the Quest 3 browser, on Spatialstrates, so both headsets shar
 id: bvh
 chapter: System
 columns: 7 5
-time: 36
+time: 34
 ---
 
 # A bounding volume hierarchy turns any chart into voxels that collect attention
@@ -403,9 +407,9 @@ Straight out of each headset, it hits the nearest voxel, which gains attention, 
 :::
 
 :::notes
-Under the hood. When a chart loads, we wrap its geometry in a bounding volume hierarchy: boxes inside boxes.
+Under the hood: when a chart loads, we wrap its geometry in a bounding volume hierarchy, boxes inside boxes.
 
-[click] Then we lay a grid over it. The boxes rule out most cells without testing a single triangle; only cells touching the geometry become voxels. So attention sticks to the data.
+[click] Then we lay a grid over it. The boxes rule out most cells without testing a triangle; only cells touching the geometry become voxels.
 
 [click] Ten times a second, a ray straight out of the centre of each headset's view hits the nearest voxel and adds to that person's value, which then fades. Head direction, because the Quest 3 has no eye tracking.
 :::
@@ -469,26 +473,27 @@ Then the real question: does it help?
 ---
 id: task
 chapter: Study
-columns: 7 5
-time: 36
+columns: 1 1 1
+rows: 5 2
+time: 32
 ---
 
 # The task: a treasure hunt for targets that light up only up close
 
-::live steps=1 tag="Live · the study's scatterplot"
+::live wide tag="Live · the HeedVision demo, forked"
 
-:::stack
 ::stat value="10 min" label="per hunt, as a pair"
-::stat value="5%" label="of voxels hide a target, lit only within 10 cm, from its open side" step=1
+
+::stat value="5%" label="of voxels hide a target, lit only from within 10 cm" step=1
+
 ::stat value="1 of 2" label="hunts had the cues on" step=2
-:::
 
 :::notes
-Here's the task, live, on the study's scatterplot. The blue circle is where I'm looking; the orange head is a simulated partner. Pairs had ten minutes to find hidden targets.
+This is our demo, live: two headsets, one shared scene. Wherever each person looks, voxels fill in: blue for your own, gold for your partner's, pink where you both looked. Click the sphere and your voxels hide; participants had that switch too. Pairs had ten minutes per hunt.
 
-[click] Targets were five percent of the voxels, spread evenly; participants couldn't see them like this. One lit up only from within ten centimetres, from its open side, so you had to get close.
+[click] Five percent of the voxels hid a target, and one lit up only from within ten centimetres, so you had to get close.
 
-[click] And in one of their two hunts, the cues were on.
+[click] In one of their two hunts, the cues were on.
 :::
 
 ---
@@ -496,7 +501,7 @@ id: why-task
 chapter: Study
 columns: 1 1
 rows: 1 1
-time: 30
+time: 26
 ---
 
 # A treasure hunt isolates what cues should change: how a pair splits up a space
@@ -518,11 +523,11 @@ Targets found, space covered and overlap give plain numbers from a 10-minute hun
 :::
 
 :::notes
-Why a treasure hunt? Our question is how a pair divides a space, and here the only unknown is where the targets are. The pair must decide who covers what; a filter would skip the search.
+Why a treasure hunt? The only unknown is where the targets are, so the pair must decide who covers what.
 
 [click] It needs no domain expertise, so nothing else muddies the coordination.
 
-[click] It mirrors needle-in-a-haystack search in exploratory analysis, and visual search is a standard probe in immersive analytics.
+[click] It mirrors needle-in-a-haystack search, a standard probe in immersive analytics.
 
 [click] And it gives clear numbers in ten minutes.
 :::
@@ -584,28 +589,6 @@ With four pairs per condition, these are trends, not significant results.
 :::
 
 ---
-id: scatter-talk
-chapter: Study
-kicker: Result 1 · Scatterplot
-columns: 5 6
-time: 20
----
-
-# Pairs split the space once, and then the colours did the talking
-
-::art name=split
-
-:::quote who="P3 · scatterplot, with cues"
-We cut the space into top and bottom, and one search for top another search for the bottom.
-:::
-
-::caveat text="Less talk can mean lower coordination cost, or less shared discussion. We read it with care."
-
-:::notes
-Coordination changed too. Pairs agreed on a split up front, here top and bottom, and the colours kept them to it. One said that with cues, they didn't talk at all. That can mean lower cost, or less discussion.
-:::
-
----
 id: terrain
 chapter: Study
 kicker: Result 2 · Terrain
@@ -649,11 +632,83 @@ Yet terrain gave our clearest result. With cues, a pair found 1.46 times what it
 :::
 
 ---
+id: strategies-cues
+chapter: Study
+kicker: Result 3 · Strategies
+columns: 1 1 1
+time: 20
+---
+
+# With cues, pairs split the space and let the colours keep score
+
+:::card icon=split title="Spatial division" tone=you cite="P3 · scatterplot, with cues"
+Each takes a region. Pairs did it in every condition, most with cues on the scatterplot.
+
+> “We cut the space into top and bottom, and one search for top another search for the bottom.”
+:::
+
+:::card icon=scan title="Systematic search" tone=both step cite="P12 · scatterplot, with cues"
+Sweep your own region in order, then check what is still blank.
+
+> “I took one half and systematically searched through it.”
+:::
+
+:::card icon=palette title="Visual feedback" tone=partner step cite="P14 · terrain, with cues"
+Read the colours to see what is covered. Only possible with cues; most common on terrain.
+
+> “Used the voxel system to avoid redundant searches.”
+:::
+
+:::notes
+We found six ways pairs coordinated. With cues, they split the space, often top and bottom.
+
+[click] They swept their own half in order.
+
+[click] And they read the colours to stay off each other's ground. On the scatterplot, one pair said they didn't talk at all.
+:::
+
+---
+id: strategies-without
+chapter: Study
+kicker: Result 3 · Strategies
+columns: 1 1 1
+time: 16
+---
+
+# Without cues, pairs fell back on talk, the room, and any landmarks the data had
+
+:::card icon=chat title="Verbal coordination" cite="P13 · scatterplot, no cues"
+Describe positions out loud. Common without cues on the scatterplot; gone with them.
+
+> “We tried to coordinate verbally by describing positions relative to the Scatter structure.”
+:::
+
+:::card icon=flag title="Landmark navigation" step cite="P10 · terrain, no cues"
+Use peaks and clusters as reference points: on terrain always, on the scatterplot only without cues.
+
+> “We used landmarks and described roughly in which area we found the targets.”
+:::
+
+:::card icon=align title="Physical synchronization" step cite="P6 · scatterplot, no cues"
+Line both copies up in the room, so pointing means the same thing. Only without cues.
+
+> “We placed the Scatter in the same location in the room using the yellow triangle.”
+:::
+
+:::notes
+Without cues, pairs talked positions through.
+
+[click] They used landmarks wherever the data had them.
+
+[click] And some lined up both copies in the room, so pointing would work.
+:::
+
+---
 id: people
 chapter: Study
 columns: 1 1 1
 rows: 1 1
-time: 22
+time: 21
 ---
 
 # 15 of 16 people preferred working with the cues

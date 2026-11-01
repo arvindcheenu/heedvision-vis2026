@@ -56,9 +56,10 @@
     progress: false,
     slideNumber: false,
     fragments: !isPoster,
-    transition: isPoster ? "none" : "fade",
-    backgroundTransition: "fade",
-    autoAnimate: !isPoster && !reduceMotion,
+    // embedded in the talk page, the slide follows scrolling: switch instantly, no cross-fades
+    transition: isPoster || isEmbed ? "none" : "fade",
+    backgroundTransition: isEmbed ? "none" : "fade",
+    autoAnimate: !isPoster && !isEmbed && !reduceMotion,
     autoAnimateEasing: "cubic-bezier(0.2, 0, 0, 1)",
     autoAnimateDuration: 0.8,
     viewDistance: 3,
@@ -133,7 +134,7 @@
   // ---------------------------------------------------------- simulations and animations
   const fields = new Map();
   const explainers = new Map();
-  const lives = new Map(); // live 3D demos (js/voxdemo.js), loaded only when a slide has one
+  const lives = new Map(); // live 3D demos (js/hvdemo.js), loaded only when a slide has one
   const SWATCH = { none: "var(--dot-off)", count: "var(--field-swatch)", sum: "linear-gradient(90deg,transparent,var(--field-swatch))", max: "linear-gradient(90deg,color-mix(in oklab,var(--field-swatch) 40%,transparent),var(--field-swatch))", diff: "linear-gradient(90deg,var(--field-swatch),transparent,var(--field-swatch))", who: "linear-gradient(135deg,var(--you),var(--both),var(--partner))" };
   function initFields() {
     document.querySelectorAll("canvas[data-field]").forEach((cv) => {
@@ -166,7 +167,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/voxdemo.js?v=20261106", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261107", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -211,10 +212,35 @@
       let v = 1.5;
       for (; v > 0.72; v -= 0.05) {
         els.forEach((el) => el.style.setProperty(prop, v.toFixed(2)));
+        alignRows(els);
         if (!over()) break;
       }
     });
     sec.dataset.fitted = "1";
+  }
+  // Cards side by side line up: each title, text and quote starts on the same line
+  // as its neighbours', however many lines the one above it took.
+  function alignRows(els) {
+    const rows = new Map();
+    els.forEach((el) => {
+      el.querySelectorAll("[data-aligned]").forEach((c) => { c.style.minHeight = ""; delete c.dataset.aligned; });
+      const r = el.getBoundingClientRect(), key = `${Math.round(r.top)}:${Math.round(r.height)}`;
+      rows.set(key, [...(rows.get(key) || []), el]);
+    });
+    const parts = (el) => [...el.children].filter((c) => { const cs = getComputedStyle(c); return cs.position !== "absolute" && cs.display !== "none"; });
+    const sig = (c) => `${c.tagName}.${c.className}`;
+    const align = (group) => {
+      const kids = group.map(parts);
+      if (kids.some((k) => k.length !== kids[0].length || k.some((c, i) => sig(c) !== sig(kids[0][i])))) return;
+      kids[0].forEach((_, i) => {
+        const col = kids.map((k) => k[i]);
+        if (parseFloat(getComputedStyle(col[0]).flexGrow) > 0) return; // pictures take what's left
+        align(col);
+        const h = Math.max(...col.map((c) => c.offsetHeight));
+        col.forEach((c) => { c.style.minHeight = `${h}px`; c.dataset.aligned = ""; });
+      });
+    };
+    rows.forEach((group) => group.length > 1 && align(group));
   }
   document.fonts && document.fonts.ready.then(() => {
     slides().forEach((s) => delete s.dataset.fitted);
@@ -466,10 +492,17 @@
     const idx = mainSlides().indexOf(cur);
     window.parent.postMessage({ hv: "state", ...currentState(), prev: a.prev || r.left, next: a.next || r.right, index: idx < 0 ? slides().indexOf(cur) : idx, total: mainSlides().length, backup: cur.hasAttribute("data-backup"), title: titleOf(cur.id) }, location.origin);
   }
+  // a jump from scrolling lands on the build at once, without replaying its animations
+  function jump(s) {
+    const root = document.documentElement;
+    root.classList.add("hv-jump");
+    goTo(s);
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("hv-jump")));
+  }
   if (isEmbed) {
     addEventListener("message", (e) => {
       if (e.origin !== location.origin || !e.data || e.data.hv !== "go") return;
-      if (e.data.id) goTo(e.data);
+      if (e.data.id) jump(e.data);
       else if (e.data.dir === "next") deck.next();
       else if (e.data.dir === "prev") deck.prev();
       else if (e.data.dir === "build") deck.slide(deck.getIndices().h, 0, e.data.f);
