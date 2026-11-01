@@ -3,12 +3,13 @@
 // audience's questions, and fans updates out over hibernatable WebSockets.
 //
 //   GET /rooms/:room/ws      WebSocket (add ?key=PRESENTER_KEY to present)
-//   GET /rooms/:room/state   current slide + visible questions as JSON
+//   GET /rooms/:room/state   current slide, visible questions and script edits as JSON
 import { DurableObject } from "cloudflare:workers";
 
 const MAX_TEXT = 600;
 const MAX_NAME = 60;
 const MAX_QUESTIONS = 2000;
+const MAX_NOTES = 12000;
 
 export default {
   async fetch(req, env) {
@@ -41,13 +42,14 @@ export class Room extends DurableObject {
       votes INTEGER NOT NULL DEFAULT 0, ts INTEGER, hidden INTEGER NOT NULL DEFAULT 0)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS votes (qid TEXT, voter TEXT, PRIMARY KEY (qid, voter))`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, md TEXT, base TEXT, ts INTEGER)`);
     this.buckets = new Map(); // in-memory rate limits; reset when the object sleeps
   }
 
   async fetch(req) {
     const url = new URL(req.url);
     if (url.pathname.endsWith("/state")) {
-      return Response.json({ slide: this.slide(), questions: this.questions() });
+      return Response.json({ slide: this.slide(), questions: this.questions(), notes: this.notes() });
     }
     const key = url.searchParams.get("key") || "";
     const presenter = await isPresenterKey(key, this.env.PRESENTER_KEY);
@@ -55,12 +57,12 @@ export class Room extends DurableObject {
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({ presenter, ip });
-    server.send(JSON.stringify({ t: "init", presenter, slide: this.slide(), questions: this.questions() }));
+    server.send(JSON.stringify({ t: "init", presenter, slide: this.slide(), questions: this.questions(), notes: this.notes() }));
     return new Response(null, { status: 101, webSocket: client });
   }
 
   async webSocketMessage(ws, raw) {
-    if (typeof raw !== "string" || raw.length > 4096) return;
+    if (typeof raw !== "string" || raw.length > MAX_NOTES + 1024) return;
     let m;
     try { m = JSON.parse(raw); } catch { return; }
     const { presenter, ip } = ws.deserializeAttachment() || {};
@@ -97,6 +99,17 @@ export class Room extends DurableObject {
       if (!ins.rowsWritten) return;
       const votes = this.sql.exec("UPDATE questions SET votes = votes + 1 WHERE id = ? RETURNING votes", id).one().votes;
       this.broadcast({ t: "votes", id, votes });
+    } else if (m.t === "notes") {
+      // presenter only: an edited script for one slide (empty text removes the edit)
+      if (!presenter) return;
+      const id = cleanId(m.id);
+      const base = cleanId(m.base, 16);
+      if (!id || !base) return;
+      const md = String(m.md ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").slice(0, MAX_NOTES);
+      const ts = Date.now();
+      if (md.trim()) this.sql.exec("INSERT OR REPLACE INTO notes (id, md, base, ts) VALUES (?, ?, ?, ?)", id, md, base, ts);
+      else this.sql.exec("DELETE FROM notes WHERE id = ?", id);
+      this.broadcast({ t: "notes", id, md: md.trim() ? md : "", base, ts });
     } else if (m.t === "hide") {
       if (!presenter) return;
       const id = cleanId(m.id, 64);
@@ -119,6 +132,10 @@ export class Room extends DurableObject {
       .exec("SELECT id, slide, text, name, votes, ts FROM questions WHERE hidden = 0 ORDER BY ts LIMIT 1000")
       .toArray()
       .map((q) => ({ ...q, hidden: false }));
+  }
+
+  notes() {
+    return this.sql.exec("SELECT id, md, base, ts FROM notes ORDER BY id LIMIT 500").toArray();
   }
 
   broadcast(msg, except) {

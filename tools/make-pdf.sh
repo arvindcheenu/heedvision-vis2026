@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Exports a PDF backup of the deck: one 1920x1080 page per slide, builds shown.
 # (Image-based: reveal's own print view needs a visible window to lay out.)
-# Needs a local server on :8000 and Google Chrome.
+# Needs a local server on :8000 (node tools/serve.mjs) and Google Chrome.
+# THEME=light or THEME=dark picks the colours (default dark).
 set -euo pipefail
-curl -sf -o /dev/null "${BASE:-http://127.0.0.1:8000}/slides/index.html" || { echo "No server on ${BASE:-http://127.0.0.1:8000}; start one with: python3 -m http.server 8000" >&2; exit 1; }
+curl -sf -o /dev/null "${BASE:-http://127.0.0.1:8000}/slides/index.html" || { echo "No server on ${BASE:-http://127.0.0.1:8000}; start one with: node tools/serve.mjs" >&2; exit 1; }
 cd "$(dirname "$0")/.."
 CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 BASE="${BASE:-http://127.0.0.1:8000}"
@@ -15,7 +16,7 @@ shot() {
 }
 pages=""
 for id in $(grep -E '^id: ' slides/talk.md | sed -E 's/^id: *//'); do
-  shot --screenshot="$TMP/$id.png" "$BASE/slides/?poster#/$id"
+  shot --screenshot="$TMP/$id.png" "$BASE/slides/?poster&theme=${THEME:-dark}#/$id"
   pages="$pages<img src=\"$id.png\">"
   echo "page: $id"
 done

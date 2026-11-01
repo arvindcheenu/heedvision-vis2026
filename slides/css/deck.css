@@ -1,6 +1,50 @@
-/* HeedVision deck. Uses the shared tokens in ../shared/hv.css (dark).
+/* HeedVision deck. Uses the shared tokens in ../shared/hv.css, light or dark.
    Every content slide has the same frame: kicker + headline + dek on top,
    a grid of components below, and the footer band. */
+
+/* deck-only tokens; light first, dark below */
+:root {
+  --sheen-a: rgba(255, 255, 255, 0.9);
+  --sheen-b: rgba(255, 255, 255, 0);
+  --tile-line: rgba(20, 20, 32, 0.09);
+  --tile-shadow: 0 1px 2px rgba(20, 20, 32, 0.04), 0 12px 32px -18px rgba(20, 20, 32, 0.18);
+  --track: rgba(20, 20, 32, 0.06);
+  --bar-a: rgba(20, 20, 32, 0.22);
+  --dot-off: rgba(20, 20, 32, 0.09);
+  --glyph-line: rgba(20, 20, 32, 0.35);
+  --glyph-fill: rgba(20, 20, 32, 0.08);
+  --person: #6b6e7c;
+  --sphere-hi: #e4e5ec;
+  --sphere-lo: #a7aab8;
+  --field-cell: rgba(20, 20, 32, 0.05);
+  --field-grey: rgb(92, 95, 110);
+  --field-swatch: #5c5f6e;
+  --field-ink: #15161b;
+  --field-numeral: #ffffff;
+  --x-ink: #15161b; --x-muted: #6b6e7c; --x-line: #8a8d9c; --x-geo: #c9ccd8; --x-bg: #ffffff;
+  --band: color-mix(in oklab, var(--vis-peach) 45%, transparent);
+}
+.dark {
+  --sheen-a: rgba(255, 255, 255, 0.055);
+  --sheen-b: rgba(255, 255, 255, 0.018);
+  --tile-line: rgba(255, 255, 255, 0.09);
+  --tile-shadow: none;
+  --track: rgba(255, 255, 255, 0.05);
+  --bar-a: rgba(233, 230, 255, 0.3);
+  --dot-off: rgba(255, 255, 255, 0.12);
+  --glyph-line: rgba(255, 255, 255, 0.38);
+  --glyph-fill: rgba(255, 255, 255, 0.12);
+  --person: #d9d9e3;
+  --sphere-hi: #5a5e6c;
+  --sphere-lo: #22242c;
+  --field-cell: rgba(255, 255, 255, 0.05);
+  --field-grey: rgb(222, 222, 230);
+  --field-swatch: #dedee6;
+  --field-ink: #ffffff;
+  --field-numeral: #15161b;
+  --x-ink: #f3f2f7; --x-muted: #9c9cab; --x-line: #8d8fa0; --x-geo: #3a3c48; --x-bg: #15161c;
+  --band: color-mix(in oklab, var(--vis-peach) 9%, transparent);
+}
 
 .reveal-viewport { background: var(--bg); }
 .stage {
@@ -34,8 +78,7 @@
 /* ---------- the content frame ---------- */
 .frame { position: absolute; inset: 92px 120px 150px; display: flex; flex-direction: column; gap: 40px; }
 .s-head .kicker { font-size: 22px; letter-spacing: 0.12em; margin-bottom: 18px; }
-.s-head .kicker::before { width: 12px; height: 12px; border-radius: 3px; }
-.s-head h2 { font-size: 72px; font-weight: 560; line-height: 1.05; max-width: 25ch; }
+.s-head h2 { font-size: 72px; font-weight: 560; line-height: 1.05; max-width: 33ch; }
 .s-head .dek { margin-top: 16px; font-size: 32px; color: var(--fg-2); max-width: 46ch; }
 .s-body { flex: 1; min-height: 0; display: grid; gap: 28px; grid-auto-rows: minmax(0, 1fr); }
 .s-body > p { font-size: 34px; color: var(--fg-2); align-self: center; }
@@ -47,9 +90,10 @@
   position: relative;
   min-height: 0;
   border-radius: 28px;
-  padding: 36px 40px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)), var(--surface);
-  border: 1px solid var(--line);
+  padding: 34px 38px;
+  background: linear-gradient(180deg, var(--sheen-a), var(--sheen-b)), var(--surface);
+  border: 1px solid var(--tile-line);
+  box-shadow: var(--tile-shadow);
   overflow: hidden;
 }
 .tile.flush { padding: 0; }
@@ -63,19 +107,30 @@
 
 .c-row { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: 28px; min-height: 0; }
 .c-stack { display: flex; flex-direction: column; gap: 28px; min-height: 0; }
-.c-stack > * { flex: 1; }
+.c-stack > * { flex: 1 1 auto; }
+/* stats size their numbers to the tile, so in a stack they take equal shares */
+.c-stack > .c-stat { flex: 1 1 0; }
 .c-spacer { min-height: 0; }
 
-.c-card h3 { font-size: 42px; font-weight: 560; line-height: 1.12; }
-.c-card h3 + p, .c-card h3 + ul { margin-top: 16px; }
-.c-card p { font-size: 30px; color: var(--fg-2); }
-.c-card p + p { margin-top: 12px; }
-.c-card li { font-size: 32px; color: var(--fg); }
+/* Card and quote type is fitted to its tiles by deck.js (fitText): --fs / --fq is
+   the largest scale at which nothing on the slide overflows. In a tall tile the
+   closing paragraph sits on the bottom edge: label on top, message at the bottom. */
+.c-card { --fs: 1; display: flex; flex-direction: column; gap: 14px; }
+.c-card > p:last-child:not(:first-child) { margin-top: auto; }
+.c-card > .label { margin-bottom: 0; }
+.c-card h3 { font-size: calc(var(--fs) * 44px); font-weight: 560; line-height: 1.08; }
+.c-card p { font-size: calc(var(--fs) * 31px); line-height: 1.3; color: var(--fg-2); }
+.c-card p + p { margin-top: 10px; }
+.c-card li { font-size: calc(var(--fs) * 31px); line-height: 1.3; color: var(--fg); }
+.c-card ul + p, .c-card ol + p { font-size: calc(var(--fs) * 25px); }
+.c-card .c-glyph { flex: 1; min-height: 0; display: flex; align-items: center; }
+.c-card table { font-size: calc(var(--fs) * 24px); }
+.c-stack .c-card { gap: 10px; padding-top: 26px; padding-bottom: 28px; }
 
 .c-stat, .c-dots { container-type: size; }
 .c-stat { display: flex; flex-direction: column; justify-content: center; }
 .c-stat .v { font-family: var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 0; font-size: clamp(64px, min(36cqh, 22cqw), 150px); font-weight: 560; line-height: 0.95; letter-spacing: -0.03em; white-space: nowrap; color: var(--tone, var(--fg)); }
-.c-stat .l { margin-top: 14px; font-size: clamp(22px, 9cqh, 32px); color: var(--fg); line-height: 1.25; }
+.c-stat .l { margin-top: 14px; font-size: clamp(24px, min(9cqh, 5cqw), 34px); color: var(--fg); line-height: 1.25; }
 .c-stat .l:first-child { margin: 0 0 12px; font-size: 22px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-3); }
 .c-stat .s { margin-top: 10px; font-size: 24px; color: var(--fg-3); }
 
@@ -86,8 +141,8 @@
 .cmp-head .change { font-family: var(--f-display); font-variation-settings: "SOFT" 100; font-size: 76px; font-weight: 560; line-height: 1; color: var(--tone, var(--both)); }
 .cmp-row { display: grid; grid-template-columns: 220px 1fr 190px; gap: 22px; align-items: center; }
 .cmp-row .who { font-size: 26px; color: var(--fg-2); line-height: 1.15; }
-.cmp-row .track { height: 58px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); overflow: hidden; }
-.cmp-row .track i { display: block; height: 100%; width: 0; border-radius: 14px; background: rgba(233, 230, 255, 0.3); transition: width 1100ms var(--ease-emph) 250ms; }
+.cmp-row .track { height: 58px; border-radius: 14px; background: var(--track); overflow: hidden; }
+.cmp-row .track i { display: block; height: 100%; width: 0; border-radius: 14px; background: var(--bar-a); transition: width 1100ms var(--ease-emph) 250ms; }
 .cmp-row.b .track i { background: var(--tone, var(--both)); }
 .reveal .slides section.present .cmp-row .track i, body.poster .cmp-row .track i, body.is-embed-still .cmp-row .track i { width: var(--w); }
 .cmp-row b { font-family: var(--f-display); font-variation-settings: "SOFT" 100; font-size: 54px; font-weight: 560; text-align: right; }
@@ -99,7 +154,7 @@
 .c-dots .v { font-family: var(--f-display); font-variation-settings: "SOFT" 100; font-size: clamp(64px, 22cqh, 150px); font-weight: 560; line-height: 0.95; color: var(--tone, var(--both)); }
 .c-dots .v span { font-size: 0.32em; color: var(--fg-2); }
 .c-dots .grid { display: grid; grid-template-columns: repeat(min(var(--of), 8), 46px); gap: 14px; }
-.c-dots .grid i { width: 46px; height: 46px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
+.c-dots .grid i { width: 46px; height: 46px; border-radius: 50%; background: var(--dot-off); }
 .c-dots .grid i.on { background: var(--tone, var(--both)); }
 .c-dots .l { font-size: 32px; color: var(--fg); }
 
@@ -119,16 +174,16 @@
   color: rgba(255, 255, 255, 0.88);
 }
 
-.c-quote { margin: 0; display: flex; flex-direction: column; justify-content: center; }
-.c-quote p { font-family: var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 0; font-style: italic; font-size: 40px; line-height: 1.22; }
-.c-quote cite { margin-top: 16px; font-style: normal; font-size: 20px; color: var(--fg-3); }
+.c-quote { --fq: 1; margin: 0; display: flex; flex-direction: column; justify-content: center; }
+.c-quote p { font-family: var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 0; font-style: italic; font-size: calc(var(--fq) * 42px); line-height: 1.2; }
+.c-quote cite { margin-top: 20px; font-style: normal; font-size: 22px; color: var(--fg-3); }
 
-.c-step { display: flex; flex-direction: column; }
+.c-step { --fs: 1; display: flex; flex-direction: column; }
 .c-step .n { font-size: 22px; font-weight: 650; letter-spacing: 0.1em; color: var(--fg-3); }
-.c-step h3 { margin-top: 8px; font-size: 54px; }
-.c-step p { margin-top: 18px; font-size: 30px; color: var(--fg-2); }
+.c-step h3 { margin-top: 8px; font-size: calc(var(--fs) * 54px); }
+.c-step p { margin-top: auto; padding-top: 18px; font-size: calc(var(--fs) * 32px); line-height: 1.3; color: var(--fg-2); }
 
-.c-glyph svg { width: 100%; height: 170px; display: block; color: var(--fg); margin-bottom: 18px; }
+.c-glyph svg { width: 100%; height: 100%; max-height: 240px; min-height: 120px; display: block; color: var(--fg); }
 
 .c-caveat { display: inline-flex; align-items: center; gap: 12px; font-size: 22px; color: var(--fg-2); align-self: end; }
 .c-caveat::before { content: "i"; flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--fg-3); font-size: 16px; font-weight: 700; }
@@ -155,15 +210,35 @@
   gap: 2px 16px;
   padding: 0 22px;
   border-radius: 22px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-  transition: background 400ms var(--ease), border-color 400ms var(--ease);
+  border: 1px solid var(--tile-line);
+  background: var(--surface);
+  transition: background 400ms var(--ease), border-color 400ms var(--ease), opacity 500ms var(--ease), transform 500ms var(--ease);
 }
 .seg-ctl button b { font-size: 30px; font-weight: 600; }
 .seg-ctl button span { grid-column: 2; font-size: 21px; color: var(--fg-3); }
 .seg-ctl button i { grid-row: span 2; align-self: center; width: 36px; height: 36px; border-radius: 10px; }
-.seg-ctl button[aria-pressed="true"] { background: color-mix(in oklab, var(--both) 16%, var(--surface)); border-color: color-mix(in oklab, var(--both) 45%, transparent); }
+/* the current mode is marked in neutral ink, so no colour shows before "who" */
+.seg-ctl button[aria-pressed="true"] { background: var(--surface-2); border-color: var(--fg-2); }
+.seg-ctl button[data-mode="who"][aria-pressed="true"] { background: color-mix(in oklab, var(--both) 14%, var(--surface)); border-color: color-mix(in oklab, var(--both) 50%, transparent); }
+.seg-ctl button.later { opacity: 0; transform: translateY(12px); pointer-events: none; }
+.seg-ctl button i { box-shadow: inset 0 0 0 1px var(--tile-line); }
 .seg-ctl button[aria-pressed="true"] span { color: var(--fg-2); }
+
+/* layers: images that build one over the other */
+.c-layers { margin: 0; padding: 0; display: flex; flex-direction: column; }
+.c-layers .layer-box { position: relative; flex: 1; min-height: 0; margin: 22px 22px 0; }
+.c-layers .layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 900ms var(--ease); }
+.c-layers .layer[data-i="0"] { opacity: 1; }
+.c-layers[data-at="1"] .layer[data-i="1"], .c-layers[data-at="2"] .layer[data-i="1"] { opacity: var(--fade, 0.85); }
+.c-layers[data-at="2"] .layer[data-i="2"], .c-layers[data-at="3"] .layer[data-i="2"], .c-layers[data-at="3"] .layer[data-i="3"] { opacity: 1; }
+.c-layers .layer-caps { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 16px 22px 20px; font-size: 20px; color: var(--fg-3); }
+.c-layers .layer-caps span { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--tile-line); transition: background 500ms var(--ease), color 500ms var(--ease); }
+.c-layers[data-at="0"] .layer-caps span[data-i="0"], .c-layers[data-at="1"] .layer-caps span[data-i="1"], .c-layers[data-at="2"] .layer-caps span[data-i="2"], .c-layers[data-at="3"] .layer-caps span[data-i="3"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* explainer animations (js/explain.js) */
+.c-explain { display: flex; }
+.c-explain canvas { flex: 1; width: 100%; height: 100%; display: block; min-height: 0; }
+.c-explain .tag { position: absolute; right: 18px; top: 18px; font-size: 18px; padding: 6px 14px; border-radius: 999px; background: var(--surface-2); color: var(--fg-2); }
 
 /* design space */
 .c-ds { display: grid; grid-template-columns: 70px 1fr 1fr 380px; grid-template-rows: 50px 1fr 1fr; gap: 20px; min-height: 0; }
@@ -182,7 +257,7 @@
 .c-ds.picked .hv, .c-ds[data-picked] .hv { border-color: color-mix(in oklab, var(--both) 60%, transparent); box-shadow: 0 0 70px -24px var(--both); }
 .c-ds.picked .badge, .c-ds[data-picked] .badge { opacity: 1; }
 .c-ds.picked .quad.done, .c-ds[data-picked] .quad.done { opacity: 0.6; }
-.c-ds .quad.done .badge { background: rgba(255, 255, 255, 0.1); color: var(--fg-2); }
+.c-ds .quad.done .badge { background: var(--dot-off); color: var(--fg-2); }
 
 /* questions (live board, or the fallback written in talk.md) */
 .c-questions { display: flex; flex-direction: column; }
@@ -194,7 +269,7 @@
 .c-questions:not(.live) { padding: 0; background: none; border: 0; }
 .qa-fallback { height: 100%; display: flex; flex-direction: column; gap: 24px; }
 .qa-fallback > * { flex: 1; }
-.qa-item { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 16px 20px; border-radius: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line); }
+.qa-item { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 16px 20px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--line); }
 .qa-votes { font-size: 30px; font-weight: 650; text-align: center; color: var(--both); font-variant-numeric: tabular-nums; }
 .qa-text { font-size: 26px; line-height: 1.3; }
 .qa-slide { font-size: 18px; color: var(--fg-3); margin-top: 6px; }
@@ -205,7 +280,7 @@
 .tab-top { top: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 34px) 100%, 0 100%); }
 .tab-bottom { bottom: 0; clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 100%, 0 100%); }
 .logo-vis { height: 100%; width: auto; }
-.logo-mono { height: 100%; width: auto; filter: invert(1) brightness(1.8); opacity: 0.92; }
+.logo-mono { height: 100%; width: auto; filter: var(--logo-filter); opacity: 0.92; }
 
 /* title */
 .layout-title canvas.field {
@@ -224,7 +299,6 @@
   clip-path: polygon(64px 0, 100% 0, 100% 100%, 0 100%, 0 64px);
 }
 .title-panel .kicker { color: rgba(255, 255, 255, 0.8); font-size: 22px; letter-spacing: 0.12em; }
-.title-panel .kicker::before { background: #fff; width: 12px; height: 12px; }
 .title-panel h1 { color: #fff; font-size: 172px; font-weight: 620; line-height: 0.95; margin-top: 18px; }
 .title-panel .subtitle { font-family: var(--f-display); font-variation-settings: "SOFT" 100; font-weight: 420; font-size: 50px; line-height: 1.12; color: rgba(255, 255, 255, 0.9); margin-top: 18px; max-width: 24ch; }
 .title-panel .byline { margin-top: 38px; font-size: 30px; color: rgba(255, 255, 255, 0.88); display: flex; gap: 28px; align-items: baseline; }
@@ -271,12 +345,12 @@
 .hv-chrome .band {
   position: absolute; left: 86px; right: 0; bottom: 0; height: 64px;
   padding: 0 120px 0 34px; display: flex; align-items: center; justify-content: space-between;
-  background: color-mix(in oklab, var(--vis-peach) 9%, transparent);
+  background: var(--band);
   clip-path: polygon(26px 0, 100% 0, 100% 100%, 0 100%, 0 26px);
 }
 .rail { display: flex; gap: 10px; align-items: center; }
 .rail .seg { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
-.rail .seg i { display: block; height: 4px; width: 36px; border-radius: 4px; background: rgba(255, 255, 255, 0.12); overflow: hidden; position: relative; }
+.rail .seg i { display: block; height: 4px; width: 36px; border-radius: 4px; background: var(--dot-off); overflow: hidden; position: relative; }
 .rail .seg i::after { content: ""; position: absolute; inset: 0; background: var(--fg-2); transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform 800ms var(--ease-emph); }
 .rail .seg.done i::after { --p: 1; background: var(--fg-3); }
 .rail .seg.now { color: var(--fg); }

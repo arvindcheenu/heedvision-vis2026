@@ -130,6 +130,12 @@
     return `<${tag} class="${c}"${d}${extra}>${inner}</${tag}>`;
   }
   const num = (v) => parseFloat(String(v).replace(/[^\d.\-−]/g, "").replace("−", "-"));
+  // hidden build markers: `steps` adds n clicks, `steps=3` pins the first one to click 3
+  const stepSpans = (a, n) => {
+    if (!a.steps) return "";
+    const from = a.steps !== true ? +a.steps : null;
+    return Array.from({ length: n }, (_, i) => `<span class="fragment step"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("");
+  };
 
   // ---------------------------------------------------------------- components
   const C = {
@@ -144,7 +150,7 @@
       return "";
     },
 
-    notes(a, body, ctx) { ctx.notes.push(md(body)); return ""; },
+    notes(a, body, ctx) { ctx.notesMd.push(String(body || "").trim()); return ""; },
 
     // layout helpers
     stack: (a, body, ctx) => wrap("div", a, "c-stack", blocks(body, ctx).join("")),
@@ -208,6 +214,19 @@
       return wrap("div", a, "c-row c-steps", cells.join(""), ` style="--n:${items.length}"`);
     },
 
+    // stacked images that build one over the other: src="a.png, b.png" captions="A | B"
+    layers(a) {
+      const srcs = String(a.src || "").split(",").map((x) => x.trim()).filter(Boolean);
+      const caps = String(a.captions || "").split("|").map((x) => x.trim());
+      const imgs = srcs.map((src, i) => `<img class="layer" data-i="${i}" src="${esc(src)}" alt="${esc(i ? "" : a.alt || "")}" loading="lazy">`).join("");
+      const legend = caps.some(Boolean) ? `<div class="layer-caps">${caps.map((c, i) => `<span data-i="${i}">${mdi(c)}</span>`).join("")}</div>` : "";
+      return wrap("figure", a, `c-layers tile fit-${esc(a.fit || "contain")}`, `<div class="layer-box" style="--fade:${esc(a.fade || 0.85)}">${imgs}</div>${legend}${stepSpans(a, srcs.length - 1)}`, ' data-stepper data-at="0"');
+    },
+
+    // explainer animations (see js/explain.js); `steps` walks through their phases
+    bvh: (a) => wrap("div", a, "c-explain tile flush", `<canvas data-explain="bvh" aria-label="${esc(a.alt || "Animation: a bounding volume hierarchy voxelizes a chart and head rays collect attention")}"></canvas><span class="tag">${esc(a.tag || "Animation")}</span>${stepSpans(a, 2)}`, ' data-stepper data-at="0"'),
+    hunt: (a) => wrap("div", a, "c-explain tile flush", `<canvas data-explain="hunt" aria-label="${esc(a.alt || "Animation: two people search for hidden targets that light up only up close")}"></canvas><span class="tag">${esc(a.tag || "Animation")}</span>${stepSpans(a, 3)}`, ' data-stepper data-at="0"'),
+
     glyph: (a) => `<div class="c-glyph">${GLYPHS[a.type] || ""}</div>`,
 
     // modes are shown in the order given; `steps` moves to the next one on each
@@ -218,7 +237,7 @@
       const btn = modes.map((m, i) => `<button type="button" data-mode="${m}" aria-pressed="${i === 0}"><i data-swatch="${m}"></i><b>${all[m][0]}</b><span>${all[m][1]}</span></button>`).join("");
       const from = a.steps && a.steps !== true ? +a.steps : null;
       const steps = a.steps ? modes.slice(1).map((m, i) => `<span class="fragment step" data-mode="${m}"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("") : "";
-      return wrap("div", a, `c-demo${a.bare ? " bare" : ""}`,
+      return wrap("div", a, `c-demo${a.bare ? " bare" : ""}${a.steps ? " stepped" : ""}${a.snapshot ? " snapshot" : ""}`,
         `<div class="tile flush"><canvas data-field="demo" aria-label="Simulation of two people's attention"></canvas><span class="tag">${esc(a.tag || "Simulation")}</span></div><div class="seg-ctl" role="group" aria-label="Aggregation">${btn}</div>${steps}`);
     },
 
@@ -254,19 +273,19 @@
     `<img class="logo-mono" src="${base}../shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics">`;
 
   const GLYPHS = {
-    joint: `<svg viewBox="0 0 300 170" aria-hidden="true"><use href="#i-eye" x="30" y="120" width="40" height="40" color="var(--you)"/><use href="#i-eye" x="230" y="120" width="40" height="40" color="var(--partner)"/><path d="M60 130L150 46M240 130L150 46" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="150" cy="42" r="34" fill="url(#g-blob)"/><circle cx="150" cy="42" r="9" fill="var(--both)"/></svg>`,
-    distributed: `<svg viewBox="0 0 300 170" aria-hidden="true"><use href="#i-eye" x="30" y="120" width="40" height="40" color="var(--you)"/><use href="#i-eye" x="230" y="120" width="40" height="40" color="var(--partner)"/><path d="M55 122L60 46M245 122L240 46" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="60" cy="40" r="10" fill="var(--you)"/><circle cx="240" cy="40" r="10" fill="var(--partner)"/></svg>`,
-    sequential: `<svg viewBox="0 0 300 170" aria-hidden="true"><circle cx="60" cy="86" r="12" fill="var(--you)"/><path d="M84 86H200" stroke="rgba(255,255,255,.4)" stroke-width="3"/><path d="M196 74l16 12-16 12" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="3"/><circle cx="240" cy="86" r="12" fill="var(--partner)"/><text x="60" y="140" text-anchor="middle" fill="currentColor" opacity=".5" font-size="22">t₁</text><text x="240" y="140" text-anchor="middle" fill="currentColor" opacity=".5" font-size="22">t₂</text></svg>`,
-    cumulative: `<svg viewBox="0 0 300 170" aria-hidden="true"><g transform="translate(38 16)">${[["you","you","both","partner",""],["you","both","partner","partner",""],["you","","","partner",""]].map((r, y) => r.map((c, x) => `<rect x="${x * 46}" y="${y * 46}" width="40" height="40" rx="8" fill="${c ? `var(--${c})` : "rgba(255,255,255,.08)"}"/>`).join("")).join("")}</g></svg>`,
+    joint: `<svg viewBox="0 0 300 170" aria-hidden="true"><use href="#i-eye" x="30" y="120" width="40" height="40" color="var(--you)"/><use href="#i-eye" x="230" y="120" width="40" height="40" color="var(--partner)"/><path d="M60 130L150 46M240 130L150 46" stroke="var(--glyph-line)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="150" cy="42" r="34" fill="url(#g-blob)"/><circle cx="150" cy="42" r="9" fill="var(--both)"/></svg>`,
+    distributed: `<svg viewBox="0 0 300 170" aria-hidden="true"><use href="#i-eye" x="30" y="120" width="40" height="40" color="var(--you)"/><use href="#i-eye" x="230" y="120" width="40" height="40" color="var(--partner)"/><path d="M55 122L60 46M245 122L240 46" stroke="var(--glyph-line)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="60" cy="40" r="10" fill="var(--you)"/><circle cx="240" cy="40" r="10" fill="var(--partner)"/></svg>`,
+    sequential: `<svg viewBox="0 0 300 170" aria-hidden="true"><circle cx="60" cy="86" r="12" fill="var(--you)"/><path d="M84 86H200" stroke="var(--glyph-line)" stroke-width="3"/><path d="M196 74l16 12-16 12" fill="none" stroke="var(--glyph-line)" stroke-width="3"/><circle cx="240" cy="86" r="12" fill="var(--partner)"/><text x="60" y="140" text-anchor="middle" fill="currentColor" opacity=".5" font-size="22">t₁</text><text x="240" y="140" text-anchor="middle" fill="currentColor" opacity=".5" font-size="22">t₂</text></svg>`,
+    cumulative: `<svg viewBox="0 0 300 170" aria-hidden="true"><g transform="translate(38 16)">${[["you","you","both","partner",""],["you","both","partner","partner",""],["you","","","partner",""]].map((r, y) => r.map((c, x) => `<rect x="${x * 46}" y="${y * 46}" width="40" height="40" rx="8" fill="${c ? `var(--${c})` : "var(--dot-off)"}"/>`).join("")).join("")}</g></svg>`,
   };
 
-  const person = (x, y) => `<use href="#i-person" x="${x}" y="${y}" width="80" height="90" color="#d9d9e3"/>`;
-  const ray = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="rgba(255,255,255,.4)" stroke-width="2.5" stroke-dasharray="5 7"/>`;
+  const person = (x, y) => `<use href="#i-person" x="${x}" y="${y}" width="80" height="90" color="var(--person)"/>`;
+  const ray = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="var(--glyph-line)" stroke-width="2.5" stroke-dasharray="5 7"/>`;
   const DS = {
     we: `<svg viewBox="0 0 400 240" aria-hidden="true"><circle cx="250" cy="120" r="78" fill="url(#g-sphere)"/><circle cx="232" cy="104" r="38" fill="url(#g-blob)"/>${ray(110, 176, 232, 104)}${person(62, 150)}</svg>`,
     ws: `<svg viewBox="0 0 400 240" aria-hidden="true"><circle cx="170" cy="110" r="70" fill="url(#g-sphere)"/>${ray(300, 172, 170, 110)}${person(262, 150)}<circle cx="358" cy="196" r="26" fill="url(#g-sphere)"/><circle cx="352" cy="190" r="16" fill="url(#g-blob)"/></svg>`,
-    ce: `<svg viewBox="0 0 400 240" aria-hidden="true"><circle cx="250" cy="120" r="70" fill="url(#g-sphere)"/><path d="M170 50h150v150H170zM190 30h150v150" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/><path d="M170 50l20-20M320 50l20-20M320 200l20-20" stroke="rgba(255,255,255,.35)" stroke-width="2"/><ellipse cx="214" cy="120" rx="30" ry="38" fill="rgba(255,255,255,.12)"/><circle cx="214" cy="120" r="22" fill="url(#g-blob)"/>${ray(110, 176, 214, 120)}${person(62, 150)}</svg>`,
-    cs: `<svg viewBox="0 0 400 240" aria-hidden="true"><circle cx="160" cy="110" r="70" fill="url(#g-sphere)"/>${ray(270, 172, 160, 110)}${person(232, 150)}<path d="M318 120l60-16v86l-60 16z" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.4)" stroke-width="2"/><circle cx="348" cy="156" r="18" fill="url(#g-blob)"/></svg>`,
+    ce: `<svg viewBox="0 0 400 240" aria-hidden="true"><circle cx="250" cy="120" r="70" fill="url(#g-sphere)"/><path d="M170 50h150v150H170zM190 30h150v150" fill="none" stroke="var(--glyph-line)" stroke-width="2"/><path d="M170 50l20-20M320 50l20-20M320 200l20-20" stroke="var(--glyph-line)" stroke-width="2"/><ellipse cx="214" cy="120" rx="30" ry="38" fill="var(--glyph-fill)"/><circle cx="214" cy="120" r="22" fill="url(#g-blob)"/>${ray(110, 176, 214, 120)}${person(62, 150)}</svg>`,
+    cs: `<svg viewBox="0 0 400 240" aria-hidden="true"><circle cx="160" cy="110" r="70" fill="url(#g-sphere)"/>${ray(270, 172, 160, 110)}${person(232, 150)}<path d="M318 120l60-16v86l-60 16z" fill="var(--dot-off)" stroke="var(--glyph-line)" stroke-width="2"/><circle cx="348" cy="156" r="18" fill="url(#g-blob)"/></svg>`,
   };
 
   // ---------------------------------------------------------------- slides
@@ -300,7 +319,7 @@
 
   function render(src) {
     const doc = split(src);
-    const ctx = { defs: {}, notes: [], sections: 0, doc };
+    const ctx = { defs: {}, notes: [], notesMd: [], sections: 0, doc };
     blocks(doc.preamble, ctx); // picks up :::define blocks
     const m = doc.meta;
     const set = settings(m);
@@ -308,7 +327,7 @@
     const used = new Set();
 
     const slides = doc.slides.map((s, idx) => {
-      ctx.notes = [];
+      ctx.notesMd = [];
       const sm = s.meta;
       const layout = (sm.layout || "content").toLowerCase();
       const { headline, dek, rest } = takeHeadline(s.lines.join("\n"));
@@ -318,7 +337,9 @@
       while (used.has(id)) id += "-x";
       used.add(id);
       const title = sm.title || strip(mdi(headline)) || (layout === "title" ? m.title : `Slide ${idx + 1}`);
-      const notes = ctx.notes.join("");
+      const notesMd = ctx.notesMd.join("\n\n");
+      const notes = renderNotes(notesMd);
+      const backup = on(sm.backup);
       let inner = "";
 
       if (layout === "title") {
@@ -337,18 +358,55 @@
             <div class="end-qr"><div class="qr" data-qr="talk"></div></div><p class="contacts">${(m.contacts || "").split(";").map((c) => mdi(c.trim())).join("<br>")}</p></div>
           <div class="end-side">${items.join("")}</div><div class="end-logos">${LOGOS("")}</div><div class="tab tab-bottom" aria-hidden="true"></div>`;
       } else {
-        const rows = sm.rows ? sm.rows.split(/[\s/,]+/).filter(Boolean).map((n) => `minmax(0,${parseFloat(n) || 1}fr)`).join(" ") : "";
+        const rows = sm.rows ? sm.rows.split(/[\s/,]+/).filter(Boolean).map((n) => (n === "auto" ? "auto" : `minmax(0,${parseFloat(n) || 1}fr)`)).join(" ") : "";
         const cols = (sm.columns || "1").split(/[\s/,]+/).filter(Boolean).map((n) => `${parseFloat(n) || 1}fr`).join(" ");
         inner = `<div class="frame"><header class="s-head">${sm.kicker ? `<div class="kicker">${mdi(sm.kicker)}</div>` : ""}${headline ? `<h2>${mdi(headline)}</h2>` : ""}${dek ? `<p class="dek">${mdi(dek)}</p>` : ""}</header>
           <div class="s-body" style="grid-template-columns:${cols}${rows ? `;grid-template-rows:${rows}` : ""}">${items.join("")}</div></div>`;
       }
 
       const cls = `layout-${layout}${["title", "section", "end"].includes(layout) ? " bleed" : ""}${sm.class ? ` ${esc(sm.class)}` : ""}`;
-      const html = `<section id="${esc(id)}" class="${cls}" data-chapter="${esc(chapter)}" data-title="${esc(title)}"${sm.time ? ` data-timing="${parseFloat(sm.time)}"` : ""}${sm.animate ? " data-auto-animate" : ""}>${inner}<aside class="notes">${notes}</aside></section>`;
-      return { id, title, chapter, layout, time: parseFloat(sm.time) || 0, notes, html };
+      const html = `<section id="${esc(id)}" class="${cls}" data-chapter="${esc(chapter)}" data-title="${esc(title)}"${sm.time ? ` data-timing="${parseFloat(sm.time)}"` : ""}${sm.animate ? " data-auto-animate" : ""}${backup ? ' data-backup data-visibility="uncounted"' : ""}>${inner}<aside class="notes">${notes}</aside></section>`;
+      return { id, title, chapter, layout, backup, time: parseFloat(sm.time) || 0, notes, notesMd, notesHash: hash(notesMd), clicks: countBuilds(html), html };
     });
     return { meta: m, settings: set, slides };
   }
 
-  window.MDeck = { render, settings, components: C, parseAttrs };
+  // builds on a slide: fragments without an index each add one, indexed ones share theirs
+  function countBuilds(html) {
+    const tags = html.match(/<[^>]+class="[^"]*\bfragment\b[^"]*"[^>]*>/g) || [];
+    const fixed = new Set();
+    let free = 0;
+    tags.forEach((t) => { const m = t.match(/data-fragment-index="(\d+)"/); if (m) fixed.add(m[1]); else free++; });
+    return free + fixed.size;
+  }
+
+  // notes are markdown; `[click]` marks where the presenter advances
+  function renderNotes(text) { return md(text); }
+
+  // short stable hash, used to tell whether an edited note still matches talk.md
+  function hash(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36);
+  }
+
+  // Replace one slide's :::notes block in the talk.md source (used when saving edits).
+  function replaceNotes(src, id, text) {
+    const lines = src.split("\n");
+    const at = lines.findIndex((l) => l.trim() === `id: ${id}`);
+    if (at < 0) return null;
+    // the slide ends where the next slide's settings block starts
+    let end = lines.findIndex((l, i) => i > at && /^id:\s/.test(l.trim()));
+    if (end < 0) end = lines.length;
+    else while (end > at && lines[end].trim() !== "---") end--;
+    const open = lines.findIndex((l, i) => i > at && i < end && /^\s*:{3,}\s*notes\s*$/.test(l));
+    const body = text.replace(/\s+$/, "");
+    if (open < 0) { lines.splice(end, 0, ":::notes", body, ":::", ""); return lines.join("\n"); }
+    let close = open + 1;
+    while (close < end && !/^\s*:{3,}\s*$/.test(lines[close])) close++;
+    lines.splice(open + 1, close - open - 1, body);
+    return lines.join("\n");
+  }
+
+  window.MDeck = { render, settings, components: C, parseAttrs, renderNotes, replaceNotes, hash };
 })();

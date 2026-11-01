@@ -18,15 +18,15 @@ Live at <https://heedvision.arvindchee.nu>
     shared/               design system (hv.css), theme toggle, fonts, logos
     slides/talk.md        the talk: settings, slides, script, components
     slides/               the deck engine (reveal.js 6 + markdown components)
-    talk/                 transcript: every slide, live, next to its script
+    talk/                 transcript: the slide pinned on top, the script below
     worker/               Cloudflare Worker for live follow-along and questions
-    tools/                poster and PDF export scripts
+    tools/                local server (saves script edits) and PDF export
 
 All three pages share one design system; see [Design](#design).
 
 ## Editing
 
-There is no build step. Edit and push; GitHub Pages redeploys. If you change a `.js` or `.css` file, bump the `?v=` number on its `<script>`/`<link>` tags so returning visitors don't mix old and new code (editing `talk.md` doesn't need this).
+There is no build step. Edit and push; GitHub Pages redeploys. To work locally, run `node tools/serve.mjs` and open <http://localhost:8000>. If you change a `.js` or `.css` file, bump the `?v=` number on its `<script>`/`<link>` tags so returning visitors don't mix old and new code (editing `talk.md` doesn't need this).
 
 The arXiv button and its entry under *Materials* hide themselves automatically while their `href` is still the literal `ARXIV_URL`. Replace both occurrences to switch them on.
 
@@ -40,7 +40,7 @@ Everything about the talk lives in **`slides/talk.md`**: settings, slides, scrip
 ---
 title: HeedVision
 url: https://heedvision.arvindchee.nu/talk/   # QR code target
-duration: 9.5                                 # minutes, for the speaker view
+duration: 9.5                                 # minutes, for presenter-view pacing
 questions: on      # on | off | a link to the venue's own Q&A tool
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
@@ -71,7 +71,7 @@ What you say. [click] marks where you advance.
 :::
 ```
 
-Slides after the end slide with `time: 0` (chapter *Backup*) are spare answers for Q&A.
+A slide with `backup: yes` is a spare answer for Q&A: it is listed in the script under *Backup*, and skipped when presenting (the talk stops at the end slide; open backups from the presenter view or with **B**).
 
 There are four layouts: `title`, `section`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence.
 
@@ -87,7 +87,9 @@ There are four layouts: `title`, `section`, `content` (the default) and `end`. T
 | `:::quote who=` | participant quote |
 | `:::steps reveal tones=` | numbered stages from a list |
 | `:::row` / `:::stack` | put components beside or under each other |
-| `::demo modes= steps bare` | attention simulation; modes (`none count sum max diff who`) step in the order given |
+| `::demo modes= steps snapshot bare` | attention simulation; modes (`none count sum max diff who`) step in the order given; `snapshot` freezes one recorded session |
+| `::layers src="a, b, c" captions="A \| B \| C" steps` | images that build one over the other |
+| `::bvh steps` `::hunt steps` | animated explainers: BVH voxelization, the treasure hunt |
 | `::designspace highlight= badge= done= trigger=` | the 2×2 design space; highlight one or more corners |
 | `::glyph type=` `::caveat` `::qr` `::logos` | talk-specific pieces |
 | `:::questions` | live question board; shows its own content when questions are off |
@@ -110,11 +112,19 @@ Anything in **markdown**.
 
 ### Presenting
 
-1. Open `https://heedvision.arvindchee.nu/slides/?present=<key>` and press **S** for the speaker view (script, timer and pacing). The key is in `worker/.presenter-key` (git-ignored). To change it, run `npx wrangler secret put PRESENTER_KEY` in `worker/`.
-2. The audience scans the QR code and follows along on `/talk/`.
-3. The last slide shows the top-voted questions. Double-click one to hide it.
+1. Open the slides: `https://heedvision.arvindchee.nu/slides/?present=<key>`. The key is in `worker/.presenter-key` (git-ignored); to change it, run `npx wrangler secret put PRESENTER_KEY` in `worker/`.
+2. Press **P** for the presenter view (current and next build, timer paced against each slide's `time:`, script, backups, questions) or **S** for the speaker view (the script, large). Both open in a window of their own and drive the slides; keep that window on your laptop screen. Use either one's tab to switch.
+3. The audience scans the QR code. `/talk/` follows you, with the slide pinned above the script.
 
-Run it locally with `python3 -m http.server 8000`, then open <http://localhost:8000/slides/>. Press **R** on a slide with a recording to switch to a live demo, if `talk.md` sets `demo-<name>: <url>`.
+Keys on the slides: **→ / space** next, **←** back, **B** backups (and back), **T** light or dark, **R** live demo or recording, **Q** questions.
+
+**Editing the script while rehearsing.** In the presenter or speaker view, press **E** (or *Edit*) and change the text; `[click]` marks a build. Saving:
+
+- with `node tools/serve.mjs` running, writes it straight into `slides/talk.md`;
+- with the presenter key, sends it to the live relay, so `/talk/` shows it at once (until `talk.md` itself changes);
+- always keeps it in this browser. *Download talk.md* gives you the file with every edit applied, to commit.
+
+Run it locally with `node tools/serve.mjs`, then open <http://localhost:8000/slides/>. Press **R** on a slide with a recording to switch to a live demo, if `talk.md` sets `demo-<name>: <url>`.
 
 ### Live relay
 
@@ -122,14 +132,12 @@ Run it locally with `python3 -m http.server 8000`, then open <http://localhost:8
 
 ### Tools
 
-- `tools/make-posters.sh` renders a thumbnail of each slide (shown until the live slide loads). Re-run it after editing slides.
-- `tools/make-pdf.sh` writes `heedvision-vis2026.pdf`, a backup with one page per slide.
-
-Both scripts need the local server on :8000 and Google Chrome.
+- `node tools/serve.mjs` serves the site on :8000 and lets the presenter view save script edits into `talk.md` (only from this machine).
+- `tools/make-pdf.sh` writes `heedvision-vis2026.pdf`, a backup with one page per slide (`THEME=light` for light). Needs the local server and Google Chrome.
 
 ## Design
 
-`shared/hv.css` holds the tokens (VIS 2026 pink, orange, brown and peach, plus the study's blue/orange/pink), the type (Fraunces and Google Sans Flex) and the header, footer, cards and buttons used by every page. `shared/site.js` remembers the light or dark choice across pages. The deck adds `slides/css/deck.css` on top.
+`shared/hv.css` holds the tokens (VIS 2026 pink, orange, brown and peach, plus the study's blue/orange/pink), the type (Fraunces and Google Sans Flex) and the header, footer, cards and buttons used by every page. `shared/site.js` remembers the light or dark choice across pages and open tabs (`?theme=light|dark` forces one). The deck adds `slides/css/deck.css` on top, with its own light and dark tokens; card and quote text is fitted to each slide's tiles when the slide is shown.
 
 ## Links
 

@@ -2,28 +2,43 @@
 // Two simulated gazes wander over a grid; each cell keeps one accumulator per
 // person that grows while looked at and decays over time. The display mode
 // picks the aggregation (count / sum / max / difference / who), or none.
+// With `snapshot`, the field records a seeded session once and then freezes it,
+// so every aggregation is shown on exactly the same data.
 (function () {
   const COLORS = {
     you: [61, 155, 255],
     partner: [255, 138, 42],
     both: [255, 95, 180],
-    grey: [222, 222, 230],
-    greyLow: [118, 120, 134],
   };
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const rgb = (s, d) => { const m = String(s).match(/\d+(\.\d+)?/g); return m && m.length >= 3 ? m.slice(0, 3).map(Number) : d; };
 
   class VoxelField {
     constructor(canvas, opts = {}) {
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
       this.ambient = !!opts.ambient;
+      this.snapshot = !!opts.snapshot;
+      this.random = rng(opts.seed || 7);
       this.cell = opts.cell || (this.ambient ? 56 : 44);
       this.gap = opts.gap || (this.ambient ? 8 : 6);
-      this.tau = this.ambient ? 9 : 16; // decay time constant (s)
+      this.tau = this.ambient ? 9 : this.snapshot ? 40 : 16; // decay time constant (s)
       this.mode = "identity";
       this.scale = opts.scale || (() => 1);
       this.running = false;
       this.last = 0;
+      this.readTheme();
       this.resize();
       this.agents = [
         this.makeAgent(COLORS.you, "you", 0.3),
@@ -33,12 +48,24 @@
       this.prefill();
       this.draw();
       new ResizeObserver(() => { this.resize(); this.draw(); }).observe(canvas);
+      addEventListener("hv-theme", () => { this.readTheme(); this.draw(); });
+    }
+
+    // colours that depend on light/dark come from CSS (see deck.css)
+    readTheme() {
+      const cs = getComputedStyle(this.canvas);
+      this.theme = {
+        cell: cs.getPropertyValue("--field-cell").trim() || "rgba(255,255,255,0.05)",
+        grey: rgb(cs.getPropertyValue("--field-grey"), [222, 222, 230]),
+        ink: cs.getPropertyValue("--field-ink").trim() || "#fff",
+        numeral: cs.getPropertyValue("--field-numeral").trim() || "#15161b",
+      };
     }
 
     makeAgent(color, name, bias) {
       return {
         color, name, bias,
-        x: bias * this.cols, y: this.rows * (0.3 + Math.random() * 0.4),
+        x: bias * this.cols, y: this.rows * (0.3 + this.random() * 0.4),
         vx: 0, vy: 0, tx: 0, ty: 0, dwell: 0,
       };
     }
@@ -70,8 +97,11 @@
 
     // run the simulation for a while so the first frame already has history
     prefill() {
-      this.agents.forEach((ag) => { ag.x = ag.bias * this.cols; ag.y = this.rows / 2; this.retarget(ag); });
-      for (let i = 0; i < (this.ambient ? 240 : 360); i++) this.step(1 / 30);
+      this.random = rng(7);
+      this.a.fill(0); this.b.fill(0);
+      this.agents.forEach((ag) => { ag.x = ag.bias * this.cols; ag.y = this.rows / 2; ag.vx = ag.vy = 0; this.retarget(ag); });
+      const n = this.ambient ? 240 : this.snapshot ? 1500 : 360;
+      for (let i = 0; i < n; i++) this.step(1 / 30);
       this.snapDisplay();
     }
 
@@ -79,11 +109,11 @@
 
     retarget(ag) {
       // Mostly stay on your own side of the space, sometimes cross over.
-      const own = Math.random() < (this.ambient ? 0.55 : 0.78);
-      const centre = own ? ag.bias : Math.random();
-      ag.tx = Math.min(this.cols - 1, Math.max(0, (centre + (Math.random() - 0.5) * 0.5) * this.cols));
-      ag.ty = Math.random() * (this.rows - 1);
-      ag.dwell = 0.8 + Math.random() * 1.8;
+      const own = this.random() < (this.ambient ? 0.55 : 0.78);
+      const centre = own ? ag.bias : this.random();
+      ag.tx = Math.min(this.cols - 1, Math.max(0, (centre + (this.random() - 0.5) * 0.5) * this.cols));
+      ag.ty = this.random() * (this.rows - 1);
+      ag.dwell = 0.8 + this.random() * 1.8;
     }
 
     step(dt) {
@@ -119,24 +149,25 @@
       });
     }
 
+    count(i) { return (this.a[i] > 0.12) + (this.b[i] > 0.12); }
+
     target(i) {
       const A = this.a[i], B = this.b[i];
+      const grey = this.theme.grey;
       const mix = (c1, c2, t) => [0, 1, 2].map((k) => c1[k] + (c2[k] - c1[k]) * t);
-      // Only "who" uses colour. The aggregations before it are grey, so each one
-      // adds a single idea: count (solid steps), then opacity for sum/max/difference.
+      // Only "who" uses colour. Before it everything is grey: count is a solid
+      // square (with its number), then sum / max / difference vary opacity.
       switch (this.mode) {
         case "none":
-          return [...COLORS.grey, 0];
-        case "count": {
-          const n = (A > 0.12) + (B > 0.12);
-          return n === 2 ? [...COLORS.grey, 0.9] : n === 1 ? [...COLORS.greyLow, 0.9] : [...COLORS.grey, 0];
-        }
+          return [...grey, 0];
+        case "count":
+          return [...grey, this.count(i) ? 0.75 : 0];
         case "sum":
-          return [...COLORS.grey, Math.min(1, (A + B) * 0.75)];
+          return [...grey, Math.min(1, (A + B) * 0.6)];
         case "max":
-          return [...COLORS.grey, Math.max(A, B)];
+          return [...grey, Math.max(A, B)];
         case "diff":
-          return [...COLORS.grey, Math.min(1, Math.abs(A - B) * 1.6)];
+          return [...grey, Math.min(1, Math.abs(A - B) * 1.4)];
         default: {
           const both = Math.min(A, B);
           const oa = A - both, ob = B - both;
@@ -169,21 +200,26 @@
       ctx.setTransform(k, 0, 0, k, 0, 0);
       ctx.clearRect(0, 0, this.w, this.h);
       const pitch = cell + gap, r = this.ambient ? 10 : 9;
-      const base = this.ambient ? 0.025 : 0.05;
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const i = y * cols + x, o = i * 4;
           const px = ox + x * pitch, py = oy + y * pitch;
-          ctx.fillStyle = `rgba(255,255,255,${base})`;
+          ctx.fillStyle = this.theme.cell;
           ctx.beginPath(); ctx.roundRect(px, py, cell, cell, r); ctx.fill();
           const al = disp[o + 3] * (this.ambient ? 0.75 : 0.95);
           if (al > 0.01) {
             ctx.fillStyle = `rgba(${disp[o] | 0},${disp[o + 1] | 0},${disp[o + 2] | 0},${al})`;
             ctx.beginPath(); ctx.roundRect(px, py, cell, cell, r); ctx.fill();
           }
+          if (this.mode === "count" && this.count(i)) {
+            ctx.fillStyle = this.theme.numeral;
+            ctx.font = `650 ${Math.round(cell * 0.46)}px 'Google Sans Flex', system-ui`;
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillText(String(this.count(i)), px + cell / 2, py + cell / 2 + 1);
+          }
         }
       }
-      // gaze reticles
+      if (this.snapshot) return; // a recorded session: no live gazes
       this.agents.forEach((ag) => {
         const px = ox + ag.x * pitch + cell / 2, py = oy + ag.y * pitch + cell / 2;
         const [R, G, B] = ag.color;
@@ -192,11 +228,12 @@
         glow.addColorStop(1, `rgba(${R},${G},${B},0)`);
         ctx.fillStyle = glow;
         ctx.beginPath(); ctx.arc(px, py, cell * 1.6, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.95)";
+        ctx.strokeStyle = this.theme.ink;
         ctx.lineWidth = 3;
         ctx.beginPath(); ctx.arc(px, py, cell * 0.36, 0, Math.PI * 2); ctx.stroke();
         if (!this.ambient) {
           ctx.font = "600 20px 'Google Sans Flex', system-ui";
+          ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
           ctx.fillStyle = `rgb(${R},${G},${B})`;
           ctx.fillText(ag.name, px + cell * 0.5, py - cell * 0.45);
         }
@@ -207,7 +244,7 @@
       if (!this.running) return;
       const dt = Math.min(0.05, (t - (this.last || t)) / 1000);
       this.last = t;
-      this.step(dt);
+      if (!this.snapshot) this.step(dt);
       this.blendDisplay(dt);
       this.draw();
       requestAnimationFrame(this.frame);
