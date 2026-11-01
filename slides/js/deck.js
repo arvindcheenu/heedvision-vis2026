@@ -75,17 +75,30 @@
   function toggleTheme() { window.HVTheme && HVTheme.toggle(); }
 
   // ---------------------------------------------------------- QR + links
+  // With asking on, the code opens the talk page (follow along, ask). Turned off
+  // (`questions: off`, or the presenter view's toggle), it opens the project site.
+  const askKey = `hv.ask.${set.room}`;
+  const askStored = () => { try { return localStorage.getItem(askKey); } catch (e) { return null; } };
+  const askOn = () => (askStored() != null ? askStored() === "on" : set.questions !== "off");
+  function setAsk(on) {
+    try { localStorage.setItem(askKey, on ? "on" : "off"); } catch (e) {}
+    renderQR();
+    postConsole();
+  }
   function renderQR() {
-    if (!set.url) return;
+    const ask = askOn();
+    const target = ask ? set.url : set.site || set.url;
+    if (!target) return;
     const qr = qrcode(0, "M");
-    qr.addData(set.url);
+    qr.addData(target);
     qr.make();
     const svg = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
     document.querySelectorAll('[data-qr="talk"]').forEach((el) => (el.innerHTML = svg));
-    document.querySelectorAll("[data-talk-url]").forEach((el) => (el.textContent = short(set.url)));
-    const label = useQuestions && set.follow ? "Follow along & ask questions" : set.follow && set.live ? "Follow along" : "Slides & script";
+    document.querySelectorAll("[data-talk-url]").forEach((el) => (el.textContent = short(target)));
+    const label = !ask ? "Paper, video & slides" : useQuestions && set.follow ? "Follow along & ask questions" : set.follow && set.live ? "Follow along" : "Slides & script";
     document.querySelectorAll("[data-qr-label]").forEach((el) => (el.textContent = label));
   }
+  addEventListener("storage", (e) => { if (e.key === askKey) renderQR(); });
 
   // ---------------------------------------------------------- chapter rail
   const chrome = slidesEl.querySelector(".hv-chrome");
@@ -120,6 +133,7 @@
   // ---------------------------------------------------------- simulations and animations
   const fields = new Map();
   const explainers = new Map();
+  const lives = new Map(); // live 3D demos (js/voxdemo.js), loaded only when a slide has one
   const SWATCH = { none: "var(--dot-off)", count: "var(--field-swatch)", sum: "linear-gradient(90deg,transparent,var(--field-swatch))", max: "linear-gradient(90deg,color-mix(in oklab,var(--field-swatch) 40%,transparent),var(--field-swatch))", diff: "linear-gradient(90deg,var(--field-swatch),transparent,var(--field-swatch))", who: "linear-gradient(135deg,var(--you),var(--both),var(--partner))" };
   function initFields() {
     document.querySelectorAll("canvas[data-field]").forEach((cv) => {
@@ -151,12 +165,22 @@
     document.querySelectorAll("canvas[data-explain]").forEach((cv) => {
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
+    const demos = document.querySelectorAll("[data-voxdemo]");
+    if (demos.length) import(new URL("js/voxdemo.js?v=20261106", location.href)).then((mod) => demos.forEach(async (el) => {
+      try {
+        lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
+        syncSteppers();
+        if (deck.getCurrentSlide().contains(el)) lives.get(el).start();
+      } catch (err) { console.warn("[live demo]", err); }
+    }));
   }
   // [data-stepper] components count their own hidden build markers
   function syncSteppers() {
     document.querySelectorAll("[data-stepper]").forEach((el) => {
       const at = isPoster ? el.querySelectorAll(".fragment.step").length : el.querySelectorAll(".fragment.step.visible").length;
       el.dataset.at = at;
+      const demo = lives.get(el);
+      if (demo) { if (isPoster) demo.settle(at); else if (demo.step !== at) demo.setStep(at); return; }
       const cv = el.querySelector("canvas[data-explain]");
       const ex = cv && explainers.get(cv);
       if (!ex) return;
@@ -166,6 +190,7 @@
   let lastSlide = null;
   function runAnimations(cur) {
     fields.forEach((f, cv) => (cur.contains(cv) ? f.start() : f.stop()));
+    lives.forEach((d, el) => (cur.contains(el) && !isPoster ? d.start() : d.stop()));
     explainers.forEach((ex, cv) => {
       if (!cur.contains(cv)) return ex.stop();
       if (cur !== lastSlide && ex.step === 0) ex.reset(); // a fresh run each time the slide comes up
@@ -302,7 +327,7 @@
   function postConsole() {
     if (!channel) return;
     const cur = deck.getCurrentSlide();
-    channel.postMessage({ t: "state", ...currentState(), builds: builds(cur), backup: cur.hasAttribute("data-backup") });
+    channel.postMessage({ t: "state", ...currentState(), builds: builds(cur), backup: cur.hasAttribute("data-backup"), ask: askOn() });
   }
   if (channel) {
     channel.onmessage = (e) => {
@@ -313,6 +338,7 @@
         else if (m.dir === "prev") deck.prev();
         else if (m.id) goTo(m);
       } else if (m.t === "backups") toggleBackups();
+      else if (m.t === "ask") setAsk(!!m.on);
     };
   }
   function openConsole(view) {

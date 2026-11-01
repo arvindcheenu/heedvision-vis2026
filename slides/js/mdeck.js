@@ -4,7 +4,7 @@
 //   ---
 //   ---                      a slide: optional `key: value` lines between two `---`
 //   id: hook
-//   layout: content          title | section | content | end
+//   layout: content          title | section | photo | content | end
 //   columns: 7 5             how the body is split (fractions)
 //   ---
 //   # Headline               the slide's message, as a sentence
@@ -127,6 +127,7 @@
     if (a.tall) c += " tall";
     if (a.tone) c += ` tone-${esc(a.tone)}`;
     if (a.class) c += ` ${esc(a.class)}`;
+    if (a.phase != null && a.phase !== true) extra += ` data-phase="${+a.phase}"`;
     return `<${tag} class="${c}"${d}${extra}>${inner}</${tag}>`;
   }
   const num = (v) => parseFloat(String(v).replace(/[^\d.\-−]/g, "").replace("−", "-"));
@@ -158,9 +159,13 @@
     cards: (a, body, ctx) => C.row(a, body, ctx),
     stats: (a, body, ctx) => C.row(a, body, ctx),
 
+    // icon="…" puts a duotone icon (an #ic-… symbol in index.html) on top; cite="…" adds a source line
     card(a, body, ctx) {
-      let inner = (a.label ? `<div class="label">${mdi(a.label)}</div>` : "") +
-        (a.title ? `<h3>${mdi(a.title)}</h3>` : "") + blocks(body, ctx).join("");
+      const label = a.label ? `<div class="label">${mdi(a.label)}</div>` : "", title = a.title ? `<h3>${mdi(a.title)}</h3>` : "";
+      // with an icon, the icon and the first heading share a row
+      const top = a.icon ? `<div class="c-top"><svg class="ic" aria-hidden="true"><use href="#ic-${esc(a.icon)}"/></svg>${label || title}</div>${label ? title : ""}` : label + title;
+      let inner = top + blocks(body, ctx).join("") +
+        (a.cite ? `<p class="cite">${mdi(a.cite)}</p>` : "");
       if (a.steps) inner = inner.replace(/<li>/g, '<li class="fragment rise">');
       return wrap("div", a, "c-card tile", inner);
     },
@@ -205,11 +210,17 @@
     steps(a, body) {
       const items = String(body || "").split("\n").map((l) => l.match(/^\s*(?:[-*]|\d+\.)\s+(.*)$/)).filter(Boolean).map((m) => m[1]);
       const tones = (a.tones || "").split(/[\s,]+/).filter(Boolean);
+      const icons = (a.icons || "").split(/[\s,]+/).filter(Boolean);
       const cells = items.map((t, i) => {
         const m = t.match(/^\*\*(.+?)\*\*\s*[—–:-]?\s*(.*)$/);
-        const title = m ? m[1] : t, text = m ? m[2] : "";
+        const title = m ? m[1] : t;
+        let text = m ? m[2] : "";
+        // a trailing {RQ1} becomes a label in the corner
+        const tag = text.match(/\s*\{([^}]+)\}\s*$/);
+        if (tag) text = text.slice(0, tag.index);
         const cls = `c-step tile${tones[i] ? ` tone-${esc(tones[i])}` : ""}${a.reveal ? " fragment rise" : ""}`;
-        return `<div class="${cls}"><span class="n">${String(i + 1).padStart(2, "0")}</span><h3>${mdi(title)}</h3>${text ? `<p>${mdi(text)}</p>` : ""}</div>`;
+        const top = icons[i] ? `<svg class="ic" aria-hidden="true"><use href="#ic-${esc(icons[i])}"/></svg>` : a.numbers ? `<span class="n">${String(i + 1).padStart(2, "0")}</span>` : "";
+        return `<div class="${cls}">${top}<div class="st-body"><h3>${mdi(title)}</h3>${text ? `<p>${mdi(text)}</p>` : ""}</div>${tag ? `<span class="st-tag">${esc(tag[1])}</span>` : ""}</div>`;
       });
       return wrap("div", a, "c-row c-steps", cells.join(""), ` style="--n:${items.length}"`);
     },
@@ -223,9 +234,39 @@
       return wrap("figure", a, `c-layers tile fit-${esc(a.fit || "contain")}`, `<div class="layer-box" style="--fade:${esc(a.fade || 0.85)}">${imgs}</div>${legend}${stepSpans(a, srcs.length - 1)}`, ' data-stepper data-at="0"');
     },
 
+    // a looping clip with its caption underneath: ::clip src poster title="…" caption="…" ratio=16/10
+    clip: (a) => wrap("figure", a, "c-clip",
+      `<div class="tile flush clip-v" style="aspect-ratio:${esc(a.ratio || "16/10")}"><div class="embed" data-video="${esc(a.src)}" data-poster="${esc(a.poster || "")}" data-label="${esc(strip(mdi(a.title || a.caption || "Recording")))}" data-quiet></div></div>` +
+      `<figcaption>${a.title ? `<b>${mdi(a.title)}</b>` : ""}${a.caption ? `<span>${mdi(a.caption)}</span>` : ""}</figcaption>`),
+
+    // live 3D demo of the study's scatterplot (js/voxdemo.js); `steps`: 1 shows the targets, 2 turns the cues on
+    live: (a) => wrap("div", a, "c-live tile flush",
+      `<canvas aria-label="${esc(a.alt || "Live demo: drag to look around the study's scatterplot; voxels colour where you and a simulated partner look")}"></canvas>` +
+      `<span class="tag">${esc(a.tag || "Live")}</span><span class="hint">Drag to look around · scroll to move closer</span><i class="reticle" aria-hidden="true"></i>` +
+      `<div class="live-bar"><span class="legend"><i class="you"></i>You<i class="both"></i>Both<i class="partner"></i>Partner</span><span class="found" data-found></span>` +
+      `<button type="button" data-act="targets" aria-pressed="false">Targets</button><button type="button" data-act="cues" aria-pressed="false">Cues</button><button type="button" data-act="reset">Reset</button></div>${stepSpans(a, 2)}`,
+      ` data-voxdemo data-stepper data-at="0"${a.src ? ` data-src="${esc(a.src)}"` : ""}`),
+
+    // what pair gain means: two people's finds as circles, overlapping less when gain is higher.
+    // ::venn a=1.19 b=1.46 a-label="Cues off" b-label="Cues on"  (gain = finds together ÷ average member)
+    venn(a) {
+      const one = (g, label, cls) => {
+        const o = Math.max(0, Math.min(1, 2 - num(g))); // share of each person's finds that the other also found, if both found as many
+        const r = 60, d = lensDistance(o, r), cx = 110, id = `vn-${++vennId}`;
+        return `<div class="venn ${cls}"><svg viewBox="0 0 220 140" aria-hidden="true"><defs><clipPath id="${id}"><circle cx="${cx - d / 2}" cy="70" r="${r}"/></clipPath></defs>` +
+          `<circle cx="${cx - d / 2}" cy="70" r="${r}" class="v-you"/><circle cx="${cx + d / 2}" cy="70" r="${r}" class="v-partner"/><circle cx="${cx + d / 2}" cy="70" r="${r}" class="v-both" clip-path="url(#${id})"/></svg>` +
+          `<div class="v-cap"><b>${esc(g)}×</b><span>${mdi(label)}</span><small>${Math.round(o * 100)}% of finds shared</small></div></div>`;
+      };
+      return wrap("div", a, "c-venn tile", `${a.label ? `<div class="label">${mdi(a.label)}</div>` : ""}<div class="venn-row">${one(a.a, a["a-label"] || "Without", "a")}${one(a.b, a["b-label"] || "With", "b")}</div>${a.note ? `<p class="v-note">${mdi(a.note)}</p>` : ""}`);
+    },
+
+    // line illustrations (ART below), drawn in the text colour
+    art: (a) => wrap("figure", a, "c-art tile", `${ART[a.name] || ""}${a.caption ? `<figcaption>${mdi(a.caption)}</figcaption>` : ""}`),
+
     // explainer animations (see js/explain.js); `steps` walks through their phases
     bvh: (a) => wrap("div", a, "c-explain tile flush", `<canvas data-explain="bvh" aria-label="${esc(a.alt || "Animation: a bounding volume hierarchy voxelizes a chart and head rays collect attention")}"></canvas><span class="tag">${esc(a.tag || "Animation")}</span>${stepSpans(a, 2)}`, ' data-stepper data-at="0"'),
     hunt: (a) => wrap("div", a, "c-explain tile flush", `<canvas data-explain="hunt" aria-label="${esc(a.alt || "Animation: two people search for hidden targets that light up only up close")}"></canvas><span class="tag">${esc(a.tag || "Animation")}</span>${stepSpans(a, 3)}`, ' data-stepper data-at="0"'),
+    hv: (a) => wrap("div", a, "c-explain tile flush", `<canvas data-explain="hv" aria-label="${esc(a.alt || "Animation: two people look at one shared voxelized sphere; voxels turn blue, orange or pink where they look")}"></canvas><span class="tag">${esc(a.tag || "Animation")}</span>${stepSpans(a, 1)}`, ' data-stepper data-at="0"'),
 
     glyph: (a) => `<div class="c-glyph">${GLYPHS[a.type] || ""}</div>`,
 
@@ -272,6 +313,34 @@
     `<img class="logo-mono" src="${base}../shared/logos/au.svg" alt="Aarhus University">` +
     `<img class="logo-mono" src="${base}../shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics">`;
 
+  // distance between two circles of radius r whose overlap is share o of each circle's area
+  let vennId = 0;
+  function lensDistance(o, r) {
+    const lens = (d) => 2 * r * r * Math.acos(d / (2 * r)) - (d / 2) * Math.sqrt(4 * r * r - d * d);
+    let lo = 0, hi = 2 * r;
+    for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (lens(mid) / (Math.PI * r * r) > o) lo = mid; else hi = mid; }
+    return (lo + hi) / 2;
+  }
+
+  // Line illustrations: ink strokes on the page colour, one accent of tone.
+  const ART = {
+    // a pair splits a scatterplot into top and bottom, one half each
+    split: `<svg viewBox="0 0 420 300" aria-hidden="true" class="ink">
+      <defs><pattern id="art-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><path d="M0 0v9" class="hair"/></pattern>
+        <pattern id="art-dots" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1.4" class="dotfill"/></pattern>
+        <clipPath id="art-top"><rect x="0" y="0" width="420" height="152"/></clipPath><clipPath id="art-bot"><rect x="0" y="152" width="420" height="148"/></clipPath></defs>
+      <circle cx="210" cy="152" r="86" class="paper"/>
+      <circle cx="210" cy="152" r="86" fill="url(#art-hatch)" clip-path="url(#art-top)"/>
+      <circle cx="210" cy="152" r="86" fill="url(#art-dots)" clip-path="url(#art-bot)"/>
+      <circle cx="210" cy="152" r="86" class="line"/>
+      <path d="M110 152H310" class="line dash"/>
+      <g class="pts">${[[178,96],[236,88],[206,120],[160,130],[252,128],[226,104],[186,176],[240,170],[210,200],[166,190],[262,190],[198,224]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="5"/>`).join("")}</g>
+      <g transform="translate(58 118)"><path d="M-44 132c0-44 18-70 44-70s44 26 44 70" class="paper line"/><circle cx="0" cy="22" r="26" class="paper line"/><path d="M-6 6c8-12 30-12 32 8" class="line"/><rect x="2" y="12" width="32" height="18" rx="7" class="solid"/><path d="M26 82l56-46" class="line"/><circle cx="85" cy="33" r="7" class="paper line"/></g>
+      <g transform="translate(362 136) scale(-1 1)"><path d="M-44 132c0-44 18-70 44-70s44 26 44 70" class="paper line"/><circle cx="0" cy="22" r="26" class="paper line"/><path d="M-22 4c10-10 34-8 40 6" class="line"/><rect x="2" y="12" width="32" height="18" rx="7" class="solid"/><path d="M26 90l60 18" class="line"/><circle cx="90" cy="110" r="7" class="paper line"/></g>
+      <g transform="translate(150 22)"><path d="M0 16c0-9 8-16 18-16h44c10 0 18 7 18 16s-8 16-18 16H26l-12 10 2-10C7 30 0 24 0 16z" class="paper line"/><circle cx="26" cy="16" r="3" class="solid"/><circle cx="40" cy="16" r="3" class="solid"/><circle cx="54" cy="16" r="3" class="solid"/></g>
+    </svg>`,
+  };
+
   const GLYPHS = {
     joint: `<svg viewBox="0 0 300 170" aria-hidden="true"><use href="#i-eye" x="30" y="120" width="40" height="40" color="var(--you)"/><use href="#i-eye" x="230" y="120" width="40" height="40" color="var(--partner)"/><path d="M60 130L150 46M240 130L150 46" stroke="var(--glyph-line)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="150" cy="42" r="34" fill="url(#g-blob)"/><circle cx="150" cy="42" r="9" fill="var(--both)"/></svg>`,
     distributed: `<svg viewBox="0 0 300 170" aria-hidden="true"><use href="#i-eye" x="30" y="120" width="40" height="40" color="var(--you)"/><use href="#i-eye" x="230" y="120" width="40" height="40" color="var(--partner)"/><path d="M55 122L60 46M245 122L240 46" stroke="var(--glyph-line)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="60" cy="40" r="10" fill="var(--you)"/><circle cx="240" cy="40" r="10" fill="var(--partner)"/></svg>`,
@@ -289,6 +358,11 @@
   };
 
   // ---------------------------------------------------------------- slides
+  // "RQ2 · Record" → a running head: the marker, then the name
+  function kicker(k) {
+    const [a, ...b] = String(k).split("·").map((x) => x.trim());
+    return `<div class="kicker">${b.length ? `<span class="k-a">${mdi(a)}</span><span class="k-b">${mdi(b.join(" · "))}</span>` : `<span class="k-b">${mdi(a)}</span>`}</div>`;
+  }
   function takeHeadline(text) {
     const lines = text.split("\n");
     let i = 0, headline = "", dek = "";
@@ -308,6 +382,7 @@
     return {
       title: meta.title || "Talk",
       url: meta.url || "",
+      site: meta.site || "",
       live: meta.live || "",
       room: meta.room || "talk",
       follow: on(meta.follow ?? "on"),
@@ -344,15 +419,20 @@
 
       if (layout === "title") {
         const venue = (m.venue || "").split("·").map((v) => esc(v.trim())).filter(Boolean).join("<i></i>");
-        const authors = (m.authors || "").split(",").map((v, i) => (i === 0 ? `<b>${esc(v.trim())}</b>` : esc(v.trim()))).join(" &amp; ");
+        const photos = (m.photos || "").split(",").map((v) => v.trim());
+        const authors = (m.authors || "").split(",").map((v, i) => `<span class="author">${photos[i] ? `<img src="${esc(photos[i])}" alt="">` : ""}<b>${esc(v.trim())}</b></span>`).join("");
         inner = `<canvas class="field" data-field="ambient" aria-hidden="true"></canvas><div class="tab tab-top" aria-hidden="true"></div>
           <div class="t-logos">${LOGOS("")}</div>
-          <div class="title-panel"><div class="kicker">${esc(m.kicker || "")}</div><h1>${mdi(m.title)}</h1><p class="subtitle">${mdi(m.subtitle || "")}</p><p class="byline">${authors}<span>${esc(m.affiliation || "")}</span></p></div>
+          <div class="title-panel"><div class="kicker">${esc(m.kicker || "")}</div><h1>${mdi(m.title)}</h1><p class="subtitle">${mdi(m.subtitle || "")}</p><div class="byline">${authors}</div></div>
           <div class="qr-card"><div class="qr" data-qr="talk"></div><p data-qr-label></p></div>
           <div class="event-line">${venue}</div>`;
       } else if (layout === "section") {
-        ctx.sections++;
-        inner = `<div class="section-panel"><div class="part">${String(ctx.sections).padStart(2, "0")}</div><h2>${mdi(headline)}</h2>${dek ? `<p>${mdi(dek)}</p>` : ""}<img class="vis-white" src="../shared/logos/vis2026.png" alt=""></div>`;
+        // image: a photo behind the panel, tinted with the panel colour
+        inner = `<div class="section-panel">${sm.image ? `<img class="sp-bg" src="${esc(sm.image)}" alt="">` : ""}<div class="sp-text"><h2>${mdi(headline)}</h2>${dek ? `<p>${mdi(dek)}</p>` : ""}</div><img class="vis-white" src="../shared/logos/vis2026.png" alt=""></div>`;
+      } else if (layout === "photo") {
+        // a full-bleed image with the headline over it; credit: a small source line
+        inner = `<figure class="photo-panel">${sm.image ? `<img src="${esc(sm.image)}" alt="${esc(sm.alt || "")}">` : ""}</figure>
+          <div class="photo-text">${headline ? `<h2>${mdi(headline)}</h2>` : ""}${dek ? `<p>${mdi(dek)}</p>` : ""}</div>${sm.credit ? `<p class="photo-credit">${mdi(sm.credit)}</p>` : ""}${items.join("")}`;
       } else if (layout === "end") {
         inner = `<div class="end-panel"><h1>${mdi(headline || "Thank you")}</h1>${dek ? `<p class="dek">${mdi(dek)}</p>` : ""}<p class="talk-url" data-talk-url></p>
             <div class="end-qr"><div class="qr" data-qr="talk"></div></div><p class="contacts">${(m.contacts || "").split(";").map((c) => mdi(c.trim())).join("<br>")}</p></div>
@@ -360,11 +440,14 @@
       } else {
         const rows = sm.rows ? sm.rows.split(/[\s/,]+/).filter(Boolean).map((n) => (n === "auto" ? "auto" : `minmax(0,${parseFloat(n) || 1}fr)`)).join(" ") : "";
         const cols = (sm.columns || "1").split(/[\s/,]+/).filter(Boolean).map((n) => `${parseFloat(n) || 1}fr`).join(" ");
-        inner = `<div class="frame"><header class="s-head">${sm.kicker ? `<div class="kicker">${mdi(sm.kicker)}</div>` : ""}${headline ? `<h2>${mdi(headline)}</h2>` : ""}${dek ? `<p class="dek">${mdi(dek)}</p>` : ""}</header>
-          <div class="s-body" style="grid-template-columns:${cols}${rows ? `;grid-template-rows:${rows}` : ""}">${items.join("")}</div></div>`;
+        // caveats are footnotes: they sit under the body, never inside its grid
+        const notes = items.filter((x) => x.startsWith('<p class="c-caveat'));
+        const body = items.filter((x) => !notes.includes(x));
+        inner = `<div class="frame"><header class="s-head">${sm.kicker ? kicker(sm.kicker) : ""}${headline ? `<h2>${mdi(headline)}</h2>` : ""}${dek ? `<p class="dek">${mdi(dek)}</p>` : ""}</header>
+          <div class="s-body${sm.align ? ` align-${esc(sm.align)}` : ""}" style="grid-template-columns:${cols}${rows ? `;grid-template-rows:${rows}` : ""}">${body.join("")}</div>${notes.length ? `<footer class="s-foot">${notes.join("")}</footer>` : ""}</div>`;
       }
 
-      const cls = `layout-${layout}${["title", "section", "end"].includes(layout) ? " bleed" : ""}${sm.class ? ` ${esc(sm.class)}` : ""}`;
+      const cls = `layout-${layout}${["title", "section", "photo", "end"].includes(layout) ? " bleed" : ""}${sm.class ? ` ${esc(sm.class)}` : ""}`;
       const html = `<section id="${esc(id)}" class="${cls}" data-chapter="${esc(chapter)}" data-title="${esc(title)}"${sm.time ? ` data-timing="${parseFloat(sm.time)}"` : ""}${sm.animate ? " data-auto-animate" : ""}${backup ? ' data-backup data-visibility="uncounted"' : ""}>${inner}<aside class="notes">${notes}</aside></section>`;
       return { id, title, chapter, layout, backup, time: parseFloat(sm.time) || 0, notes, notesMd, notesHash: hash(notesMd), clicks: countBuilds(html), html };
     });

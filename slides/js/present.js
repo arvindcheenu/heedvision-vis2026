@@ -102,6 +102,7 @@
     $(".pv-meta .pos").textContent = sl?.backup ? "Backup" : `${idx + 1} / ${main().length}${s.builds ? ` · build ${s.f + 2} of ${s.builds + 1}` : ""}`;
     $(".pv-meta .title").textContent = sl ? sl.title : s.id;
     $(".next-title").textContent = n ? (n.sameSlide ? "Next build on this slide" : slides.get(n.id)?.title || n.id) : "";
+    if (s.ask != null) { const b = $("[data-ask]"); b.setAttribute("aria-pressed", String(s.ask)); b.textContent = s.ask ? "Ask: on" : "Ask: off"; }
     renderBackups();
     renderQuestions();
     tick();
@@ -260,6 +261,8 @@
   // ---------------------------------------------------------- controls
   document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => go({ dir: b.dataset.go })));
   $("[data-backups]").addEventListener("click", () => channel.postMessage({ t: "backups" }));
+  // asking on or off: switches what the QR code on the slides opens
+  $("[data-ask]").addEventListener("click", () => channel.postMessage({ t: "ask", on: !(state ? state.ask !== false : true) }));
   addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || (e.target.closest && e.target.closest("textarea, input"))) return;
     const k = e.key;

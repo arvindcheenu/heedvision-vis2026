@@ -204,9 +204,10 @@ a { color: var(--accent); }
 .chapter { margin-top: 44px; }
 .chapter .section-title { margin-bottom: 0; }
 .chapter .section-title .sub { font-weight: 550; letter-spacing: 0.02em; text-transform: none; margin-left: 8px; }
-.entry { padding: 26px 0 6px 18px; margin-left: -18px; border-left: 3px solid transparent; scroll-margin-top: calc(var(--stage-h, 0px) + 24px); transition: border-color 300ms var(--ease); cursor: pointer; }
-.entry.reading { border-left-color: var(--line); }
-.entry.live { border-left-color: var(--accent); }
+.entry { padding: 26px 0 6px; scroll-margin-top: calc(var(--stage-h, 0px) + 24px); cursor: pointer; }
+.entry h3 { transition: color 300ms var(--ease); }
+/* the entry you're reading (or the one being presented) takes the accent in its title */
+.entry.reading h3, .entry.live h3 { color: var(--accent); }
 .entry h3 { font-size: 24px; font-weight: 560; margin-bottom: 10px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
 .entry h3 .n { font-family: var(--f-text); font-size: 13px; font-weight: 650; color: var(--fg-3); font-variant-numeric: tabular-nums; }
 .entry .live-tag { display: none; margin-left: auto; font-family: var(--f-text); font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
@@ -222,7 +223,6 @@ a { color: var(--accent); }
   .talk-stage .deck-frame { border-radius: 0; border: 0; }
   .stage-bar { padding: 0 12px; margin-top: 6px; }
   .talk-hero { padding-top: 24px; }
-  .entry { padding-left: 12px; margin-left: -12px; }
 }
 
 .qs { margin-top: 6px; }
@@ -276,3 +276,9 @@ a { color: var(--accent); }
 .bibtex { position: relative; padding: 18px 20px; }
 .bibtex pre { margin: 0; overflow-x: auto; font: 13px/1.6 ui-monospace, "SF Mono", Menlo, monospace; color: var(--fg-2); }
 .bibtex .btn { position: absolute; top: 12px; right: 12px; height: 32px; font-size: 13px; }
+
+/* colour words: blue you, orange partner, pink both (slides and script) */
+mark.you { background: color-mix(in oklab, var(--you) 30%, transparent); }
+mark.partner { background: color-mix(in oklab, var(--partner) 34%, transparent); }
+mark.both { background: color-mix(in oklab, var(--both) 30%, transparent); }
+mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-radius: 0.2em; }

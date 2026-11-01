@@ -39,8 +39,10 @@ Everything about the talk lives in **`slides/talk.md`**: settings, slides, scrip
 ```yaml
 ---
 title: HeedVision
-url: https://heedvision.arvindchee.nu/talk/   # QR code target
-duration: 9.5                                 # minutes, for presenter-view pacing
+url: https://heedvision.arvindchee.nu/talk/   # QR code target while asking is on
+site: https://heedvision.arvindchee.nu/       # QR code target when asking is off
+photos: assets/people/arvind.jpg, assets/people/niklas.jpg   # title-slide portraits, in author order
+duration: 9.6                                 # minutes, for presenter-view pacing
 questions: on      # on | off | a link to the venue's own Q&A tool
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
@@ -48,7 +50,7 @@ room: vis2026
 ---
 ```
 
-If the venue runs its own Q&A, set `questions: off` or paste their link. The Ask buttons, question threads and the live board on the last slide then go away or point to that link, and the last slide shows its fallback content instead.
+If the venue runs its own Q&A, set `questions: off` or paste their link. The Ask buttons and question threads then go away or point to that link, and the QR codes on the title and end slides open the project site (`site:`) instead of the talk page. The presenter view's **Ask** button does the same on the spot, for the slides on this computer.
 
 ### A slide
 
@@ -73,7 +75,9 @@ What you say. [click] marks where you advance.
 
 A slide with `backup: yes` is a spare answer for Q&A: it is listed in the script under *Backup*, and skipped when presenting (the talk stops at the end slide; open backups from the presenter view or with **B**).
 
-There are four layouts: `title`, `section`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence.
+There are five layouts: `title`, `section`, `photo`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence. `section` and `photo` take `image:` (a section's photo is toned to the brand colours; a photo slide shows it full-bleed, with `credit:` as a source line). `align: center` keeps tiles at their natural height, centred on the slide.
+
+Keep `kicker:` (the running head over the headline) for wayfinding only, such as `RQ2 · Record`, `Result 1 · Scatterplot` or `Backup · …`; most slides don't need one.
 
 ### Components
 
@@ -83,18 +87,22 @@ There are four layouts: `title`, `section`, `content` (the default) and `end`. T
 | `::compare a= b= a-label= b-label= unit= change=` | before/after on one scale, starting at zero |
 | `::dots n= of= label=` | n of m people |
 | `::image src= caption= fit=` / `::video src= poster= caption=` | media |
-| `:::card label= title= steps` | text tile; `steps` reveals list items one by one |
+| `:::card label= title= icon= cite= steps` | text tile; `icon` (eye layers palette pin person search gauge toggle fade) sits beside the heading, `cite` adds a small source line, `steps` reveals list items one by one |
 | `:::quote who=` | participant quote |
-| `:::steps reveal tones=` | numbered stages from a list |
+| `:::steps reveal tones= icons=` | stages from a list; end an item with `{RQ1}` for a corner label |
+| `::clip src= poster= title= caption= ratio=` | looping video with its caption underneath |
+| `::live steps` | live 3D demo of the study's scatterplot (drag, scroll); builds show the targets, then the cues |
+| `::venn a= b= a-label= b-label=` | what a pair gain means, as overlapping finds |
+| `::art name=split` | line illustration in the text colour |
 | `:::row` / `:::stack` | put components beside or under each other |
 | `::demo modes= steps snapshot bare` | attention simulation; modes (`none count sum max diff who`) step in the order given; `snapshot` freezes one recorded session |
 | `::layers src="a, b, c" captions="A \| B \| C" steps` | images that build one over the other |
-| `::bvh steps` `::hunt steps` | animated explainers: BVH voxelization, the treasure hunt |
+| `::bvh steps` `::hunt steps` `::hv steps` | animated explainers: BVH voxelization, the treasure hunt, HeedVision's two headsets |
 | `::designspace highlight= badge= done= trigger=` | the 2×2 design space; highlight one or more corners |
 | `::glyph type=` `::caveat` `::qr` `::logos` | talk-specific pieces |
 | `:::questions` | live question board; shows its own content when questions are off |
 
-Any component takes `step` (appear on a click), `wide` (span all columns), `tall` (span two rows) and `tone=you|partner|both|brand`. You can make your own in the file:
+Any component takes `step` (appear on a click), `wide` (span all columns), `tall` (span two rows) and `tone=you|partner|both|brand`. Colour words in text can be highlighted with `<mark class="you">blue</mark>` (also `partner`, `both`). You can make your own in the file:
 
 ```markdown
 :::define callout

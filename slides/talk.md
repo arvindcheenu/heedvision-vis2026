@@ -3,14 +3,15 @@ title: HeedVision
 subtitle: Attention Awareness in Collaborative Immersive Analytics Environments
 kicker: Full paper · TVCG
 authors: Arvind Srinivasan, Niklas Elmqvist
-affiliation: Aarhus University
+photos: assets/people/arvind.jpg, assets/people/niklas.jpg
 venue: IEEE VIS 2026 · Boston · November 9–13
 contacts: **Arvind Srinivasan** · arvind@cs.au.dk; Niklas Elmqvist · elm@cs.au.dk
 url: https://heedvision.arvindchee.nu/talk/
-duration: 9.5     # minutes, for presenter-view pacing; the slot allows 10 at most
+site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
+duration: 9.6     # minutes, for presenter-view pacing; the slot allows 10 at most
 
 # Live layer. Turn these off if the venue runs its own Q&A.
-questions: on      # on | off | a link to the venue's Q&A tool
+questions: on      # on | off | a link to the venue's Q&A tool (the presenter view can also switch it off)
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
 room: vis2026
@@ -21,11 +22,13 @@ HOW THIS FILE WORKS
 
 Each slide starts with `---`. Optional settings go between two `---` lines:
   id        stable name (used in links and questions)
-  layout    title | section | content (default) | end
+  layout    title | section | photo | content (default) | end
+  image     section and photo: the picture behind the slide (credit: a source line)
   chapter   label in the footer band
-  kicker    small line above the headline
+  kicker    running head, for wayfinding only: `RQ2 · Record`, `Result 1 · Scatterplot`
   columns   body split, e.g. `7 5` or `1 1 1`
   rows      row split, e.g. `2 1`, or `1 auto` for a row that fits its content
+  align     center = tiles keep their natural height, centred on the slide
   time      seconds you plan to spend (presenter view pacing)
   backup    yes = a spare slide for Q&A: listed in the script, skipped when presenting
 
@@ -43,9 +46,10 @@ its click number, `wide` to span all columns, `tall` to span two rows, and
   ::dots n=15 of=16 label="…"
   ::image src="…" alt="…" caption="…" fit=cover|contain
   ::video src="…" poster="…" caption="…" fit=contain live=<demo name>
-  :::card label="…" title="…" (steps: list items appear one by one) … :::
+  :::card label="…" title="…" icon=eye cite="…" (steps: list items appear one by one) … :::
+        (icons: eye layers palette pin person search gauge toggle fade)
   :::quote who="…" … :::
-  :::steps reveal tones="you partner both"  - **Title** — text  :::
+  :::steps reveal tones="you partner both" icons="eye layers palette"  - **Title** — text {RQ1}  :::
   :::stack … :::   :::row … :::   (put components under or beside each other)
   ::glyph type=joint|distributed|sequential|cumulative
   ::demo modes="count,sum,max,diff,who" steps snapshot bare tag="…"
@@ -53,7 +57,12 @@ its click number, `wide` to span all columns, `tall` to span two rows, and
          recorded session so every mode shows the same data; `bare` hides the buttons)
   ::layers src="a.png, b.png, c.png" captions="A | B | C" steps
         (images that build one over the other)
-  ::bvh steps   ::hunt steps   (explainer animations; `steps=2` starts at click 2)
+  ::bvh steps   ::hunt steps   ::hv steps   (explainer animations; `steps=2` starts at click 2)
+  ::live steps  (live 3D demo of the study's scatterplot: drag, scroll; steps show targets, then cues)
+  ::clip src="…" poster="…" title="…" caption="…" ratio=8/5   (looping video, caption below)
+  ::venn a=1.19 b=1.46 a-label="…" b-label="…"   (what a pair gain means, as overlapping finds)
+  ::art name=split   (line illustration)
+  Colour words: <mark class="you">blue</mark>, <mark class="partner">orange</mark>, <mark class="both">pink</mark>
   ::designspace highlight="…" badge="…" done="…" done-badge="…" trigger=explicit steps
         (quadrants: world-embedded world-separated camera-embedded camera-separated)
   ::caveat text="…"   ::qr   ::logos
@@ -75,21 +84,74 @@ Make your own with :::define, then use it like any other component.
 id: title
 layout: title
 chapter: Motivation
-time: 18
+time: 15
 ---
 
 :::notes
-Hi, I'm Arvind Srinivasan from Aarhus University, and this is joint work with Niklas Elmqvist.
+Hi, I'm Arvind Srinivasan, and this is joint work with Niklas Elmqvist.
 
-HeedVision makes attention visible when people analyze data together in mixed reality. Scan the code to follow along or ask a question on any slide.
+HeedVision shows people analyzing data together in mixed reality where each of them has looked. Scan the code to follow along or ask questions.
+:::
+
+---
+id: hook-up
+layout: photo
+chapter: Motivation
+image: assets/fig/hook-embedding.jpg
+alt: Thousands of grey spheres float in clusters against a dark background, seen from inside.
+credit: 3D t-SNE of the scikit-learn digits, standing in for a cell atlas
+time: 8
+---
+
+# Some data has no up,
+
+## A biologist steps inside an embedding of thousands of cells, hunting for a rare type.
+
+:::notes
+Picture a biologist inside a 3D embedding of thousands of cells, hunting for a rare type. There's no up.
+:::
+
+---
+id: hook-landmarks
+layout: photo
+chapter: Motivation
+image: assets/fig/hook-molecule.jpg
+alt: A DNA double helix of grey spheres runs diagonally across a dark background.
+credit: B-DNA, drawn from its helix geometry
+time: 7
+---
+
+# no landmarks,
+
+## A chemist circles a molecule, looking for the one place a drug could bind.
+
+:::notes
+A chemist circling a molecule, looking for where a drug could bind. No landmarks.
+:::
+
+---
+id: hook-alone
+layout: photo
+chapter: Motivation
+image: assets/fig/hook-network.jpg
+alt: A dense 3D network of grey nodes and faint edges against a dark background.
+credit: A generated 3D network
+time: 9
+---
+
+# and too much to search alone.
+
+## An analyst flies through a network of thousands of hosts, looking for the one that shouldn't be talking.
+
+:::notes
+An analyst in a network of thousands of hosts, looking for the one that shouldn't be talking. Too much for one person.
 :::
 
 ---
 id: scenario
 chapter: Motivation
-kicker: Imagine
 columns: 7 5
-time: 38
+time: 30
 ---
 
 # Two analysts search one 3D space, but neither can see where the other has looked
@@ -110,11 +172,11 @@ What if the space remembered **who looked where**?
 :::
 
 :::notes
-Imagine you and a colleague in headsets, hunting for a few rare outliers in a 3D embedding, say a UMAP of cell data. These two circles are where each of you is looking.
+So add a colleague. These two circles are where each of you is looking.
 
-[click] Two minutes in: “Did you check the back?” “Which back?” An embedding has no back, and no landmarks to name.
+[click] Two minutes in: “Did you check the back?” “Which back?” An embedding has no back.
 
-[click] Ten minutes in, you've both searched the same cluster, and nobody looked underneath.
+[click] Ten minutes in, you've both searched one cluster twice, and nobody looked underneath.
 
 [click] Now imagine the space remembered who looked where. That's this talk.
 :::
@@ -122,37 +184,39 @@ Imagine you and a colleague in headsets, hunting for a few rare outliers in a 3D
 ---
 id: gap
 chapter: Motivation
-kicker: Why it's hard
-columns: 1 1 1
+columns: 5 7
 time: 24
 ---
 
 # Teams split up work by seeing each other. Headsets take that away.
 
-:::card label="At a desk" title="Group awareness"
-Seeing what collaborators are doing is what lets a team divide the work. *Gutwin & Greenberg, 1998*
+:::stack
+:::card label="At a desk" title="Group awareness" cite="Gutwin & Greenberg, CHI 1998"
+Seeing what others are doing is how a team divides the work.
 :::
-
 :::card label="In a headset" title="Separate viewpoints" tone=partner step
-Everyone stands somewhere else. There's no shared screen to point at.
+Everyone stands somewhere else, with no shared screen to point at.
+:::
 :::
 
-:::card label="Our prior work" title="Attention-aware vis" tone=you step
-Tracks where *one* viewer looked and feeds it back into the display. Built for one person.
+:::card label="Our prior work" title="Attention-aware visualization" tone=you step cite="Srinivasan et al., TVCG 2025"
+::image src="assets/fig/aav-teaser.jpg" fit=contain alt="The attention-aware visualization teaser: attention heatmaps on 3D bar charts, scatterplots and terrains, captured by headset orientation or eye tracking."
+Tracks where *one* viewer looks over time, and changes the display in response. Built for one person.
 :::
 
 :::notes
-This is group awareness: seeing what collaborators are doing, which lets a team divide the work.
+Group awareness, seeing what others are doing, is how a team divides the work.
 
-[click] In a headset it's harder. Everyone has their own viewpoint, and no shared screen to point at.
+[click] In a headset that's harder. Everyone stands somewhere else, with no shared screen to point at.
 
-[click] Our earlier attention-aware visualizations tracked where a viewer looked and fed it back into the display. But only for one person.
+[click] Our earlier attention-aware visualizations tracked where a viewer looked over time and fed it back into the display. But only for one person.
 :::
 
 ---
 id: part-idea
 layout: section
 chapter: Idea
+image: assets/fig/section-pair.jpg
 time: 4
 ---
 
@@ -161,22 +225,21 @@ time: 4
 ## Collaborative attention-aware visualization
 
 :::notes
-So: how do we carry that idea over to a group?
+So how do we carry that over to a group?
 :::
 
 ---
 id: caav
 chapter: Idea
-kicker: The idea · CAAV
-time: 26
+time: 24
 ---
 
 # Every stage of attention-aware vis gets a new job when a group is watching
 
-:::steps reveal tones="you partner both"
-- **Capture** — Track everyone at once, and know who is who. *RQ1*
-- **Record** — Keep one memory per person per spot, and combine them. *RQ2*
-- **Display** — Show *whose* attention, not just how much. *RQ3*
+:::steps reveal tones="you partner both" icons="eye layers palette"
+- **Capture** — Track everyone at once, and know who is who. {RQ1}
+- **Record** — Keep one memory per person per spot, and combine them. {RQ2}
+- **Display** — Show *whose* attention it is, not just how much. {RQ3}
 :::
 
 :::notes
@@ -227,7 +290,7 @@ We capture it through proxies like pointing, head direction or eye tracking, eac
 id: record
 chapter: Idea
 kicker: RQ2 · Record
-time: 40
+time: 38
 ---
 
 # One recorded session, combined five ways: each way shows a different pattern
@@ -235,7 +298,7 @@ time: 40
 ::demo steps snapshot tag="One recorded session"
 
 :::notes
-Recording. Here is one recorded session of two people. Each spot keeps one value per person that grows while someone looks and fades over time. Same data, combined five ways.
+Recording: one session of two people. Each spot keeps one value per person that grows while someone looks, and fades. Same data, five ways.
 
 Count: how many people looked here. Just grey squares.
 
@@ -245,7 +308,7 @@ Count: how many people looked here. Just grey squares.
 
 [click] Difference: shared spots fade. That shows division of labour.
 
-[click] And Who adds colour: blue for you, orange for your partner, pink for both. That's what HeedVision shows.
+[click] And Who adds colour: <mark class="you">blue</mark> for you, <mark class="partner">orange</mark> for your partner, <mark class="both">pink</mark> for both. That's what HeedVision shows.
 :::
 
 ---
@@ -264,13 +327,14 @@ For display, a design space. [click] Embed attention in the visualization, or in
 
 [click] And three triggers: always on, on request, or automatic.
 
-[click] HeedVision takes the world-space, embedded corner, on request: embedding keeps context, a shared world lets people say “look at that orange patch,” and a button keeps the trail out of the way. We'll come back to the other corners.
+[click] HeedVision takes the world-space, embedded corner, on request: embedding keeps context, a shared world lets people say “look at that orange patch,” and a button keeps the trail out of the way.
 :::
 
 ---
 id: part-system
 layout: section
 chapter: System
+image: assets/fig/terrain-caav-photo.jpg
 time: 4
 ---
 
@@ -285,38 +349,41 @@ Here's how we built it.
 ---
 id: heedvision
 chapter: System
-kicker: The system
-columns: 1 1 1
-rows: 2 1
-time: 28
+columns: 7 5
+time: 30
 ---
 
-# HeedVision paints attention onto the data as coloured voxels
+# HeedVision colours the data wherever each person has looked
 
-::video src="assets/video/heedvision.mp4" poster="assets/video/heedvision.jpg" caption="From the video figure" fit=contain live=heedvision wide
+::hv steps=1
 
-::stat value="1 button" label="shows the trail only when you ask, so it never clutters the search" tone=you step
-
-::stat value="3 colours" label="blue you, orange partner, pink both; safe for common colour blindness" tone=both step
-
-::stat value="Opacity" label="more attention, more solid; it fades as time passes" tone=partner step
+:::stack
+:::card icon=toggle title="On request" step=1
+Press a button to show the trail. Press again to hide it.
+:::
+:::card icon=palette title="Who looked" step=2
+<mark class="you">Blue</mark> is you, <mark class="partner">orange</mark> your partner, <mark class="both">pink</mark> both of you.
+:::
+:::card icon=fade title="How much" step=3
+The longer you look, the more solid a voxel gets. Leave it, and it fades.
+:::
+:::
 
 :::notes
-HeedVision runs in the Meta Quest 3 browser, built with WebXR and React Three Fiber, with both headsets sharing one scene.
+HeedVision runs in the Quest 3 browser, on Spatialstrates, so both headsets share one scene: when one of you looks, both copies change.
 
-[click] The trail stays hidden until you press a button.
+[click] The trail is recorded all along, but hidden until you press a button.
 
-[click] Then you see blue where you looked, orange for your partner, pink for both, colours chosen to stay distinct with common colour blindness.
+[click] Then <mark class="you">blue</mark> is you, <mark class="partner">orange</mark> your partner, <mark class="both">pink</mark> both: colours that survive common colour blindness.
 
-[click] The more attention, the more solid the voxel.
+[click] The longer you look, the more solid the voxel. Leave it, and it fades.
 :::
 
 ---
 id: bvh
 chapter: System
-kicker: Under the hood
 columns: 7 5
-time: 40
+time: 36
 ---
 
 # A bounding volume hierarchy turns any chart into voxels that collect attention
@@ -331,22 +398,21 @@ Nested boxes around its geometry, built once.
 Boxes rule out empty space fast, so attention sticks to the data.
 :::
 :::card label="3 · A ray, 10 times a second" step=2
-Each head's ray hits the nearest voxel, which gains attention, then fades.
+Straight out of each headset, it hits the nearest voxel, which gains attention, then fades.
 :::
 :::
 
 :::notes
 Under the hood. When a chart loads, we wrap its geometry in a bounding volume hierarchy: boxes inside boxes.
 
-[click] Then we lay a grid over it. The boxes rule out most cells without testing a single triangle, and only cells touching the geometry become voxels. So attention sticks to the data, on one grid both headsets share.
+[click] Then we lay a grid over it. The boxes rule out most cells without testing a single triangle; only cells touching the geometry become voxels. So attention sticks to the data.
 
-[click] Ten times a second, a ray along each head hits the nearest voxel and adds to that person's value, which then fades. Head direction, because the Quest 3 has no eye tracking.
+[click] Ten times a second, a ray straight out of the centre of each headset's view hits the nearest voxel and adds to that person's value, which then fades. Head direction, because the Quest 3 has no eye tracking.
 :::
 
 ---
 id: prototypes
 chapter: System
-kicker: Back to the design space
 time: 10
 ---
 
@@ -361,34 +427,34 @@ Back to the design space. HeedVision is the corner we tested. To show the space 
 ---
 id: quadrants
 chapter: System
-kicker: The three prototypes
 columns: 1 1 1
-rows: 5 1
-time: 25
+align: center
+time: 24
 ---
 
 # Each prototype suits a different kind of teamwork
 
-::image src="assets/fig/q-world-separated.jpg" alt="A small replica of the terrain floats beside the main view, showing attention." caption="World · separated: a miniature, for cluttered scenes" step
+::clip src="assets/video/proto-world-separated.mp4" poster="assets/video/proto-world-separated.jpg" title="World · separated" caption="A miniature you can move, for cluttered scenes" ratio=8/5 step
 
-::image src="assets/fig/q-camera-embedded.jpg" alt="Attention projected onto the faces of the terrain's bounding box." caption="Camera · embedded: projections, for guided tours" step
+::clip src="assets/video/proto-camera-embedded.mp4" poster="assets/video/proto-camera-embedded.jpg" title="Camera · embedded" caption="Attention projected onto the box, for guided tours" ratio=8/5 step
 
-::image src="assets/fig/q-camera-separated.jpg" alt="A 2D panel beside the terrain shows the attention map." caption="Camera · separated: a 2D panel, for handoffs" step
+::clip src="assets/video/proto-camera-separated.mp4" poster="assets/video/proto-camera-separated.jpg" title="Camera · separated" caption="A 2D panel beside the data, for handoffs" ratio=8/5 step
 
 ::caveat text="VR only, synced locally between browser tabs, and not part of the study."
 
 :::notes
 [click] A miniature you can move around, like a minimap, for scenes too cluttered to read directly.
 
-[click] Projections on the faces of the bounding box, for when everyone shares one viewpoint, like a guided tour.
+[click] Projections onto the faces of the bounding box, for when everyone shares one viewpoint, like a guided tour.
 
-[click] And a 2D panel, which suits handoffs: someone joining later sees where you have been. These run in VR only, and we haven't evaluated them.
+[click] And a 2D panel, which suits handoffs: someone joining later sees where you've been. These run in VR only, and we haven't evaluated them.
 :::
 
 ---
 id: part-study
 layout: section
 chapter: Study
+image: assets/video/eval-scatter.jpg
 time: 4
 ---
 
@@ -403,55 +469,51 @@ Then the real question: does it help?
 ---
 id: task
 chapter: Study
-kicker: The task · a treasure hunt
 columns: 7 5
 time: 36
 ---
 
-# Pairs hunted for hidden targets that only light up when you look closely
+# The task: a treasure hunt for targets that light up only up close
 
-::hunt steps=1
+::live steps=1 tag="Live · the study's scatterplot"
 
 :::stack
 ::stat value="10 min" label="per hunt, as a pair"
-::stat value="5%" label="of voxels hide a target, spread so no region is richer" step=1
-::stat value="10 cm" label="a target lights up only this close, from the right side" step=2
+::stat value="5%" label="of voxels hide a target, lit only within 10 cm, from its open side" step=1
+::stat value="1 of 2" label="hunts had the cues on" step=2
 :::
 
 :::notes
-Our task was a treasure hunt. Each pair had ten minutes to find hidden white targets.
+Here's the task, live, on the study's scatterplot. The blue circle is where I'm looking; the orange head is a simulated partner. Pairs had ten minutes to find hidden targets.
 
-[click] Targets were five percent of the voxels, spread so no region was richer than another. You had to cover everything.
+[click] Targets were five percent of the voxels, spread evenly; participants couldn't see them like this. One lit up only from within ten centimetres, from its open side, so you had to get close.
 
-[click] And a target only lit up from within ten centimetres, from the right side, so you couldn't scan from afar.
-
-[click] In one of their two hunts, the pair had the cues on.
+[click] And in one of their two hunts, the cues were on.
 :::
 
 ---
 id: why-task
 chapter: Study
-kicker: Why a treasure hunt
 columns: 1 1
 rows: 1 1
-time: 32
+time: 30
 ---
 
 # A treasure hunt isolates what cues should change: how a pair splits up a space
 
-:::card label="The unknown is where" tone=you
-Targets could be anywhere, so the pair must decide who covers what. Filtering would skip the search entirely.
+:::card icon=pin label="The unknown is where" tone=you
+Targets could be anywhere, so the pair must decide who covers what. A filter would skip the search entirely.
 :::
 
-:::card label="No expertise needed" step
+:::card icon=person label="No expertise needed" tone=partner step cite="Synthetic tasks: Cockburn et al. 2006 · Wong et al. 2015"
 A simple probe of moving, sharing attention and dividing work, with no domain knowledge to muddy it.
 :::
 
-:::card label="Like real exploration" step
-Needle-in-a-haystack search is common in exploratory analysis, and a standard probe in immersive analytics.
+:::card icon=search label="Like real exploration" tone=both step cite="Grinstein et al. 2002 · Pirolli & Card 2005 · Prouzeau et al. 2017 · Marguet et al. 2025"
+Needle-in-a-haystack search is common in exploratory analysis, and visual search is a standard probe in immersive analytics.
 :::
 
-:::card label="Clear to measure" step
+:::card icon=gauge label="Clear to measure" step
 Targets found, space covered and overlap give plain numbers from a 10-minute hunt.
 :::
 
@@ -468,10 +530,9 @@ Why a treasure hunt? Our question is how a pair divides a space, and here the on
 ---
 id: study
 chapter: Study
-kicker: The study
 columns: 1 1
 rows: 2 1
-time: 32
+time: 28
 ---
 
 # 16 people in 8 pairs searched two spaces, with cues in one and not the other
@@ -491,7 +552,7 @@ Peaks and valleys to talk about: do cues still help when a space has landmarks? 
 ::caveat text="Space–cue pairing and order counterbalanced. Exploratory: 4 pairs per cell."
 
 :::notes
-Sixteen graduate students in eight pairs, co-located in AR and free to talk. Each pair searched two spaces, with cues in one.
+Sixteen graduate students in eight pairs, together in AR and free to talk, searched two spaces, with cues in one.
 
 [click] A scatterplot of a hundred random points, without clusters, so only the cues could guide the split.
 
@@ -526,26 +587,22 @@ With four pairs per condition, these are trends, not significant results.
 id: scatter-talk
 chapter: Study
 kicker: Result 1 · Scatterplot
-columns: 1 1
+columns: 5 6
 time: 20
 ---
 
-# The colours did the coordinating, so pairs stopped talking about where to look
+# Pairs split the space once, and then the colours did the talking
 
-:::quote who="P8, with cues"
-we have no verbal communication during the condition where we have [CAAV]
-:::
+::art name=split
 
-:::quote who="P7, on dividing the space" step
-split into front/back faces for each of us
+:::quote who="P3 · scatterplot, with cues"
+We cut the space into top and bottom, and one search for top another search for the bottom.
 :::
 
 ::caveat text="Less talk can mean lower coordination cost, or less shared discussion. We read it with care."
 
 :::notes
-Coordination changed too. One participant said that with cues, they didn't talk at all.
-
-[click] Pairs split the space up front and used the colours to stick to the plan. Less talk can mean lower cost, or less discussion.
+Coordination changed too. Pairs agreed on a split up front, here top and bottom, and the colours kept them to it. One said that with cues, they didn't talk at all. That can mean lower cost, or less discussion.
 :::
 
 ---
@@ -553,7 +610,7 @@ id: terrain
 chapter: Study
 kicker: Result 2 · Terrain
 columns: 1 1
-time: 28
+time: 26
 ---
 
 # On a landscape, overlap went up 3.7×, because peaks pulled both partners in
@@ -575,6 +632,7 @@ id: teamwork
 chapter: Study
 kicker: Result 2 · Terrain
 columns: 1 1
+align: center
 time: 20
 ---
 
@@ -582,47 +640,51 @@ time: 20
 
 ::compare label="Targets found by the pair, vs. its average member" a=1.19 b=1.46 unit="×" a-label="Cues off" b-label="Cues on" change="+23%" tone=you
 
-::dots n=4 of=4 label="pairs with cues beat the average pair without" tone=you step
+::venn a=1.19 b=1.46 a-label="Cues off" b-label="Cues on" label="What that means: less overlap in what partners found" note="If both partners found as many, the pink share is what each found that the other also found." step
 
 :::notes
 Yet terrain gave our clearest result. With cues, a pair found 1.46 times what its average member found alone, against 1.19 without.
 
-[click] All four pairs with cues beat the no-cue average. So the cues didn't fail here. The landscape already offered cues of its own.
+[click] Put another way, partners' finds overlapped less: about half, not four fifths. The cues didn't fail here; the landscape just had cues of its own.
 :::
 
 ---
 id: people
 chapter: Study
-kicker: What people said
 columns: 1 1 1
-time: 20
+rows: 1 1
+time: 22
 ---
 
 # 15 of 16 people preferred working with the cues
 
-::dots n=15 of=16 label="preferred the conditions with cues" tone=both
+::dots n=15 of=16 label="preferred the conditions with cues" tone=both tall
 
-:::stack
 ::stat value="−24%" label="workload overall (NASA TLX)" sub="but it trended higher in terrain"
+
 ::stat value="75%" label="of the time, people kept the cues on"
+
+:::quote who="P7, with cues" tone=both step
+I can see what the other guy and I did!
 :::
 
-:::quote who="P6, on the colours" step
-a nice blue side and a nice orange side with very little overlap
+:::quote who="P1, the one who preferred no cues" step
+It increase[d] redundant search due to visual noise
 :::
 
 :::notes
-Fifteen of sixteen preferred the conditions with cues. Workload was about a quarter lower overall, though higher in terrain, and people kept the cues on three quarters of the time.
+Fifteen of sixteen preferred the cues. Workload was about a quarter lower overall, though higher in terrain, and cues stayed on three quarters of the time.
 
-[click] Some made a game of it: a nice blue side and a nice orange side with very little overlap.
+[click] As one put it: I can see what the other guy and I did!
+
+[click] The one who preferred no cues found the colours noisy.
 :::
 
 ---
 id: takeaway
 chapter: Takeaways
-kicker: Takeaway
 columns: 7 5
-time: 24
+time: 22
 ---
 
 # Show attention where the space gives you nothing to point at
@@ -641,7 +703,7 @@ time: 24
 :::
 
 :::notes
-Back to our two analysts in the embedding. Attention cues seem most useful where the space gives you nothing to point at: embeddings, molecules, 3D networks, when you must cover all of it.
+Back to our biologist, chemist and analyst. Attention cues seem most useful where the space gives you nothing to point at, and you must cover all of it.
 
 [click] Where the data has its own landmarks, the cues add to what people already use, and to the clutter.
 :::
@@ -649,9 +711,8 @@ Back to our two analysts in the embedding. Attention cues seem most useful where
 ---
 id: next
 chapter: Takeaways
-kicker: Limits and next steps
 columns: 1 1
-time: 24
+time: 22
 ---
 
 # A first step, with clear limits
@@ -671,7 +732,7 @@ time: 24
 :::
 
 :::notes
-This is a first step: pairs, head direction, one task, colours that stop scaling past four. Our only baseline was no cues, so gaze rays or pointer trails might give part of this.
+This is a first step: pairs, head direction, one task, colours that stop scaling past four, and only a no-cue baseline.
 
 [click] Next: test the prototypes, cues that fade or appear on their own, attention to data items, and remote teams.
 :::
@@ -691,6 +752,26 @@ time: 10
 
 :::notes
 Thank you. The slides, this script and a place for your questions are behind the code. I'm happy to take questions.
+:::
+
+---
+id: backup-hunt
+chapter: Backup
+backup: yes
+kicker: Backup · The task, step by step
+columns: 7 5
+---
+
+# How the treasure hunt played out
+
+::hunt steps
+
+:::card label="Read it like this"
+Two people search 100 random points. Targets are hidden until one of them gets close, from the right side. With cues on, each sees where the other has looked, and they split up.
+:::
+
+:::notes
+The hunt, step by step: the hidden targets, the rule that a target lights up only up close and from its open side, and how cues let the pair split the space.
 :::
 
 ---
@@ -756,7 +837,7 @@ Training before each condition, then 10 minutes of search. A short questionnaire
 :::
 
 :::card label="The cues"
-Blue for you, orange for your partner, pink for both, shown with a controller button as often as people liked.
+<mark class="you">Blue</mark> for you, <mark class="partner">orange</mark> for your partner, <mark class="both">pink</mark> for both, shown with a controller button as often as people liked.
 :::
 
 :::notes
