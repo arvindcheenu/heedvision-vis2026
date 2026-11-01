@@ -8,7 +8,7 @@ CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 BASE="${BASE:-http://127.0.0.1:8000}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-ids=$(grep -oE '<section id="[^"]+"' slides/index.html | sed -E 's/.*id="([^"]+)"/\1/')
+ids=$(grep -E '^id: ' slides/talk.md | sed -E 's/^id: *//')
 for id in $ids; do
   "$CHROME" --headless=new --disable-gpu --hide-scrollbars --mute-audio \
     --window-size=1920,1080 --force-device-scale-factor=1 \

@@ -1,8 +1,8 @@
 // Live layer: follow the presenter's slide and ask/upvote questions per slide.
-// Talks to the Cloudflare Worker in /worker over one WebSocket. If no endpoint
-// is configured (or the network is down) everything else keeps working.
+// Talks to the Cloudflare Worker in /worker over one WebSocket. Call
+// HVLive.start({ endpoint, room }) once settings are known; without an
+// endpoint (or offline) everything else keeps working.
 (function () {
-  const cfg = (window.HV && window.HV.live) || {};
   const params = new URLSearchParams(location.search);
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
@@ -13,8 +13,9 @@
   if (!clientId) { clientId = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set("hv.cid", clientId); }
 
   const bus = new EventTarget();
+  let cfg = {};
   const live = {
-    enabled: !!cfg.endpoint,
+    enabled: false,
     status: "off",          // off | connecting | open | closed
     presenterKey: params.get("present") || "",
     slide: null,            // last slide broadcast by the presenter
@@ -31,7 +32,6 @@
       return [...this.questions.values()].filter((q) => !q.hidden)
         .sort((a, b) => b.votes - a.votes || a.ts - b.ts).slice(0, n);
     },
-    count(id) { return this.forSlide(id).length; },
 
     ask(slide, text, name) {
       text = (text || "").trim();
@@ -45,9 +45,21 @@
     },
     hide(id) { return send({ t: "hide", id }); },
     broadcast(slide) { if (this.presenterKey) send({ t: "slide", slide }); },
+
+    start(options) {
+      cfg = { ...options };
+      // For local testing: ?live=http://127.0.0.1:8787 points at `npx wrangler dev`.
+      // Only loopback addresses are accepted, so a link can't redirect the audience.
+      const v = params.get("live");
+      if (v && /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\/?$/.test(v)) cfg.endpoint = v;
+      this.enabled = !!cfg.endpoint;
+      // Speaker-view iframes ("receivers"), posters and embeds never connect.
+      if (this.enabled && !params.has("receiver") && !params.has("poster") && !params.has("embed")) connect();
+    },
   };
 
-  let ws = null, retry = 0, queue = [];
+  let ws = null, retry = 0;
+  const queue = [];
   function send(msg) {
     if (!live.enabled) return false;
     if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
@@ -58,7 +70,6 @@
   function setStatus(s) { live.status = s; live.emit("status", s); }
 
   function connect() {
-    if (!live.enabled) return;
     const base = cfg.endpoint.replace(/\/$/, "").replace(/^http/, "ws");
     const url = `${base}/rooms/${encodeURIComponent(cfg.room || "default")}/ws` +
       (live.presenterKey ? `?key=${encodeURIComponent(live.presenterKey)}` : "");
@@ -98,6 +109,4 @@
   }
 
   window.HVLive = live;
-  // Speaker-view iframes ("receivers"), posters and embeds must not connect.
-  if (!params.has("receiver") && !params.has("poster") && !params.has("embed")) connect();
 })();

@@ -14,7 +14,7 @@ shot() {
     --virtual-time-budget=6000 --user-data-dir="$TMP/profile" "$@" >/dev/null 2>&1
 }
 pages=""
-for id in $(grep -oE '<section id="[^"]+"' slides/index.html | sed -E 's/.*id="([^"]+)"/\1/'); do
+for id in $(grep -E '^id: ' slides/talk.md | sed -E 's/^id: *//'); do
   shot --screenshot="$TMP/$id.png" "$BASE/slides/?poster#/$id"
   pages="$pages<img src=\"$id.png\">"
   echo "page: $id"
