@@ -8,7 +8,14 @@
   const isReceiver = params.has("receiver");
   const isPresenting = !!(live && live.presenterKey);
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // ?embed shows the deck inside another page; ?embed=<id> shows just that slide
+  const isEmbed = params.has("embed");
+  const single = params.get("embed") || null;
+  if (single && document.getElementById(single)) {
+    document.querySelectorAll(".reveal .slides > section").forEach((s) => { if (s.id !== single) s.remove(); });
+  }
 
+  document.body.classList.toggle("embed", isEmbed);
   document.body.classList.toggle("poster", isPoster);
   document.body.classList.toggle("receiver", isReceiver);
   document.body.classList.toggle("presenting", isPresenting);
@@ -21,7 +28,9 @@
     minScale: 0.1,
     maxScale: 3,
     center: false,
-    hash: true,
+    hash: !isEmbed,
+    embedded: isEmbed,
+    ...(isEmbed ? { scrollActivationWidth: null } : {}),
     history: false,
     controls: false,
     progress: false,
@@ -70,8 +79,8 @@
   function updateChrome(cur) {
     const all = slides();
     const idx = all.indexOf(cur);
-    chrome.classList.toggle("hidden", idx === 0);
-    count.textContent = `${idx + 1} / ${all.length}`;
+    chrome.classList.toggle("hidden", cur.classList.contains("bleed") || !!single);
+    count.textContent = `${idx + 1}`;
     const segs = rail.querySelectorAll(".seg");
     let passed = 0;
     chapters.forEach((c, i) => {
@@ -401,6 +410,33 @@
 
   function broadcast() { if (isPresenting) live.broadcast(currentState()); }
 
+  // ---------------------------------------------------------- embed bridge
+  // The host page steps through builds with {hv:"go", dir} and gets {hv:"state"} back.
+  function postState() {
+    if (!isEmbed || window.parent === window) return;
+    const a = deck.availableFragments(), r = deck.availableRoutes();
+    window.parent.postMessage({
+      hv: "state", id: deck.getCurrentSlide().id,
+      prev: a.prev || r.left, next: a.next || r.right,
+      index: deck.getIndices().h, total: deck.getTotalSlides(),
+    }, location.origin);
+  }
+  if (isEmbed) {
+    addEventListener("message", (e) => {
+      if (e.origin !== location.origin || !e.data || e.data.hv !== "go") return;
+      if (e.data.dir === "next") deck.next();
+      else if (e.data.dir === "prev") deck.prev();
+      else if (e.data.dir === "first") deck.slide(0, 0, -1);
+      else if (e.data.dir === "build") deck.slide(deck.getIndices().h, 0, e.data.f);
+    });
+    // clicking the slide advances, like a clicker
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("button, a, iframe, video, .seg-ctl")) return;
+      deck.next();
+    });
+    ["slidechanged", "fragmentshown", "fragmenthidden"].forEach((t) => deck.on(t, postState));
+  }
+
   // ---------------------------------------------------------- wiring
   deck.on("ready", (e) => {
     renderQR();
@@ -408,7 +444,7 @@
     initCharts();
     document.querySelectorAll(".embed").forEach(buildEmbed);
     deck.addKeyBinding({ keyCode: 82, key: "R", description: "Toggle live demo / recording" }, toggleEmbeds);
-    if (!isPoster && !isReceiver && !isPresenting) buildAudienceUI();
+    if (!isPoster && !isReceiver && !isPresenting && !isEmbed) buildAudienceUI();
     if (live) {
       live.on("questions", renderBoard);
       live.on("status", (s) => { if (s === "open") broadcast(); });
@@ -416,6 +452,7 @@
     }
     renderBoard();
     onSlide(e.currentSlide);
+    postState();
   });
   function onSlide(cur) {
     updateChrome(cur);

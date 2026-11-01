@@ -53,36 +53,40 @@
 <div class="reveal">
 <div class="slides">
 
-<!-- ============================ 1. TITLE ============================ -->
-<section id="title" class="title-slide bleed" data-chapter="Motivation" data-title="HeedVision" data-timing="22">
+<!-- ============================ TITLE ============================ -->
+<section id="title" class="title-slide bleed" data-chapter="Motivation" data-title="HeedVision" data-timing="21">
   <canvas class="field" data-field="ambient" aria-hidden="true"></canvas>
+  <div class="tab tab-top" aria-hidden="true"></div>
   <img class="vis-logo" src="assets/img/vis2026-logo.png" alt="IEEE VIS 2026">
-  <div class="title-block">
+  <div class="title-panel">
+    <div class="kicker on-panel">Full paper · TVCG</div>
     <h1>HeedVision</h1>
     <p class="subtitle">Attention Awareness in Collaborative Immersive Analytics Environments</p>
-    <p class="byline"><span><b>Arvind Srinivasan</b> &amp; Niklas Elmqvist</span><span class="faint">Aarhus University</span></p>
+    <p class="byline"><b>Arvind Srinivasan</b> &amp; Niklas Elmqvist <span>Aarhus University</span></p>
   </div>
   <div class="qr-card tile">
     <div class="qr" data-qr="talk"></div>
     <p>Follow along &amp; ask questions</p>
   </div>
+  <div class="event-line">IEEE VIS 2026 <i></i> Boston <i></i> November 9–13</div>
   <aside class="notes">
     <p>Hi, I'm Arvind Srinivasan from Aarhus University, and this is joint work with Niklas Elmqvist.</p>
-    <p>Today I'll talk about HeedVision, which makes attention visible when people analyze data together in mixed reality. If you'd like to follow along or leave a question, the QR code takes you to the slides and the script.</p>
+    <p>I'll talk about HeedVision, which makes attention visible when people analyze data together in mixed reality. To follow along or leave a question on any slide, scan the QR code.</p>
   </aside>
 </section>
 
-<!-- ============================ 2. HOOK ============================ -->
-<section id="hook" data-chapter="Motivation" data-title="Two analysts, one corner" data-timing="35">
+<!-- ============================ HOOK ============================ -->
+<section id="hook" data-chapter="Motivation" data-title="Two analysts, one corner" data-timing="29">
   <div class="fill">
     <div class="head">
       <div class="kicker">The problem</div>
       <h2>“Did you already check over there?”</h2>
     </div>
     <div class="grow bento" style="grid-template-rows: 1fr;">
-      <div class="tile flush span-7">
-        <div class="embed" data-video="assets/video/eval-scatter.mp4" data-poster="assets/video/eval-scatter.jpg" data-label="Recording · scatterplot task"></div>
-      </div>
+      <figure class="tile flush span-7">
+        <img class="media" src="assets/fig/scatter-no-caav.jpg" alt="Two participants in headsets searching a 3D scatterplot without any attention cues.">
+        <figcaption class="on-media">Study photo · scatterplot, no attention cues</figcaption>
+      </figure>
       <div class="span-5" style="display:flex; flex-direction:column; gap:24px;">
         <div class="tile fragment rise" style="flex:1;">
           <p class="lede" style="font-size:36px;">Each analyst sees the data. Neither sees what the other has already looked at.</p>
@@ -94,14 +98,14 @@
     </div>
   </div>
   <aside class="notes">
-    <p>Picture two analysts wearing headsets, searching the same 3D scatterplot together. Each of them sees the data. Neither sees what the other has already looked at.</p>
-    <p>So they talk. “Did you check the back corner?” “Which corner?” And they still end up searching the same points twice.</p>
-    <p>In immersive analytics, knowing what your partner has seen can matter as much as what you see yourself.</p>
+    <p>Picture two analysts wearing headsets, searching the same 3D scatterplot. Each of them sees the data. Neither sees what the other has already looked at.</p>
+    <p>[click] So they talk. “Did you check the back?” “Which back?” And they still end up searching the same points twice.</p>
+    <p>[click] In immersive analytics, knowing what your partner has seen can matter as much as what you see yourself.</p>
   </aside>
 </section>
 
-<!-- ============================ 3. GAP ============================ -->
-<section id="gap" data-chapter="Motivation" data-title="The gap" data-timing="35">
+<!-- ============================ GAP ============================ -->
+<section id="gap" data-chapter="Motivation" data-title="The gap" data-timing="33">
   <div class="fill">
     <div class="head">
       <div class="kicker">Background</div>
@@ -111,11 +115,11 @@
       <div class="tile span-5 row-2">
         <div class="label">Group awareness</div>
         <h3>Perceiving what your collaborators are doing in a shared space</h3>
-        <p>Gutwin &amp; Greenberg, 1998</p>
+        <p>Gutwin &amp; Greenberg, CHI 1998</p>
       </div>
       <div class="tile span-7 fragment rise">
         <div class="label">In AR / VR</div>
-        <h3>Many viewpoints, attention spread across space, no shared screen to point at</h3>
+        <h3>Separate viewpoints, attention spread across the room, no shared screen to point at</h3>
       </div>
       <div class="tile tone-you span-7 fragment rise">
         <div class="label">Attention-aware visualization (AAV)</div>
@@ -125,14 +129,27 @@
     </div>
   </div>
   <aside class="notes">
-    <p>The CSCW literature calls this group awareness: knowing what your collaborators are doing in a shared space.</p>
-    <p>In immersive 3D it gets harder. Everyone has their own viewpoint, attention is spread around the room, and there's no shared screen to point at.</p>
-    <p>In our earlier work on attention-aware visualizations, or AAVs, we tracked where a viewer had looked and fed that back into the display. But AAVs serve a single person. Nobody had carried the idea over to a group.</p>
+    <p>In CSCW this is called group awareness: perceiving what your collaborators are doing in a shared space.</p>
+    <p>[click] In immersive 3D it gets harder. Everyone has their own viewpoint, attention is spread around the room, and there's no shared screen to point at.</p>
+    <p>[click] In our earlier work on attention-aware visualizations, or AAVs, we tracked where a viewer had looked and fed it back into the display. But AAVs serve one person.</p>
   </aside>
 </section>
 
-<!-- ============================ 4a. AAV PIPELINE ============================ -->
-<section id="aav" data-auto-animate data-chapter="Concept" data-title="From AAV…" data-timing="12">
+<!-- ============================ PART: CONCEPT ============================ -->
+<section id="part-concept" class="section-slide bleed" data-chapter="Concept" data-title="Part 1 · Collaborative attention-aware visualization" data-timing="6">
+  <div class="section-panel">
+    <div class="part">01</div>
+    <h2>Collaborative attention-aware visualization</h2>
+    <p>From one viewer to many</p>
+    <img class="vis-logo-white" src="assets/img/vis2026-logo.png" alt="">
+  </div>
+  <aside class="notes">
+    <p>So the first part is about carrying that idea over to groups.</p>
+  </aside>
+</section>
+
+<!-- ============================ AAV PIPELINE ============================ -->
+<section id="aav" data-auto-animate data-chapter="Concept" data-title="From AAV…" data-timing="9">
   <div class="fill">
     <div class="head">
       <div class="kicker" data-id="k-pipe">Attention-aware visualization</div>
@@ -145,15 +162,15 @@
     </div>
   </div>
   <aside class="notes">
-    <p>So we start from the AAV pipeline, which has three stages: capture attention, record it over time, and display it.</p>
+    <p>An AAV has three stages: capture attention, record it over time, and display it back.</p>
   </aside>
 </section>
 
-<!-- ============================ 4b. CAAV PIPELINE ============================ -->
-<section id="caav" data-auto-animate data-chapter="Concept" data-title="…to collaborative AAV" data-timing="38">
+<!-- ============================ CAAV PIPELINE ============================ -->
+<section id="caav" data-auto-animate data-chapter="Concept" data-title="…to collaborative AAV" data-timing="34">
   <div class="fill">
     <div class="head">
-      <div class="kicker" data-id="k-pipe">Collaborative attention-aware visualization</div>
+      <div class="kicker" data-id="k-pipe">Collaborative attention-aware visualization (CAAV)</div>
       <h2 data-id="h-pipe">Many viewers: every stage gets a new problem</h2>
     </div>
     <div class="pipeline">
@@ -163,14 +180,14 @@
     </div>
   </div>
   <aside class="notes">
-    <p>We extend it to collaborative attention-aware visualizations, or CAAVs. The pipeline stays the same, but every stage gets a new problem.</p>
-    <p>Capture has to tell people apart while tracking all of them at once. Recording needs one accumulator per person per target, plus ways to combine them. And the display has to show whose attention it is, not just how much, so that partners can coordinate instead of only reflecting on their own path.</p>
+    <p>Collaborative attention-aware visualizations, or CAAVs, keep those three stages, but each one gets a problem with no single-user counterpart.</p>
+    <p>Capture has to tell people apart while tracking everyone at once. Recording needs one accumulator per person per target, plus ways to combine them. And the display has to show whose attention it is, not just how much, so partners can coordinate instead of only reflecting.</p>
     <p>These three stages are our three research questions.</p>
   </aside>
 </section>
 
-<!-- ============================ 5. COLLECTIVE ATTENTION ============================ -->
-<section id="collective" data-chapter="Concept" data-title="Kinds of collective attention" data-timing="30">
+<!-- ============================ COLLECTIVE ATTENTION ============================ -->
+<section id="collective" data-chapter="Concept" data-title="Kinds of collective attention" data-timing="27">
   <div class="fill">
     <div class="head">
       <div class="kicker">RQ1 · Capture</div>
@@ -221,25 +238,25 @@
     </div>
   </div>
   <aside class="notes">
-    <p>Once there's more than one person, we get kinds of attention with no single-user counterpart. Joint attention, when we look at the same thing. Distributed, when we split up. Sequential, when I build on where you looked. And cumulative: everything the team has covered so far.</p>
-    <p>We capture all of this through proxies like pointing, head direction or eye tracking, tagged by who it came from.</p>
+    <p>With more than one person, we get new kinds of attention. [click] Joint, when we look at the same thing. [click] Distributed, when we split up. [click] Sequential, when I build on where you looked. [click] And cumulative: everything the team has covered.</p>
+    <p>We capture these through proxies like pointing, head direction or eye tracking, each tagged with who it came from.</p>
   </aside>
 </section>
 
-<!-- ============================ 6. RECORDING DEMO ============================ -->
-<section id="record" data-chapter="Concept" data-title="Recording attention" data-timing="36">
+<!-- ============================ RECORDING DEMO ============================ -->
+<section id="record" data-chapter="Concept" data-title="Recording attention" data-timing="35">
   <div class="fill">
     <div class="head" style="margin-bottom:36px;">
       <div class="kicker">RQ2 · Record</div>
       <h2>Per-person memory that fades</h2>
     </div>
     <div class="grow demo-wrap">
-      <div class="tile flush"><canvas data-field="demo" aria-label="Simulation of two people's attention filling a voxel grid"></canvas></div>
+      <div class="tile flush"><canvas data-field="demo" aria-label="Simulation of two people's attention filling a grid of cells"></canvas><span class="sim-tag">Simulation</span></div>
       <div class="seg-ctl" role="group" aria-label="Aggregation">
         <button type="button" data-mode="identity" aria-pressed="true"><i data-swatch="identity"></i><b>Who</b><span>blue you · orange partner · pink both</span></button>
-        <button type="button" data-mode="sum" aria-pressed="false"><i data-swatch="sum"></i><b>Sum</b><span>total coverage</span></button>
+        <button type="button" data-mode="sum" aria-pressed="false"><i data-swatch="sum"></i><b>Sum</b><span>total collective attention</span></button>
         <button type="button" data-mode="max" aria-pressed="false"><i data-swatch="max"></i><b>Max</b><span>strongest individual focus</span></button>
-        <button type="button" data-mode="diff" aria-pressed="false"><i data-swatch="diff"></i><b>Difference</b><span>who owns which area</span></button>
+        <button type="button" data-mode="diff" aria-pressed="false"><i data-swatch="diff"></i><b>Difference</b><span>balance between partners</span></button>
         <button type="button" data-mode="count" aria-pressed="false"><i data-swatch="count"></i><b>Count</b><span>how many people were here</span></button>
       </div>
     </div>
@@ -250,13 +267,13 @@
     <span class="fragment step" data-mode="identity"></span>
   </div>
   <aside class="notes">
-    <p>Here's what recording looks like. Every cell keeps a separate value for each person. Values grow while someone looks at a cell, and decay over time, a bit like short-term memory.</p>
-    <p>How you combine them changes what you see. [click] Sum shows total coverage. [click] Max shows the strongest individual focus. [click] Difference shows who owns which area. [click] And count shows how many people have been there. [click] Back to who-looked-where.</p>
+    <p>Here's recording, as a simulation. Each cell keeps a separate value for each person. It grows while someone looks at it and decays over time, a bit like short-term memory. In HeedVision these values live in voxels on the visualization itself.</p>
+    <p>How you combine the values changes what you see. [click] Sum shows total coverage. [click] Max, the strongest individual focus. [click] Difference, who owns which area. [click] And count, how many people have been there. [click] Back to who looked where.</p>
   </aside>
 </section>
 
-<!-- ============================ 7. DESIGN SPACE ============================ -->
-<section id="design-space" data-chapter="Concept" data-title="A design space for display" data-timing="45">
+<!-- ============================ DESIGN SPACE ============================ -->
+<section id="design-space" data-chapter="Concept" data-title="A design space for display" data-timing="37">
   <div class="fill">
     <div class="head" style="margin-bottom:28px;">
       <div class="kicker">RQ3 · Display</div>
@@ -270,7 +287,7 @@
 
       <div class="axis-y">World space</div>
       <div class="tile quad hv fragment rise" data-fragment-index="1">
-        <span class="q-label">World · embedded</span><span class="chip on hv-badge tiny">HeedVision</span>
+        <span class="q-label">World · embedded</span><span class="chip on hv-badge tiny">HeedVision · evaluated</span>
         <svg viewBox="0 0 400 240" aria-hidden="true">
           <circle cx="250" cy="120" r="78" fill="url(#g-sphere)"/>
           <circle cx="232" cy="104" r="38" fill="url(#g-blob)"/>
@@ -314,7 +331,7 @@
       </div>
 
       <div class="trig fragment rise" data-fragment-index="3">
-        <div class="tile"><svg><use href="#i-loop" color="var(--text-2)"/></svg><div><b>Always on</b><span>risks clutter and feedback loops</span></div></div>
+        <div class="tile"><svg><use href="#i-loop" color="var(--text-2)"/></svg><div><b>Always on</b><span>risks Midas touch, feedback loops</span></div></div>
         <div class="tile hv"><svg><use href="#i-hand" color="var(--text)"/></svg><div><b>Explicit</b><span>you ask to see it</span></div></div>
         <div class="tile"><svg><use href="#i-bolt" color="var(--text-2)"/></svg><div><b>Implicit</b><span>the system decides</span></div></div>
       </div>
@@ -322,46 +339,59 @@
     <span class="fragment step" data-fragment-index="4" data-ds-pick></span>
   </div>
   <aside class="notes">
-    <p>For display, we lay out a design space. [click] One axis is presentation: embed attention in the visualization itself, or show it in a separate view, like a miniature you hold. [click] The other is situatedness: anchor it in the shared world, or attach it to your own camera.</p>
+    <p>For display, we propose a design space. [click] One axis is presentation: embed attention in the visualization itself, or show it in a separate view, like a miniature. [click] The other is situatedness: anchor it in the shared world, or attach it to your own camera.</p>
     <p>[click] Across all four sits triggering: always on, on request, or automatic.</p>
-    <p>[click] HeedVision sits in the world-space, embedded corner with explicit triggering. Both people share one frame of reference, so they can say “look at that orange patch.”</p>
+    <p>[click] HeedVision sits in the world-space, embedded corner, with explicit triggering. Both people share one frame of reference, so they can say “look at that orange patch.”</p>
   </aside>
 </section>
 
-<!-- ============================ 8. HEEDVISION ============================ -->
-<section id="heedvision" data-chapter="System" data-title="HeedVision" data-timing="43">
+<!-- ============================ PART: SYSTEM ============================ -->
+<section id="part-system" class="section-slide bleed" data-chapter="System" data-title="Part 2 · HeedVision" data-timing="5">
+  <div class="section-panel">
+    <div class="part">02</div>
+    <h2>HeedVision</h2>
+    <p>One quadrant built for the study, three as prototypes</p>
+    <img class="vis-logo-white" src="assets/img/vis2026-logo.png" alt="">
+  </div>
+  <aside class="notes">
+    <p>Next, how we built it.</p>
+  </aside>
+</section>
+
+<!-- ============================ HEEDVISION ============================ -->
+<section id="heedvision" data-chapter="System" data-title="HeedVision" data-timing="42">
   <div class="fill">
     <div class="head" style="margin-bottom:36px;">
       <div class="kicker">The system</div>
-      <h2>HeedVision</h2>
+      <h2>Attention as voxels you can see</h2>
     </div>
     <div class="grow bento" style="grid-template-rows: 1.9fr 1fr;">
       <div class="tile flush span-12">
-        <div class="embed" data-fit="contain" data-live="heedvision" data-video="assets/video/heedvision.mp4" data-poster="assets/video/heedvision.jpg" data-label="Recording"></div>
+        <div class="embed" data-fit="contain" data-live="heedvision" data-video="assets/video/heedvision.mp4" data-poster="assets/video/heedvision.jpg" data-label="From the video figure"></div>
       </div>
       <div class="tile span-4 fragment rise">
         <div class="label">Capture</div>
-        <p style="font-size:30px;">Head direction as a gaze proxy, cast into a voxel grid at 10&nbsp;Hz</p>
+        <p style="font-size:30px;">Head direction as a gaze proxy, cast into a voxel grid 10 times a second</p>
       </div>
       <div class="tile span-4 fragment rise">
-        <div class="label">Display</div>
-        <p style="font-size:30px;"><span class="swatch you"></span>you <span class="swatch partner" style="margin-left:.5em"></span>partner <span class="swatch both" style="margin-left:.5em"></span>both, opacity = attention</p>
+        <div class="label">Display, on a button press</div>
+        <p style="font-size:30px;"><span class="swatch you"></span>you <span class="swatch partner" style="margin-left:.4em"></span>partner <span class="swatch both" style="margin-left:.4em"></span>both · more attention, more opaque</p>
       </div>
-      <div class="tile span-4 fragment rise">
+      <div class="tile span-4">
         <div class="label">Runs on</div>
-        <p style="font-size:30px;">WebXR + React Three Fiber, in the headset's browser (Quest&nbsp;3)</p>
+        <p style="font-size:30px;">WebXR + React Three Fiber, in the Meta Quest&nbsp;3 browser</p>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p>HeedVision is built in WebXR with React Three Fiber, so it runs in the headset's browser.</p>
-    <p>We split each visualization into voxels. [click] A ray from each person's head direction hits a voxel and raises its value. Head direction is our proxy for gaze, since the Quest 3 has no eye tracking.</p>
-    <p>[click] Press a button and the voxels appear: blue where you looked, orange for your partner, pink where you both did. The more attention a voxel got, the more opaque it is.</p>
+    <p>HeedVision runs in the headset's browser, built with WebXR and React Three Fiber, on the Meta Quest 3. We split each visualization into voxels, and only voxels that touch the data's geometry collect attention.</p>
+    <p>[click] A ray along each person's head direction raises the value of the voxel it hits, ten times a second. Head direction is our gaze proxy, since the Quest 3 has no eye tracking.</p>
+    <p>[click] Press a controller button and the voxels appear: blue where you looked, orange for your partner, pink where you both did. More attention means more opaque.</p>
   </aside>
 </section>
 
-<!-- ============================ 9. OTHER QUADRANTS ============================ -->
-<section id="quadrants" data-chapter="System" data-title="The other three quadrants" data-timing="25">
+<!-- ============================ OTHER QUADRANTS ============================ -->
+<section id="quadrants" data-chapter="System" data-title="The other three quadrants" data-timing="23">
   <div class="fill">
     <div class="head" style="margin-bottom:36px;">
       <div class="kicker">Design space, built out</div>
@@ -375,50 +405,66 @@
       <div class="fragment rise" data-fragment-index="1"><div class="label faint tiny" style="letter-spacing:.1em; text-transform:uppercase;">Camera · embedded</div><p class="small">Projections on the bounding box</p></div>
       <div class="fragment rise" data-fragment-index="2"><div class="label faint tiny" style="letter-spacing:.1em; text-transform:uppercase;">Camera · separated</div><p class="small">A 2D overview panel</p></div>
     </div>
-    <p class="faint tiny" style="margin-top:18px;">VR-only proofs of concept with local sync; not part of the study.</p>
+    <p class="faint tiny" style="margin-top:18px;">VR-only prototypes with local sync; not formally evaluated.</p>
   </div>
   <aside class="notes">
-    <p>To show the design space can generate designs and isn't just a label for one system, we also built the other three quadrants: a miniature replica you can move around, [click] projections onto the faces of the bounding box, [click] and a 2D overview panel.</p>
-    <p>These are VR-only proofs of concept, and they weren't part of the study.</p>
+    <p>To show the design space generates designs and isn't just a label for one system, we built the other three quadrants too: a miniature replica you can move, [click] projections on the faces of the bounding box, [click] and a 2D overview panel.</p>
+    <p>These are VR-only prototypes, and we didn't evaluate them.</p>
   </aside>
 </section>
 
-<!-- ============================ 10. STUDY ============================ -->
-<section id="study" data-chapter="Study" data-title="The study" data-timing="40">
+<!-- ============================ PART: STUDY ============================ -->
+<section id="part-study" class="section-slide bleed" data-chapter="Study" data-title="Part 3 · Exploratory study" data-timing="5">
+  <div class="section-panel">
+    <div class="part">03</div>
+    <h2>Does it help?</h2>
+    <p>An exploratory study with eight pairs</p>
+    <img class="vis-logo-white" src="assets/img/vis2026-logo.png" alt="">
+  </div>
+  <aside class="notes">
+    <p>Then, the question that matters: does it help?</p>
+  </aside>
+</section>
+
+<!-- ============================ STUDY ============================ -->
+<section id="study" data-chapter="Study" data-title="The study" data-timing="49">
   <div class="fill">
     <div class="head" style="margin-bottom:36px;">
       <div class="kicker">Exploratory study</div>
       <h2>A treasure hunt for pairs</h2>
     </div>
     <div class="grow bento" style="grid-template-rows: 1fr 1fr;">
-      <div class="tile flush span-6 row-2"><div class="embed" data-video="assets/video/eval-terrain.mp4" data-poster="assets/video/eval-terrain.jpg" data-label="Terrain · CAAV on"></div></div>
+      <div class="tile flush span-5 row-2"><div class="embed" data-video="assets/video/eval-terrain.mp4" data-poster="assets/video/eval-terrain.jpg" data-label="Terrain, through the headset"></div></div>
       <div class="tile span-3">
         <div class="big">8</div>
         <p class="muted" style="margin-top:12px;">co-located pairs in AR, 16 people</p>
       </div>
-      <div class="tile span-3">
+      <div class="tile span-4">
         <div class="big">10<span style="font-size:.45em"> min</span></div>
-        <p class="muted" style="margin-top:12px;">per search, targets light up only up close</p>
+        <p class="muted" style="margin-top:12px;">per search · targets glow only when seen up close</p>
       </div>
-      <div class="tile span-6 fragment rise">
-        <div class="label">Two kinds of space × CAAV on / off</div>
-        <p style="font-size:30px;"><b>Terrain</b> has peaks and valleys to talk about. A uniform random <b>scatterplot</b> has no landmarks at all.</p>
+      <div class="tile span-7 fragment rise">
+        <div class="label">Two spaces · CAAV in one of them</div>
+        <div class="design-grid">
+          <span></span><b>CAAV</b><b>No CAAV</b>
+          <b>Terrain <i>landmarks</i></b><span class="cell">4 pairs</span><span class="cell">4 pairs</span>
+          <b>Scatterplot <i>none</i></b><span class="cell">4 pairs</span><span class="cell">4 pairs</span>
+        </div>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p>To see whether this helps, we ran an exploratory study with eight co-located pairs in AR.</p>
-    <p>They played a treasure hunt: find hidden targets that only light up when you look at them from close by.</p>
-    <p>[click] We used two kinds of space. A terrain, which has peaks and valleys you can talk about. And a uniform random scatterplot, which deliberately has no landmarks at all. Each was tried with and without CAAV.</p>
+    <p>We ran an exploratory study with eight co-located pairs in AR. Their task was a treasure hunt: find hidden targets that only glow when you look at them from close by, ten minutes per search. Targets made up five percent of the voxels, spread so that no region was easier than another.</p>
+    <p>[click] We used two spaces: a terrain of Mount Bruno, with peaks and valleys to talk about, and a scatterplot of a hundred uniformly random points, deliberately without landmarks. Each pair searched both, with CAAV in one and without it in the other. So each condition has four pairs, and I'll read the numbers as trends.</p>
   </aside>
 </section>
 
-<!-- ============================ 11. SCATTER RESULT ============================ -->
-<section id="result-scatter" data-auto-animate data-chapter="Study" data-title="Scatterplot: less redundancy" data-timing="40">
+<!-- ============================ SCATTER RESULT ============================ -->
+<section id="result-scatter" data-auto-animate data-chapter="Study" data-title="Scatterplot: less redundancy" data-timing="42">
   <div class="fill">
     <div class="head" style="margin-bottom:28px;">
       <div class="kicker" data-id="k-res">Result · scatterplot</div>
-      <h2 data-id="h-res">Without landmarks, CAAV cut redundant search by about 70%</h2>
+      <h2 data-id="h-res">Without landmarks, redundant search dropped by about 70%</h2>
     </div>
     <div class="grow bento" style="grid-template-rows: 1fr;">
       <div class="tile span-8 chart" data-id="chart" data-chart="redundancy" data-focus="scatter" role="img" aria-label="Normalized redundancy. Scatterplot: 11.3% without CAAV, 3.3% with CAAV. Terrain: 4.0% without, 14.9% with."></div>
@@ -433,44 +479,47 @@
         </div>
       </div>
     </div>
+    <p class="caveat" data-id="cav">Directional, not significant: 4 pairs per condition (permutation p = .26)</p>
   </div>
   <aside class="notes">
-    <p>In the scatterplot, CAAV helped. Redundant exploration dropped from 11.3 to 3.3 percent, about 70 percent less. Pairs found more targets, 78.5 versus 62.4 percent, and searched more efficiently.</p>
-    <p>[click] They also stopped talking about where to look. One pair said they didn't speak at all in the CAAV condition, because the colors did the coordinating.</p>
-    <p>With eight pairs, read these as trends, not proof.</p>
+    <p>In the scatterplot, the trend favours CAAV. Redundant exploration dropped from 11.3 to 3.3 percent, about 70 percent less. With four pairs per condition that's directional, not significant. Pairs also found more targets, 78.5 versus 62.4 percent, and found them faster than random search would predict: an efficiency of 1.03 versus 0.92.</p>
+    <p>[click] And they stopped talking about where to look. One participant said they had no verbal communication at all with CAAV; the colours did the coordinating. That can mean lower coordination cost, but also less discussion, so we read it with care.</p>
   </aside>
 </section>
 
-<!-- ============================ 12. TERRAIN RESULT ============================ -->
-<section id="result-terrain" data-auto-animate data-chapter="Study" data-title="Terrain: landmarks already coordinate" data-timing="35">
+<!-- ============================ TERRAIN RESULT ============================ -->
+<section id="result-terrain" data-auto-animate data-chapter="Study" data-title="Terrain: more overlap, more teamwork" data-timing="39">
   <div class="fill">
     <div class="head" style="margin-bottom:28px;">
       <div class="kicker" data-id="k-res">Result · terrain</div>
-      <h2 data-id="h-res">With landmarks, CAAV added overlap instead</h2>
+      <h2 data-id="h-res">With landmarks, overlap went up, and so did teamwork</h2>
     </div>
     <div class="grow bento" style="grid-template-rows: 1fr;">
       <div class="tile span-8 chart" data-id="chart" data-chart="redundancy" data-focus="terrain" role="img" aria-label="Normalized redundancy, terrain highlighted: 4.0% without CAAV, 14.9% with CAAV."></div>
       <div class="span-4" style="display:flex; flex-direction:column; gap:24px;">
-        <div class="tile plate" style="flex:1.3;" data-id="side1">
+        <div class="tile plate" style="flex:1.1;" data-id="side1">
           <img class="media contain" src="assets/fig/terrain_contour_attention.png" alt="Terrain gradient, attention heatmap, and overlay: attention concentrates on steep terrain features.">
         </div>
-        <div class="tile" style="flex:1;" data-id="side2">
+        <div class="tile" style="flex:.8;">
           <div class="label">Gradient vs attention</div>
-          <div class="big" style="font-size:72px;">r = 0.49</div>
-          <p class="muted small" style="margin-top:8px;">peaks and ridges drew both people</p>
+          <div class="big" style="font-size:64px;">r = 0.49</div>
+        </div>
+        <div class="tile tone-you fragment rise" style="flex:1;" data-id="side2">
+          <div class="label">Target gain over individuals</div>
+          <div class="big" style="font-size:64px;">1.46× <span class="muted" style="font-size:.5em">vs 1.19×</span></div>
+          <p class="muted tiny" style="margin-top:6px;">Strongest supported result (p = .029)</p>
         </div>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p>The terrain told a different story. With CAAV, redundancy went up, from 4 to about 15 percent.</p>
-    <p>Attention followed the landscape: terrain gradient and attention correlate at r = 0.49. Peaks and ridges already pulled both people to the same places, and the voxels made those overlaps more visible, so pairs went back for second passes.</p>
-    <p>The landmarks were already doing the coordinating.</p>
+    <p>The terrain is more nuanced. With CAAV, redundancy went up, from 4 to about 15 percent. Attention followed the landscape: terrain gradient and attention correlate at r = 0.49. Peaks and ridges pulled both people to the same places, and the voxels made that overlap visible, so pairs went back for second passes.</p>
+    <p>[click] Yet terrain also gave our strongest supported result. Pairs with CAAV gained more over their individual members: 1.46 times versus 1.19. So this isn't CAAV failing; the space already offered its own cues.</p>
   </aside>
 </section>
 
-<!-- ============================ 13. EXPERIENCE ============================ -->
-<section id="experience" data-chapter="Study" data-title="What participants did" data-timing="34">
+<!-- ============================ EXPERIENCE ============================ -->
+<section id="experience" data-chapter="Study" data-title="What participants did" data-timing="40">
   <div class="fill">
     <div class="head" style="margin-bottom:36px;">
       <div class="kicker">Experience</div>
@@ -484,27 +533,28 @@
       <div class="tile span-4">
         <div class="label">Workload (NASA TLX)</div>
         <div class="big">−24<span style="font-size:.45em">%</span></div>
+        <p class="muted tiny" style="margin-top:8px;">overall; trended higher in terrain</p>
       </div>
       <div class="tile span-4">
         <div class="label">Time with cues on</div>
         <div class="big">~75<span style="font-size:.45em">%</span></div>
       </div>
       <div class="tile tone-both span-7 fragment rise">
-        <blockquote class="q">“…having the least pink as possible, and then having a nice blue side and a nice orange side.”<cite>P6</cite></blockquote>
+        <blockquote class="q">“…a nice blue side and a nice orange side with very little overlap.”<cite>P6</cite></blockquote>
       </div>
       <div class="tile span-5 fragment rise">
-        <blockquote class="q" style="font-size:32px;">“It would be nice if color of your attention would fade away.”<cite>P8, on visual clutter</cite></blockquote>
+        <blockquote class="q" style="font-size:32px;">“It would be nice if color of your attention would fade away [without noticing].”<cite>P8</cite></blockquote>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p>Participants liked it. Fifteen of sixteen preferred the CAAV conditions, reported workload was about a quarter lower, and they kept the cues on for roughly three quarters of each session, switching them off briefly when it got busy.</p>
-    <p>[click] Some turned it into a game: keep the pink small, with a nice blue side and a nice orange side. [click] And they asked for attention that fades more on its own, which points at implicit triggering.</p>
+    <p>Participants liked it. Fifteen of sixteen preferred the CAAV conditions, and overall workload was about a quarter lower, though in terrain it trended higher. They kept the cues on about three quarters of the time, switching them off briefly when it got busy. Usability averaged 74 on the SUS, above the usual benchmark of 68.</p>
+    <p>[click] Some made it a game: a nice blue side and a nice orange side with very little overlap. [click] And some asked for attention that fades on its own, which points to implicit triggering.</p>
   </aside>
 </section>
 
-<!-- ============================ 14. TAKEAWAY ============================ -->
-<section id="takeaway" data-chapter="Takeaways" data-title="When to show attention" data-timing="30">
+<!-- ============================ TAKEAWAY ============================ -->
+<section id="takeaway" data-chapter="Takeaways" data-title="When to show attention" data-timing="26">
   <div class="fill">
     <div class="head">
       <div class="kicker">Takeaway</div>
@@ -530,29 +580,29 @@
     </div>
   </div>
   <aside class="notes">
-    <p>So the takeaway: attention visualization seems most useful where the space itself gives you nothing to point at. Abstract, discrete data like embeddings, molecular structures or 3D networks, especially when you need to cover everything.</p>
-    <p>[click] Where the data already has landmarks, it can add noise on top of cues people already use.</p>
+    <p>So, attention visualization seems most useful where the space gives you nothing to point at: abstract, discrete data like embeddings, molecules or 3D networks, when you need to cover all of it and locations are hard to describe.</p>
+    <p>[click] Where the data has its own landmarks, it adds to cues people already use, and to the clutter.</p>
   </aside>
 </section>
 
-<!-- ============================ 15. LIMITS ============================ -->
-<section id="next" data-chapter="Takeaways" data-title="Limits and next steps" data-timing="25">
+<!-- ============================ LIMITS ============================ -->
+<section id="next" data-chapter="Takeaways" data-title="Limits and next steps" data-timing="26">
   <div class="fill">
     <div class="head">
       <div class="kicker">Limits &amp; next steps</div>
       <h2>An exploratory first step</h2>
     </div>
     <div class="grow bento" style="grid-template-rows: 1fr;">
-      <div class="tile span-6">
+      <div class="tile span-7">
         <div class="label">Limits</div>
         <ul class="ticks dim">
-          <li>Pairs only; colors stop scaling past ~4 people</li>
+          <li>Pairs only; colours stop scaling past ~4 people</li>
           <li>Head direction, not eye tracking</li>
-          <li>One synthetic task, eight pairs</li>
-          <li>Three quadrants not yet evaluated</li>
+          <li>One synthetic task, four pairs per condition</li>
+          <li>One baseline: no attention display at all</li>
         </ul>
       </div>
-      <div class="tile tone-both span-6 fragment rise">
+      <div class="tile tone-both span-5 fragment rise">
         <div class="label">Next</div>
         <ul class="ticks partner">
           <li>Implicit triggering and fading</li>
@@ -563,45 +613,36 @@
     </div>
   </div>
   <aside class="notes">
-    <p>There are clear limits: pairs only, head direction instead of eye tracking, one synthetic task, and colors that won't scale past about four people.</p>
-    <p>[click] Next we want implicit triggering, attention to data items rather than just space, and remote and asynchronous teams, where seeing your partner's attention may matter even more.</p>
+    <p>This is a first step. Pairs only, head direction instead of eye tracking, one synthetic task, and colours that stop scaling past about four people. Our only baseline was no attention display, so gaze rays or pointer trails might give part of this benefit.</p>
+    <p>[click] Next: implicit triggering, attention to data items, and remote and asynchronous teams.</p>
   </aside>
 </section>
 
-<!-- ============================ 16. THANKS + Q&A ============================ -->
-<section id="thanks" data-chapter="Takeaways" data-title="Thank you · Questions" data-timing="15">
-  <div class="fill">
-    <div class="bento grow" style="grid-template-rows: 1fr;">
-      <div class="span-5" style="display:flex; flex-direction:column; justify-content:space-between;">
-        <div>
-          <img src="assets/img/vis2026-logo.png" alt="IEEE VIS 2026" style="width:260px; margin-bottom:56px;">
-          <h1 style="font-size:132px;">Thank you</h1>
-          <p class="lede" style="margin-top:22px;">Slides, script and questions:</p>
-          <p class="small" style="margin-top:8px; color:var(--text);" data-talk-url></p>
-        </div>
-        <div style="display:flex; gap:28px; align-items:flex-end;">
-          <div class="tile" style="width:220px; padding:16px; border-radius:24px;"><div class="qr" data-qr="talk" style="background:#fff; border-radius:14px; padding:10px;"></div></div>
-          <div class="small muted" style="line-height:1.5; flex:1; white-space:nowrap;">
-            <b style="color:var(--text)">Arvind Srinivasan</b> · arvind@cs.au.dk<br>
-            Niklas Elmqvist · elm@cs.au.dk<br>
-            Aarhus University
-          </div>
-        </div>
-      </div>
-      <div class="tile span-7" style="display:flex; flex-direction:column;">
-        <div class="label">Your questions, live</div>
-        <div class="qa-board grow" data-qa-board style="flex:1;"></div>
-      </div>
-    </div>
+<!-- ============================ THANKS + Q&A ============================ -->
+<section id="thanks" class="closing-slide bleed" data-chapter="Takeaways" data-title="Thank you · Questions" data-timing="12">
+  <div class="closing-panel">
+    <h1>Thank you</h1>
+    <p class="lede">Slides, script and your questions</p>
+    <p class="talk-url" data-talk-url></p>
+    <div class="closing-qr"><div class="qr" data-qr="talk"></div></div>
+    <p class="contacts"><b>Arvind Srinivasan</b> · arvind@cs.au.dk<br>Niklas Elmqvist · elm@cs.au.dk</p>
   </div>
+  <div class="tile qa-tile">
+    <div class="label">Your questions, live</div>
+    <div class="qa-board" data-qa-board></div>
+  </div>
+  <img class="vis-logo closing-logo" src="assets/img/vis2026-logo.png" alt="IEEE VIS 2026">
+  <div class="tab tab-bottom" aria-hidden="true"></div>
   <aside class="notes">
-    <p>Thank you. The slides, this script and a place for your questions are behind the QR code. I'm happy to take questions now.</p>
+    <p>Thank you. The slides, this script and a place for your questions are behind the QR code. I'm happy to take questions.</p>
   </aside>
 </section>
 
 <div class="hv-chrome" aria-hidden="true">
-  <div class="rail"></div>
-  <div class="foot-right"><span class="url" data-talk-url></span><span class="count"></span></div>
+  <div class="band">
+    <div class="rail"></div>
+    <div class="foot-right"><span class="url" data-talk-url></span><img src="assets/img/vis2026-logo.png" alt=""><span class="count"></span></div>
+  </div>
 </div>
 
 </div>

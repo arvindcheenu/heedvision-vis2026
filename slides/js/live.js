@@ -98,6 +98,6 @@
   }
 
   window.HVLive = live;
-  // The speaker-view iframes are reveal "receivers": they must not connect.
-  if (!params.has("receiver") && !params.has("poster")) connect();
+  // Speaker-view iframes ("receivers"), posters and embeds must not connect.
+  if (!params.has("receiver") && !params.has("poster") && !params.has("embed")) connect();
 })();

@@ -51,10 +51,15 @@
       art.innerHTML = `
         <span class="live-tag">● On screen now</span>
         <h3><span class="n">${String(n).padStart(2, "0")}</span>${esc(title)}</h3>
-        <a class="slide-card" href="../slides/#/${encodeURIComponent(id)}" target="_blank" rel="noopener" aria-label="Open slide ${n}: ${esc(title)}">
+        <div class="slide-card">
           <img loading="lazy" decoding="async" src="../slides/assets/posters/${encodeURIComponent(id)}.jpg" alt="Slide ${n}: ${esc(title)}">
-          <span class="open">Open slide ↗</span>
-        </a>
+        </div>
+        <div class="slide-ctl">
+          <button type="button" data-go="prev" aria-label="Previous build" disabled>‹</button>
+          <button type="button" data-go="next" aria-label="Next build" disabled>›</button>
+          <span class="hint">Click the slide or use the arrows to step through it</span>
+          <a href="../slides/#/${encodeURIComponent(id)}" target="_blank" rel="noopener">Open in the deck ↗</a>
+        </div>
         <div class="script">${script}</div>
         <details class="qs">
           <summary>Questions on this slide <span class="count">0</span></summary>
@@ -67,22 +72,15 @@
             </form>
           </div>
         </details>`;
-      // poster missing? show a live, non-interactive render of the slide instead
-      art.querySelector("img").addEventListener("error", (e) => {
-        const f = document.createElement("iframe");
-        f.src = `../slides/?poster#/${encodeURIComponent(id)}`;
-        f.loading = "lazy";
-        f.tabIndex = -1;
-        f.title = `Slide ${n}`;
-        f.style.pointerEvents = "none";
-        e.target.replaceWith(f);
-      }, { once: true });
+      art.querySelectorAll("[data-go]").forEach((b) =>
+        b.addEventListener("click", () => send(entries.find((x) => x.el === art), { dir: b.dataset.go })));
       chEl.appendChild(art);
       tocList.insertAdjacentHTML("beforeend", `<li><a href="#s-${esc(id)}" data-slide="${esc(id)}"><span class="ld"></span><span>${esc(title)}</span><span class="qn"></span></a></li>`);
       entries.push({ id, title, n, el: art });
     });
     wireQuestions();
     observeReading();
+    mountLiveSlides();
     // re-apply the hash once fonts have settled the layout
     if (location.hash) document.fonts.ready.then(() => document.querySelector(location.hash)?.scrollIntoView());
     if (live) {
@@ -93,6 +91,55 @@
       if (live.slide) onLiveSlide(live.slide);
     }
     renderQuestions();
+  }
+
+  // ---------- live slides
+  // Each card shows the poster until it nears the viewport, then the real slide
+  // (the deck in ?embed=<id> mode). Far-away slides are unloaded again.
+  function mountLiveSlides() {
+    const io = new IntersectionObserver((list) => {
+      list.forEach((en) => {
+        const e = entries.find((x) => x.el === en.target);
+        if (en.isIntersecting) mount(e); else unmount(e);
+      });
+    }, { rootMargin: "900px 0px" });
+    entries.forEach((e) => io.observe(e.el));
+  }
+  function mount(e) {
+    if (!e || e.frame) return;
+    const card = e.el.querySelector(".slide-card");
+    const f = document.createElement("iframe");
+    f.src = `../slides/?embed=${encodeURIComponent(e.id)}`;
+    f.title = `Slide ${e.n}: ${e.title}`;
+    f.allow = "fullscreen; autoplay";
+    f.addEventListener("load", () => card.classList.add("ready"));
+    card.appendChild(f);
+    e.frame = f;
+  }
+  function unmount(e) {
+    if (!e || !e.frame) return;
+    e.frame.remove();
+    e.frame = null;
+    e.el.querySelector(".slide-card").classList.remove("ready");
+    e.el.querySelectorAll("[data-go]").forEach((b) => (b.disabled = true));
+  }
+  function send(e, msg) {
+    if (e && e.frame && e.frame.contentWindow) e.frame.contentWindow.postMessage({ hv: "go", ...msg }, location.origin);
+  }
+  addEventListener("message", (ev) => {
+    if (ev.origin !== location.origin || !ev.data || ev.data.hv !== "state") return;
+    const e = entries.find((x) => x.frame && x.frame.contentWindow === ev.source);
+    if (!e) return;
+    e.el.querySelector('[data-go="prev"]').disabled = !ev.data.prev;
+    e.el.querySelector('[data-go="next"]').disabled = !ev.data.next;
+    if (e.pendingBuild != null) { send(e, { dir: "build", f: e.pendingBuild }); e.pendingBuild = null; }
+  });
+  // mirror the room: the live slide shows the same build as the projector
+  function syncBuild(s) {
+    const e = entries.find((x) => x.id === s.id);
+    if (!e) return;
+    if (e.frame) send(e, { dir: "build", f: s.f });
+    else e.pendingBuild = s.f;
   }
 
   // ---------- questions
@@ -155,6 +202,7 @@
     entries.forEach((x) => x.el.classList.toggle("live", x === e));
     tocList.querySelectorAll("a").forEach((a) => a.classList.toggle("live", a.dataset.slide === s.id));
     if (!e) return;
+    syncBuild(s);
     pill.hidden = false;
     pillText.textContent = `Live · ${e.n}. ${e.title}`;
     if (following) scrollToLive();

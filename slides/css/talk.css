@@ -159,7 +159,6 @@ main { min-width: 0; }
 .entry h3 { font-size: 28px; font-weight: 560; line-height: 1.15; margin: 0 0 14px; display: flex; gap: 12px; align-items: baseline; }
 .entry h3 .n { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--text-3); font-variant-numeric: tabular-nums; }
 .slide-card {
-  display: block;
   position: relative;
   aspect-ratio: 16 / 9;
   border-radius: 20px;
@@ -167,26 +166,30 @@ main { min-width: 0; }
   background: #0b0c10;
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
-  margin-bottom: 20px;
-  transition: transform 300ms var(--ease-emph), box-shadow 300ms var(--ease);
 }
-.slide-card:hover { transform: translateY(-2px); }
 .slide-card img, .slide-card iframe { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
-.slide-card .open {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-  opacity: 0;
-  transition: opacity 200ms var(--ease);
+.slide-card iframe { opacity: 0; transition: opacity 400ms var(--ease); }
+.slide-card.ready iframe { opacity: 1; }
+.slide-ctl { display: flex; align-items: center; gap: 8px; margin: 10px 0 20px; font-size: 14px; color: var(--text-3); }
+.slide-ctl button {
+  all: unset;
+  cursor: pointer;
+  width: 34px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 20px;
+  line-height: 1;
 }
-.slide-card:hover .open, .slide-card:focus-visible .open { opacity: 1; }
+.slide-ctl button:disabled { opacity: 0.35; cursor: default; }
+.slide-ctl .hint { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slide-ctl a { font-weight: 600; color: var(--text-2); text-decoration: none; white-space: nowrap; }
+.slide-ctl a:hover { color: var(--accent); }
+@media (max-width: 560px) { .slide-ctl .hint { display: none; } .slide-ctl a { margin-left: auto; } }
 .entry.live .slide-card { box-shadow: 0 0 0 3px var(--accent), var(--shadow); }
 .entry .live-tag {
   display: none;

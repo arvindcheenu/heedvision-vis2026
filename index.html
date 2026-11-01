@@ -329,6 +329,21 @@ a { color: var(--primary); }
   .btn { justify-content: center; }
   .paper-footer { flex-direction: column; align-items: flex-start; }
 }
+
+/* ─── Talk (slides embedded from slides/, driven over postMessage) ─────── */
+.talk-lede { margin: 0 0 16px; font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--foreground); }
+.talk-frame {
+  position: relative; aspect-ratio: 16 / 9;
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 32px var(--shadow-tint);
+  background: #0b0c10;
+}
+.talk-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.talk-ctl { display: flex; align-items: center; gap: 8px; margin: 12px 0 18px; }
+.talk-ctl .btn { padding: 9px 13px; }
+.talk-ctl .btn[disabled] { opacity: 0.4; pointer-events: none; }
+.talk-pos { flex: 1; font-size: 13px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
 </style>
 </head>
 
@@ -384,6 +399,10 @@ a { color: var(--primary); }
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg>
       OSF
     </a>
+    <a class="btn btn-outline" href="#talk">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg>
+      Talk
+    </a>
   </div>
 
   <figure class="paper-teaser">
@@ -421,6 +440,37 @@ a { color: var(--primary); }
       <span class="keyword">Immersive analytics</span>
       <span class="keyword">Ubiquitous analytics</span>
       <span class="keyword">Post-WIMP interaction</span>
+    </div>
+  </section>
+
+  <section class="paper-section" id="talk">
+    <h2 class="paper-section-title">Talk</h2>
+    <p class="talk-lede">Presented at IEEE VIS 2026 in Boston: nine minutes on letting collaborators see each other's attention, and on when that helps. Click the slide or use the arrows to step through it.</p>
+    <div class="talk-frame">
+      <iframe id="talk-iframe" src="slides/?embed" title="HeedVision talk slides" loading="lazy" allow="fullscreen; autoplay"></iframe>
+    </div>
+    <div class="talk-ctl">
+      <button class="btn btn-outline" type="button" data-go="prev" aria-label="Previous" disabled>‹</button>
+      <button class="btn btn-outline" type="button" data-go="next" aria-label="Next">›</button>
+      <span class="talk-pos" id="talk-pos" aria-live="polite"></span>
+    </div>
+    <div class="resources">
+      <a class="resource" href="talk/">
+        <span class="resource-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></svg></span>
+        <span class="resource-body">
+          <span class="resource-name">Slides &amp; script</span>
+          <span class="resource-desc">Every slide next to what is said over it, with a question thread per slide</span>
+        </span>
+        <span class="resource-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></span>
+      </a>
+      <a class="resource" href="slides/" target="_blank" rel="noopener">
+        <span class="resource-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/></svg></span>
+        <span class="resource-body">
+          <span class="resource-name">Full-screen slides</span>
+          <span class="resource-desc">The deck itself; press S for speaker notes</span>
+        </span>
+        <span class="resource-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></span>
+      </a>
     </div>
   </section>
 
@@ -523,6 +573,24 @@ a { color: var(--primary); }
       }, 2000);
     });
   });
+
+  // Talk: step the embedded deck and show where it is.
+  (function () {
+    var frame = document.getElementById('talk-iframe');
+    var pos = document.getElementById('talk-pos');
+    if (!frame) return;
+    document.querySelectorAll('.talk-ctl [data-go]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        frame.contentWindow.postMessage({ hv: 'go', dir: b.getAttribute('data-go') }, location.origin);
+      });
+    });
+    window.addEventListener('message', function (e) {
+      if (e.origin !== location.origin || e.source !== frame.contentWindow || !e.data || e.data.hv !== 'state') return;
+      pos.textContent = 'Slide ' + (e.data.index + 1) + ' of ' + e.data.total;
+      document.querySelector('.talk-ctl [data-go="prev"]').disabled = !e.data.prev;
+      document.querySelector('.talk-ctl [data-go="next"]').disabled = !e.data.next;
+    });
+  })();
 </script>
 
 </body>
