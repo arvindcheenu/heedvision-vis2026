@@ -26,7 +26,7 @@ All three pages share one design system; see [Design](#design).
 
 ## Editing
 
-There is no build step. Edit and push; GitHub Pages redeploys.
+There is no build step. Edit and push; GitHub Pages redeploys. If you change a `.js` or `.css` file, bump the `?v=` number on its `<script>`/`<link>` tags so returning visitors don't mix old and new code (editing `talk.md` doesn't need this).
 
 The arXiv button and its entry under *Materials* hide themselves automatically while their `href` is still the literal `ARXIV_URL`. Replace both occurrences to switch them on.
 
