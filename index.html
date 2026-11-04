@@ -20,11 +20,13 @@
 <meta property="og:image" content="assets/teaser.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="shared/logos/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="shared/hv.css?v=20261118">
-<script src="shared/site.js?v=20261118"></script>
+<link rel="stylesheet" href="shared/hv.css?v=20261123">
+<script src="shared/site.js?v=20261123"></script>
 </head>
 <body>
 
+<div class="page-bar" aria-hidden="true"><i></i></div>
+<nav class="page-toc" aria-label="Contents"><ol></ol></nav>
 <main class="page">
   <h1 class="page-title">HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</h1>
   <p class="page-sub">Tracking, recording, and revisualizing the collective attention of collaborators in shared immersive environments.</p>
@@ -119,7 +121,32 @@
   <p>© 2026 the authors. Paper © IEEE.<br>Supplemental materials released under CC BY 4.0.</p>
 </footer>
 
+<script src="shared/progress.js?v=20261123"></script>
 <script>
+  // Contents, built from the page's sections, with its scroll progress.
+  (function () {
+    var list = document.querySelector('.page-toc ol');
+    var sections = [].slice.call(document.querySelectorAll('.page > .section'));
+    var items = [];
+    sections.forEach(function (sec, i) {
+      var title = sec.querySelector('.section-title');
+      if (!title) return;
+      if (!sec.id) sec.id = 'section-' + (i + 1);
+      // each section has its own colour
+      var colour = 'var(--c' + (items.length % 6 + 1) + ')';
+      sec.style.setProperty('--sec', colour);
+      var li = document.createElement('li'), a = document.createElement('a');
+      a.href = '#' + sec.id;
+      a.textContent = title.textContent;
+      a.style.setProperty('--sec', colour);
+      li.appendChild(a);
+      list.appendChild(li);
+      items.push({ el: sec, link: a });
+    });
+    if (items.length) HVProgress.rail(list, items, { mark: true });
+    HVProgress.bar(document.querySelector('.page-bar i'));
+  })();
+
   // Hide the arXiv entries until a real URL is filled in.
   ['arxiv-btn', 'arxiv-resource'].forEach(function (id) {
     var el = document.getElementById(id);

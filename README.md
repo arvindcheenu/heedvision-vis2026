@@ -55,6 +55,14 @@ Math works anywhere as `$x^2$` and `$$x^2$$`. A fenced ` ```mermaid ` block draw
 
 `columns: 3 2` and `rows: 2 1` on a slide split it differently. Add a layout to `LAYOUTS` in `slides/js/mdeck.js`.
 
+### Bullets
+
+`bullet:` at the top of `talk.md` sets the bullet for the whole talk: `vis`, `triangle`, `dot`, `square`, `dash`, `none`, or the path to an image. `:::items bullet=dot` changes one list. The default, `vis`, echoes the IEEE VIS 2026 mark.
+
+### Sections on the pages
+
+The project page and the script page have no rules or native scrollbars. Each section has its own colour from `--c1` to `--c6` in `shared/hv.css`, on its heading, a tinted block, its contents entries and its progress segment. `shared/progress.js` draws the scroll progress.
+
 ### Styles
 
 The palette, the font and the border radius are at the top of `shared/hv.css`; the slides' own sizes, and what each colour means, are in `slides/css/deck.css`. The palette is the IEEE VIS 2026 template's. Everything is flat colour. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.

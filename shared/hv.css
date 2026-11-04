@@ -94,7 +94,6 @@ a { color: var(--accent); }
   background: color-mix(in oklab, var(--bg) 82%, transparent);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border-bottom: 1px solid var(--line);
 }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--fg); text-decoration: none; font-family: var(--f-display); font-variation-settings: "SOFT" 100; font-weight: 600; font-size: 19px; }
 .brand img { width: 24px; height: 24px; }
@@ -126,7 +125,7 @@ a { color: var(--accent); }
 .page-title { font-size: clamp(36px, 6vw, 58px); font-weight: 600; margin: 16px 0 12px; }
 .page-sub { font-family: var(--f-display); font-variation-settings: "SOFT" 100; font-size: clamp(19px, 2.6vw, 23px); line-height: 1.4; color: var(--fg-2); margin: 0 0 28px; }
 .section { margin-top: 52px; }
-.section-title { font-size: 12px; font-family: var(--f-text); font-weight: 700; color: var(--fg-3); padding-bottom: 10px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+.section-title { font-size: 12px; font-family: var(--f-text); font-weight: 700; color: var(--fg-3); padding-bottom: 10px; margin-bottom: 18px; }
 .prose { font-size: 17px; line-height: 1.7; }
 .prose p { margin: 0 0 14px; max-width: 66ch; }
 
@@ -181,7 +180,7 @@ a { color: var(--accent); }
 
 .figure { overflow: hidden; margin-left: 0; margin-right: 0; }
 .figure img { display: block; width: 100%; height: auto; }
-.figure figcaption { padding: 12px 16px; font-size: 13.5px; line-height: 1.55; color: var(--fg-2); border-top: 1px solid var(--line); }
+.figure figcaption { padding: 12px 16px; font-size: 13.5px; line-height: 1.55; color: var(--fg-2); }
 
 /* the deck embedded in a page */
 .deck-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #0b0c10; }
@@ -195,7 +194,7 @@ a { color: var(--accent); }
 .deck-ctl a:hover { color: var(--accent); }
 
 /* ---------- footer (same on every page) ---------- */
-.site-foot { max-width: 780px; margin: 64px auto 0; padding: 28px 20px 56px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; justify-content: space-between; }
+.site-foot { max-width: 780px; margin: 64px auto 0; padding: 28px 20px 56px; display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; justify-content: space-between; }
 .logos { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 .logos img { height: 30px; width: auto; display: block; }
 .logos img.mono { filter: var(--logo-filter); opacity: 0.85; }
@@ -203,7 +202,7 @@ a { color: var(--accent); }
 
 /* ---------- talk page (transcript) ---------- */
 /* the slide is pinned under the header; the script scrolls beneath it */
-.talk-stage { position: sticky; top: 0; z-index: 25; padding: 12px 16px 10px; background: color-mix(in oklab, var(--bg) 92%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
+.talk-stage { position: sticky; top: 0; z-index: 25; padding: 12px 16px 10px; background: color-mix(in oklab, var(--bg) 92%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
 .talk-stage-inner { width: min(100%, calc(min(48vh, 560px) * 16 / 9)); margin: 0 auto; }
 .talk-stage .deck-frame { border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface-2); }
 .stage-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13.5px; color: var(--fg-2); }
@@ -350,3 +349,57 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 .bibtex { background: var(--surface-2); }
 .figure { border: 0; }
 .link-card > span:nth-child(2) > b { color: var(--fg); }
+
+/* ---------- scroll progress, in place of scrollbars ---------- */
+html, .toc-inner, .page-toc { scrollbar-width: none; }
+html::-webkit-scrollbar, .toc-inner::-webkit-scrollbar, .page-toc::-webkit-scrollbar { display: none; }
+/* a rail beside a contents list, filling as you read */
+.toc ol, .page-toc ol { position: relative; list-style: none; margin: 0; padding: 0 0 0 16px; }
+.toc ol::before, .page-toc ol::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: var(--radius); background: var(--line); }
+.toc ol::after, .page-toc ol::after { content: ""; position: absolute; left: 0; top: 0; width: 3px; height: var(--fill, 0); border-radius: var(--radius); background: var(--vis-orange); }
+/* the bar across the project page */
+.page-bar { position: fixed; left: 0; right: 0; top: 0; height: 4px; z-index: 40; background: var(--line); }
+.page-bar i { display: block; height: 100%; background: var(--vis-orange); transform-origin: left; transform: scaleX(0); }
+/* the project page's contents */
+.page-toc { position: fixed; top: 96px; left: calc(50% + 420px); width: 210px; max-height: calc(100vh - 140px); overflow-y: auto; font-size: 14.5px; line-height: 1.3; }
+.page-toc a { display: block; padding: 6px 10px; border-radius: var(--radius); color: var(--fg-2); text-decoration: none; }
+.page-toc a:hover { background: var(--surface-2); }
+.page-toc a.here { background: var(--surface-2); color: #bb4a72; font-weight: 700; }
+.dark .page-toc a.here { color: #ed74b5; }
+@media (max-width: 1240px) { .page-toc { display: none; } }
+/* slide progress on the script page, with a tick per section */
+.slide-progress { position: relative; height: 5px; margin-top: 8px; border-radius: var(--radius); background: var(--line); }
+.slide-progress i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: var(--radius); background: var(--vis-orange); }
+.slide-progress b { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: var(--fg-3); }
+
+/* ---------- sections are told apart by colour alone, no rules ----------
+   Each section has its own colour from the VIS 2026 palette, on its heading, a tinted block,
+   its contents entries and its segment of the progress bar. */
+:root { --c1: #df6824; --c2: #bb4a72; --c3: #693a19; --c4: #f8a45a; --c5: #ed74b5; --c6: #8a817a; --sec-ink: #000; }
+.dark { --c3: #b0805a; --sec-ink: #fff; }
+.page > .section:has(.section-title), .chapter {
+  --sec-text: color-mix(in srgb, var(--sec, var(--c1)) 78%, var(--sec-ink));
+  margin: 18px -28px 0; padding: 26px 28px 28px; border-radius: var(--radius);
+  background: color-mix(in srgb, var(--sec, var(--c1)) 9%, var(--bg));
+}
+.section-title, .chapter > .section-title { margin: 0 0 14px; padding: 0; border: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--sec-text); }
+.chapter .entry { padding: 14px 0 6px; }
+.chapter .entry:first-of-type { padding-top: 0; }
+.entry h3, .entry.reading h3, .entry.live h3 { color: var(--fg); }
+.dark .entry.reading h3, .dark .entry.live h3 { color: var(--fg); }
+.entry.reading h3, .entry.live h3, .dark .entry.reading h3, .dark .entry.live h3 { color: var(--sec-text); }
+.chapter .btn, .chapter .q .btn, .chapter .qs textarea, .chapter .qs input, .page > .section .chip, .page > .section .bibtex { background: color-mix(in srgb, var(--sec, var(--c1)) 16%, var(--bg)); }
+.page > .section .link-card .ico { background: color-mix(in srgb, var(--sec, var(--c1)) 16%, var(--bg)); color: var(--sec-text); }
+.talk-main, .talk-layout { min-width: 0; }
+.site-foot { padding-top: 12px; }
+@media (max-width: 860px) { .page > .section:has(.section-title), .chapter { margin-left: 0; margin-right: 0; padding-left: 18px; padding-right: 18px; } }
+/* contents take their section's colour */
+.toc .ch { color: color-mix(in srgb, var(--sec, var(--c1)) 78%, var(--sec-ink)); }
+.toc a.here, .dark .toc a.here, .page-toc a.here, .dark .page-toc a.here { color: color-mix(in srgb, var(--sec, var(--c1)) 78%, var(--sec-ink)); background: color-mix(in srgb, var(--sec, var(--c1)) 13%, var(--bg)); }
+.toc ol::after, .page-toc ol::after { background: var(--rail, var(--c1)); }
+/* slide progress: one coloured segment per section */
+.slide-progress { display: flex; gap: 4px; height: 6px; background: none; border-radius: 0; }
+.slide-progress span { position: relative; overflow: hidden; border-radius: var(--radius); background: color-mix(in srgb, var(--sec) 22%, var(--bg)); }
+.slide-progress i { display: block; position: absolute; left: 0; top: 0; bottom: 0; width: var(--p, 0%); background: var(--sec); border-radius: 0; }
+/* the pinned slide shows at once */
+.deck-frame iframe { opacity: 1 !important; transition: none !important; }

@@ -32,6 +32,11 @@
   const src = await fetch("talk.md", { cache: "no-cache" }).then((r) => r.text());
   await MDeck.prepare(src);
   const talk = MDeck.render(src);
+  // the bullet for the whole talk: a name, or the path to an image
+  if (talk.meta.bullet) {
+    if (/[./]/.test(talk.meta.bullet)) document.documentElement.style.setProperty("--bullet", `url("${talk.meta.bullet}")`);
+    else document.documentElement.dataset.bullet = talk.meta.bullet;
+  }
   const set = talk.settings;
   const slidesEl = document.querySelector(".reveal .slides");
   slidesEl.innerHTML = talk.slides.filter((x) => !single || x.id === single).map((x) => x.html).join("");
@@ -139,7 +144,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261118"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261123"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -195,7 +200,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261118", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261123", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();

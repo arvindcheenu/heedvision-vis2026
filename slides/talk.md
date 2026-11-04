@@ -9,6 +9,7 @@ open-to-work: Open to work · Postdoc · Industry
 slug: Third-year PhD student, open to postdoc and industry positions
 url: https://heedvision.arvindchee.nu/talk/
 site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
+bullet: vis       # vis | triangle | dot | square | dash | none | a path to an image
 duration: 9.9     # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
@@ -37,7 +38,8 @@ Then:
 
 Blocks (`step` shows one on a click, `step=2` fixes its click number, `wide` spans all columns):
   :::items steps … :::                   bullets, one per click, the current one highlighted
-                                         (`steps=2` starts at click 2; `uncover=off` keeps all visible)
+                                         (`steps=2` starts at click 2; `uncover=off` keeps all visible;
+                                         `bullet=dot` changes this list's bullet)
   :::card title="…" icon=eye cite="…" tone=both … :::   a heading with text under it; `> a quote` works inside
   ::stat value="70%" label="…" sub="…" tone=both        a number
   ::image src="…" alt="…" caption="…" fit=cover         a picture

@@ -35,16 +35,19 @@
   root.innerHTML = "";
   const entries = [];
   const main = talk.slides.filter((s) => !s.backup);
-  let chapter = null, chEl = null;
+  let chapter = null, chEl = null, chapterNo = -1;
+  const colourOf = (n) => `var(--c${(n % 6) + 1})`; // each section has its own colour
   talk.slides.forEach((s) => {
     const n = s.backup ? "B" : String(main.indexOf(s) + 1).padStart(2, "0");
     if (s.chapter !== chapter) {
       chapter = s.chapter;
       chEl = document.createElement("section");
       chEl.className = "chapter";
+      chapterNo++;
+      chEl.style.setProperty("--sec", colourOf(chapterNo));
       chEl.innerHTML = `<h2 class="section-title">${esc(chapter)}${s.backup ? ` <span class="sub">Spare slides for questions</span>` : ""}</h2>`;
       root.appendChild(chEl);
-      tocList.insertAdjacentHTML("beforeend", `<li class="ch">${esc(chapter)}</li>`);
+      tocList.insertAdjacentHTML("beforeend", `<li class="ch" style="--sec:${colourOf(chapterNo)}">${esc(chapter)}</li>`);
     }
     const art = document.createElement("article");
     art.className = "entry";
@@ -65,11 +68,30 @@
       </details>` : set.questions === "link" ? `<a class="btn" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask in the venue's Q&amp;A ↗</a>` : ""}`;
     const e = { id: s.id, slide: s, title: s.title, n, el: art };
     chEl.appendChild(art);
-    tocList.insertAdjacentHTML("beforeend", `<li><a href="#s-${esc(s.id)}" data-slide="${esc(s.id)}"><span class="ld"></span><span>${esc(s.title)}</span><span class="qn"></span></a></li>`);
+    tocList.insertAdjacentHTML("beforeend", `<li style="--sec:${colourOf(chapterNo)}"><a href="#s-${esc(s.id)}" style="--sec:${colourOf(chapterNo)}" data-slide="${esc(s.id)}"><span class="ld"></span><span>${esc(s.title)}</span><span class="qn"></span></a></li>`);
     entries.push(e);
     renderScript(e);
   });
   const byId = (id) => entries.find((x) => x.id === id);
+
+  // slide progress under the pinned slide: one coloured segment per section
+  const slideBar = document.querySelector(".slide-progress");
+  const sections = [];
+  main.forEach((s) => { const last = sections[sections.length - 1]; if (last && last.name === s.chapter) last.slides.push(s); else sections.push({ name: s.chapter, slides: [s] }); });
+  slideBar.innerHTML = sections.map((c, i) => `<span style="flex:${c.slides.length};--sec:${colourOf(i)}"><i></i></span>`).join("");
+  function showSlideProgress(slide) {
+    const at = main.indexOf(slide);
+    let seen = 0;
+    sections.forEach((c, i) => {
+      const inSection = Math.max(0, Math.min(c.slides.length, at + 1 - seen));
+      slideBar.children[i].firstChild.style.setProperty("--p", `${(inSection / c.slides.length) * 100}%`);
+      seen += c.slides.length;
+    });
+  }
+  // the contents list's own scroll progress
+  HVProgress.rail(tocList, entries.map((e) => ({ el: e.el, link: tocList.querySelector(`a[data-slide="${CSS.escape(e.id)}"]`) })), {
+    line: () => stage.getBoundingClientRect().bottom + Math.max(80, (innerHeight - stage.getBoundingClientRect().bottom) * 0.3),
+  });
 
   // the script, with an edit from the presenter view if one applies
   function renderScript(e) {
@@ -112,6 +134,7 @@
     stage.querySelector('[data-go="prev"]').disabled = !s.prev;
     stage.querySelector('[data-go="next"]').disabled = !s.next;
     const e = byId(s.id);
+    if (e && !e.slide.backup) showSlideProgress(e.slide);
     pos.textContent = e ? `${e.n === "B" ? "Backup" : `${Number(e.n)} / ${main.length}`} · ${e.title}` : "";
     markReading(s.id, s.f);
     if (stepping) { stepping = false; want = { id: s.id, f: s.f }; scrollToMarker(s.id, s.f); }

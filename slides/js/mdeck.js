@@ -171,7 +171,10 @@
     // current one; `uncover=off` keeps them all visible and only moves the highlight.
     items(a, body) {
       const n = (String(body || "").match(/^[-*]\s/gm) || []).length;
-      return wrap("div", a, `c-items${a.steps ? " stepped" : ""}${a.uncover === "off" ? " all-visible" : ""}`, md(body) + stepSpans(a, Math.max(0, n - 1)), a.steps ? " data-items" : "");
+      // bullet=dot, or the path to an image
+      const isPath = a.bullet && /[./]/.test(a.bullet);
+      const extra = (a.steps ? " data-items" : "") + (isPath ? ` style="--bullet:url('${esc(a.bullet)}')"` : "");
+      return wrap("div", a, `c-items${a.steps ? " stepped" : ""}${a.uncover === "off" ? " all-visible" : ""}${a.bullet && !isPath ? ` bullet-${esc(a.bullet)}` : ""}`, md(body) + stepSpans(a, Math.max(0, n - 1)), extra);
     },
 
     // a heading with text under it, on the page: no box
@@ -361,13 +364,14 @@
         const photos = (m.photos || "").split(",").map((v) => v.trim());
         const contacts = (m.contacts || "").split(";");
         const people = (m.authors || "").split(",").map((v, i) => ({ name: v.trim(), photo: photos[i], mail: ((contacts[i] || "").split("·")[1] || "").trim() }));
-        const ring = (txt) => `<svg class="ring" viewBox="0 0 270 270" aria-label="${esc(txt)}"><circle cx="135" cy="135" r="117" class="ring-band"/><g class="ring-spin"><path id="ring-path" d="M135 135m-104.5 0a104.5 104.5 0 1 1 209 0a104.5 104.5 0 1 1 -209 0" fill="none"/><text class="ring-text"><textPath href="#ring-path" textLength="650" lengthAdjust="spacing">${esc(txt)} · ${esc(txt)} · </textPath></text></g></svg>`;
-        const person = (p, i) => `<div class="e-person${i === 0 ? " first" : ""}"><div class="e-face">${i === 0 && m["open-to-work"] ? ring(m["open-to-work"]) : ""}${p.photo ? `<img src="${esc(p.photo)}" alt="">` : ""}</div><div class="e-who"><b>${esc(p.name)}</b>${p.mail ? `<span>${esc(p.mail)}</span>` : ""}${i === 0 && m.slug ? `<p class="e-slug">${mdi(m.slug)}</p>` : ""}</div>${i === people.length - 1 ? '<div class="e-qr"><div class="qr" data-qr="talk"></div></div>' : ""}</div>`;
+        // the text runs on a circle 7.5 units outside the band's centre line, so its letters sit centred in the band
+        const ring = (txt) => `<svg class="ring" viewBox="0 0 270 270" aria-label="${esc(txt)}"><circle cx="135" cy="135" r="117" class="ring-band"/><g class="ring-spin"><path id="ring-path" d="M135 135m-109.5 0a109.5 109.5 0 1 1 219 0a109.5 109.5 0 1 1 -219 0" fill="none"/><text class="ring-text"><textPath href="#ring-path" textLength="688" lengthAdjust="spacing">${esc(txt)} · ${esc(txt)} · </textPath></text></g></svg>`;
+        const person = (p, i) => `<div class="e-person${i === 0 ? " first" : ""}"><div class="e-face">${i === 0 && m["open-to-work"] ? ring(m["open-to-work"]) : ""}${p.photo ? `<img src="${esc(p.photo)}" alt="">` : ""}</div><div class="e-who"><b>${esc(p.name)}</b>${p.mail ? `<span>${esc(p.mail)}</span>` : ""}${i === 0 && m.slug ? `<p class="e-slug">${mdi(m.slug)}</p>` : ""}</div></div>`;
         inner = `<header class="frametitle"><h2>${mdi(dek || "Takeaways")}</h2></header>
           <div class="e-body">${items.join("")}</div>
           <div class="e-side fragment fade-up"><div class="e-thanks"><h1>${mdi(headline || "Thank you")}</h1></div>
             <div class="e-people">${people.map(person).join("")}</div>
-            <div class="e-logos">${LOGOS("")}</div></div>`;
+            <div class="e-foot"><div class="e-logos">${LOGOS("")}</div><div class="e-qr"><div class="qr" data-qr="talk"></div><p data-qr-label></p></div></div></div>`;
       } else {
         const rowsSpec = sm.rows || preset.rows;
         const rows = rowsSpec ? rowsSpec.split(/[\s/,]+/).filter(Boolean).map((n) => (n === "auto" ? "auto" : `minmax(0,${parseFloat(n) || 1}fr)`)).join(" ") : "";
