@@ -10,7 +10,7 @@ site: https://heedvision.arvindchee.nu/   # where the QR code points when asking
 duration: 9.8     # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
-questions: on      # on | off | a link to the venue's Q&A tool (the presenter view can also switch it off)
+questions: off     # on | off | a link to the venue's Q&A tool (the presenter view can also switch it off)
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
 room: vis2026
