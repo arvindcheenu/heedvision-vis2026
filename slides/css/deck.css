@@ -212,6 +212,7 @@
 .c-step .st-body { margin-top: auto; padding-top: 24px; }
 .c-step h3 { font-size: calc(var(--fs) * 54px); line-height: 1.08; }
 .c-step p { margin-top: 14px; font-size: calc(var(--fs) * 32px); line-height: 1.36; color: var(--fg-2); }
+.c-step p.st-rq { margin-top: 20px; font-family: var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 0; font-style: italic; font-size: calc(var(--fs) * 28px); line-height: 1.28; color: var(--fg); }
 .c-step:has(.st-tag) .st-body { padding-bottom: 58px; }
 .c-step .st-tag { position: absolute; right: 30px; bottom: 30px; padding: 5px 14px; border-radius: 999px; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--fg-2); background: color-mix(in oklab, var(--tone, var(--fg)) 16%, var(--surface)); border: 1px solid color-mix(in oklab, var(--tone, var(--fg)) 35%, transparent); }
 

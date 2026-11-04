@@ -215,12 +215,12 @@
         const m = t.match(/^\*\*(.+?)\*\*\s*[—–:-]?\s*(.*)$/);
         const title = m ? m[1] : t;
         let text = m ? m[2] : "";
-        // a trailing {RQ1} becomes a label in the corner
-        const tag = text.match(/\s*\{([^}]+)\}\s*$/);
+        // a trailing {RQ1} becomes a label in the corner; {RQ1 | the question} adds its wording
+        const tag = text.match(/\s*\{([^}|]+?)(?:\s*\|\s*([^}]+))?\}\s*$/);
         if (tag) text = text.slice(0, tag.index);
         const cls = `c-step tile${tones[i] ? ` tone-${esc(tones[i])}` : ""}${a.reveal ? " fragment rise" : ""}`;
         const top = icons[i] ? `<svg class="ic" aria-hidden="true"><use href="#ic-${esc(icons[i])}"/></svg>` : a.numbers ? `<span class="n">${String(i + 1).padStart(2, "0")}</span>` : "";
-        return `<div class="${cls}">${top}<div class="st-body"><h3>${mdi(title)}</h3>${text ? `<p>${mdi(text)}</p>` : ""}</div>${tag ? `<span class="st-tag">${esc(tag[1])}</span>` : ""}</div>`;
+        return `<div class="${cls}">${top}<div class="st-body"><h3>${mdi(title)}</h3>${text ? `<p>${mdi(text)}</p>` : ""}${tag && tag[2] ? `<p class="st-rq">${mdi(tag[2])}</p>` : ""}</div>${tag ? `<span class="st-tag">${esc(tag[1])}</span>` : ""}</div>`;
       });
       return wrap("div", a, "c-row c-steps", cells.join(""), ` style="--n:${items.length}"`);
     },

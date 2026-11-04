@@ -89,7 +89,7 @@ Keep `kicker:` (the running head over the headline) for wayfinding only, such as
 | `::image src= caption= fit=` / `::video src= poster= caption=` | media |
 | `:::card label= title= icon= cite= steps` | text tile; `icon` (eye layers palette pin person search gauge toggle fade) sits beside the heading, `cite` adds a small source line, `steps` reveals list items one by one |
 | `:::quote who=` | participant quote |
-| `:::steps reveal tones= icons=` | stages from a list; end an item with `{RQ1}` for a corner label |
+| `:::steps reveal tones= icons=` | stages from a list; end an item with `{RQ1}` for a corner label, or `{RQ1 | the question}` to show its wording too |
 | `::clip src= poster= title= caption= ratio=` | looping video with its caption underneath |
 | `::live tag="…"` | the HeedVision demo, forked: two headsets side by side over one shared voxel store (drag a view, scroll, click the sphere to hide or show voxels) |
 | `::venn a= b= a-label= b-label=` | what a pair gain means, as overlapping finds |

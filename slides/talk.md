@@ -50,7 +50,7 @@ its click number, `wide` to span all columns, `tall` to span two rows, and
   :::card label="…" title="…" icon=eye cite="…" (steps: list items appear one by one) … :::
         (icons: eye layers palette pin person search gauge toggle fade)
   :::quote who="…" … :::
-  :::steps reveal tones="you partner both" icons="eye layers palette"  - **Title** — text {RQ1}  :::
+  :::steps reveal tones="you partner both" icons="eye layers palette"  - **Title** — text {RQ1 | the question}  :::
   :::stack … :::   :::row … :::   (put components under or beside each other)
   ::glyph type=joint|distributed|sequential|cumulative
   ::demo modes="count,sum,max,diff,who" steps snapshot bare tag="…"
@@ -242,9 +242,9 @@ time: 28
 # Every stage of attention-aware vis gets a new job when a group is watching
 
 :::steps reveal tones="you partner both" icons="eye layers palette"
-- **Capture** — Track everyone at once, and know who is who. {RQ1}
-- **Record** — Keep one memory per person per spot, and combine them. {RQ2}
-- **Display** — Show *whose* attention it is, not just how much. {RQ3}
+- **Capture** — Track everyone at once, and know who is who. {RQ1 | How should the attention of multiple viewers on a visualization be **captured in real time**?}
+- **Record** — Keep one memory per person per spot, and combine them. {RQ2 | How should the attention of multiple viewers on a visualization be **recorded over time**?}
+- **Display** — Show *whose* attention it is, as well as how much. {RQ3 | How should the attention of multiple viewers on a visualization be **displayed**?}
 :::
 
 :::notes
@@ -501,16 +501,14 @@ time: 30
 
 ::stat value="10 min" label="per hunt, as a pair"
 
-::stat value="5%" label="of voxels hide a target, lit only from within 10 cm" step=1
+::stat value="5%" label="of voxels hide a target, lit only from within 10 cm"
 
-::stat value="1 of 2" label="hunts had the cues on" step=2
+::stat value="1 of 2" label="hunts had the cues on"
 
 :::notes
 The task was a treasure hunt. This is our demo, running live: two headsets, one shared scene. Wherever someone looks, voxels fill in. Your own are blue, your partner's are gold here, and shared ones are pink. Clicking the sphere hides your voxels, and participants had that same switch. Pairs got ten minutes per hunt.
 
-[click] Five percent of voxels hid a target, and a target lit up only from within ten centimetres.
-
-[click] And one of their two hunts had the cues on.
+Five percent of voxels hid a target, and a target lit up only from within ten centimetres. And one of their two hunts had the cues on.
 :::
 
 ---
