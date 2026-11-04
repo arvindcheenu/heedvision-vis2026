@@ -315,8 +315,9 @@
     main.forEach((s) => { let c = chapters.find((x) => x.name === s.chapter); if (!c) chapters.push((c = { name: s.chapter, slides: [] })); c.slides.push(s); });
     const at = main.indexOf(slide);
     const dots = (c) => c.slides.map((s) => { const i = main.indexOf(s); return `<button type="button" class="${i < at ? "done" : i === at ? "now" : ""}" data-to="${esc(s.id)}" title="${esc(s.title)}" aria-label="${esc(s.title)}"></button>`; }).join("");
-    const head = `<nav class="headline" aria-label="Sections">${chapters.map((c) => `<div class="sec${c.name === slide.chapter ? " now" : ""}"><b>${esc(c.name)}</b><span class="dots">${dots(c)}</span></div>`).join("")}</nav>`;
-    const foot = `<div class="footline"><span class="f-who">${esc(m.authors || "")}</span><span class="f-what">${esc(m.title || "")}</span><span class="f-where">${esc((m.venue || "").split("·").slice(0, 1).join(""))}<span class="count">${slide.backup ? "Backup" : `${at + 1} / ${main.length}`}</span></span></div>`;
+    const here = chapters.findIndex((c) => c.name === slide.chapter);
+    const head = `<nav class="headline" aria-label="Sections">${chapters.map((c, i) => `<div class="sec${i === here ? " now" : i < here ? " past" : ""}"><b>${esc(c.name)}</b><span class="dots">${dots(c)}</span></div>`).join("")}</nav>`;
+    const foot = `<div class="footline"><span class="f-who">${esc(m.authors || "")}</span><span class="f-what">${esc(m.title || "")}</span><span class="f-logos">${LOGOS("")}</span><span class="count">${slide.backup ? "Backup" : `${at + 1} / ${main.length}`}</span></div>`;
     return head + foot;
   }
 
