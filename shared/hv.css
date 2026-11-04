@@ -349,3 +349,4 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 .chip { border: 0; border-radius: var(--radius); background: var(--surface-2); }
 .bibtex { background: var(--surface-2); }
 .figure { border: 0; }
+.link-card > span:nth-child(2) > b { color: var(--fg); }
