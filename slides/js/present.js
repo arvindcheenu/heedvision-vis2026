@@ -143,6 +143,7 @@
     else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(k)) { e.preventDefault(); go({ dir: "prev" }); }
     else if (k === "b" || k === "B") channel.postMessage({ t: "backups" });
     else if (k === "a" || k === "A") { const on = !(ask !== false); channel.postMessage({ t: "ask", on }); toast(on ? "QR code opens the script page" : "QR code opens the project site"); }
+    else if (k === "t" || k === "T") { HVTheme.cycle(); toast(`Theme: ${HVTheme.mode()}`); }
     else if (k === "s" || k === "S") setView("speaker");
     else if (k === "p" || k === "P") setView("presenter");
   });

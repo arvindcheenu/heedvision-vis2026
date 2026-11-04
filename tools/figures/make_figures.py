@@ -16,6 +16,7 @@ import matplotlib
 matplotlib.use("svg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import FancyBboxPatch
 from scipy.ndimage import gaussian_filter
 
 HERE = Path(__file__).parent
@@ -23,12 +24,12 @@ DATA = HERE / "data"
 OUT = HERE.parent.parent / "slides" / "assets" / "fig"
 
 ACCENT = "#ff00aa"  # placeholder, swapped for var(--accent) on write
-INK, MUTED, GREY, LINE = "#1d1d1f", "#6e6e73", "#a1a1a6", "#d2d2d7"
+INK, MUTED, GREY, LINE = "#111111", "#6e6e6b", "#8d8d8a", "#cfcfca"
 plt.rcParams.update({
-    "svg.fonttype": "none", "font.family": "DejaVu Sans", "font.size": 24,
-    "axes.edgecolor": LINE, "axes.linewidth": 1.5, "axes.labelcolor": MUTED,
+    "svg.fonttype": "none", "font.family": "DejaVu Sans", "font.size": 30,
+    "axes.edgecolor": LINE, "axes.linewidth": 2, "axes.labelcolor": MUTED,
     "xtick.color": INK, "ytick.color": MUTED, "text.color": INK,
-    "xtick.major.size": 0, "ytick.major.size": 6, "ytick.major.width": 1.5, "ytick.major.pad": 8,
+    "xtick.major.size": 0, "ytick.major.size": 6, "ytick.major.width": 2, "ytick.major.pad": 8,
 })
 
 pairs = list(csv.DictReader(open(DATA / "per_pair.csv")))
@@ -54,24 +55,24 @@ def panel(ax, title, stat, off, on, ylim, ticks, fmt, base=0):
     """No-CAAV and CAAV side by side. Lists are per-pair dots with a mean bar; scalars are stems."""
     for x, vals, color in ((0, off, GREY), (1, on, ACCENT)):
         if isinstance(vals, list):
-            ax.scatter(x + spread(vals), vals, s=190, color=color, alpha=0.55, linewidths=0, zorder=2, clip_on=False)
+            ax.scatter(x + spread(vals), vals, s=300, color=color, alpha=0.6, linewidths=0, zorder=2, clip_on=False)
             mean = float(np.mean(vals))
-            ax.hlines(mean, x - 0.27, x + 0.27, color=color, linewidth=5, zorder=3)
+            ax.hlines(mean, x - 0.28, x + 0.28, color=color, linewidth=7, zorder=3)
         else:
             mean = vals
-            ax.vlines(x, base, mean, color=color, linewidth=5, zorder=2)
-            ax.scatter([x], [mean], s=260, color=color, zorder=3, clip_on=False)
-        ax.annotate(fmt(mean), (x + 0.31, mean), va="center", fontsize=25, fontweight="bold", color=INK if color == GREY else ACCENT)
-    ax.set_xlim(-0.5, 1.75)
+            ax.vlines(x, base, mean, color=color, linewidth=7, zorder=2)
+            ax.scatter([x], [mean], s=440, color=color, zorder=3, clip_on=False)
+        ax.annotate(fmt(mean), (x + 0.33, mean), va="center", fontsize=34, fontweight="bold", color=INK if color == GREY else ACCENT)
+    ax.set_xlim(-0.5, 2.0)
     ax.set_ylim(*ylim)
     ax.set_xticks([0, 1], ["No-CAAV", "CAAV"])
     ax.set_yticks(ticks)
-    ax.tick_params(axis="x", labelsize=23, pad=12)
-    ax.tick_params(axis="y", labelsize=21)
+    ax.tick_params(axis="x", labelsize=30, pad=14)
+    ax.tick_params(axis="y", labelsize=26)
     ax.spines[["top", "right"]].set_visible(False)
     ax.spines["bottom"].set_visible(True)
-    ax.set_title(title, loc="left", fontsize=27, fontweight="bold", pad=52, color=INK)
-    ax.text(0, 1.045, stat, transform=ax.transAxes, fontsize=21, color=MUTED, va="bottom")
+    ax.set_title(title, loc="left", fontsize=36, fontweight="bold", pad=62, color=INK)
+    ax.text(0, 1.05, stat, transform=ax.transAxes, fontsize=28, color=MUTED, va="bottom")
 
 
 def write(fig, name):
@@ -80,6 +81,8 @@ def write(fig, name):
     plt.close(fig)
     svg = path.read_text()
     svg = svg.replace(ACCENT, "var(--accent)")
+    for hex_, var in ((INK, "--plot-ink"), (MUTED, "--plot-muted"), (GREY, "--plot-grey"), (LINE, "--plot-line")):
+        svg = svg.replace(hex_, f"var({var})")
     svg = svg.replace("'DejaVu Sans'", "var(--font-body)").replace("DejaVu Sans", "var(--font-body)")
     # drop metadata; size comes from the slide
     svg = svg.split("<metadata>")[0] + svg.split("</metadata>")[1]
@@ -124,7 +127,7 @@ def coverage(ax, g, stat):
 
 def redundancy(ax, g, stat):
     a, b = cond(g, "normalized_redundancy")
-    panel(ax, "Normalized redundancy (%)", stat, a, b, **REDUND)
+    panel(ax, "Redundancy (%)", stat, a, b, **REDUND)
     tick_fmt(ax, "nr")
 
 
@@ -136,18 +139,18 @@ def tgain(ax, g, stat):
 # ---------------------------------------------------------------- slides: Figs 7, 8, 10, 12
 OUT.mkdir(parents=True, exist_ok=True)
 
-fig, axs = plt.subplots(1, 4, figsize=(1728 / 72, 640 / 72))
-fig.subplots_adjust(left=0.035, right=0.995, top=0.8, bottom=0.1, wspace=0.34)
+fig, axs = plt.subplots(1, 4, figsize=(1744 / 72, 700 / 72))
+fig.subplots_adjust(left=0.035, right=0.995, top=0.77, bottom=0.1, wspace=0.26)
 targets(axs[0], "scatter", "Δ = +16.1 pp, g = 1.12")
 coverage(axs[1], "scatter", "per condition")
-redundancy(axs[2], "scatter", "≈ 70% reduction")
+redundancy(axs[2], "scatter", "normalized, ≈ 70% lower")
 tgain(axs[3], "scatter", "Δ = +0.138")
 write(fig, "plot-scatter")
 
-fig, axs = plt.subplots(1, 2, figsize=(880 / 72, 640 / 72))
-fig.subplots_adjust(left=0.07, right=0.99, top=0.8, bottom=0.1, wspace=0.34)
-tgain(axs[0], "terrain", "Δ = +0.277, g = 1.67, p = 0.029")
-redundancy(axs[1], "terrain", "per condition")
+fig, axs = plt.subplots(1, 2, figsize=(860 / 72, 700 / 72))
+fig.subplots_adjust(left=0.08, right=0.995, top=0.77, bottom=0.1, wspace=0.3)
+tgain(axs[0], "terrain", "Δ = +0.277, g = 1.67")
+redundancy(axs[1], "terrain", "normalized")
 write(fig, "plot-terrain")
 
 # ---------------------------------------------------------------- Fig 9, redrawn
@@ -157,15 +160,17 @@ gy, gx = np.gradient(height)
 grad = np.hypot(gx, gy)
 cmap_grey = matplotlib.colors.LinearSegmentedColormap.from_list("g", ["#ffffff", "#1d1d1f"])
 
-fig, axs = plt.subplots(1, 2, figsize=(800 / 72, 640 / 72))
-fig.subplots_adjust(left=0.01, right=0.99, top=0.8, bottom=0.1, wspace=0.05)
-axs[0].imshow(grad, cmap=cmap_grey, interpolation="nearest", origin="upper")
-axs[1].imshow(attention, cmap="viridis", interpolation="nearest", origin="upper")
+fig, axs = plt.subplots(1, 2, figsize=(840 / 72, 700 / 72))
+fig.subplots_adjust(left=0.01, right=0.99, top=0.77, bottom=0.02, wspace=0.05)
+ims = [axs[0].imshow(grad, cmap=cmap_grey, interpolation="nearest", origin="upper"),
+       axs[1].imshow(attention, cmap="viridis", interpolation="nearest", origin="upper")]
+for ax, im in zip(axs, ims):  # rounded, like every other image on the slides
+    im.set_clip_path(FancyBboxPatch((-0.5, -0.5), 24, 24, boxstyle="round,pad=0,rounding_size=1.2", transform=ax.transData))
 # the paper's landmark threshold (75th percentile of the gradient, 42.98), lightly smoothed to draw
 axs[1].contour(gaussian_filter(grad, 0.8), levels=[42.98], colors="white", linewidths=2)
-for ax, t, s in ((axs[0], "Terrain gradient", "landmarks: peaks, ridges, valleys"), (axs[1], "Attention", "contour: top quartile of gradient")):
+for ax, t, s in ((axs[0], "Terrain gradient", "peaks, ridges, valleys"), (axs[1], "Attention", "outline: steepest quarter")):
     ax.set_xticks([]); ax.set_yticks([])
     ax.spines[:].set_visible(False)
-    ax.set_title(t, loc="left", fontsize=27, fontweight="bold", pad=52, color=INK)
-    ax.text(0, 1.045, s, transform=ax.transAxes, fontsize=21, color=MUTED, va="bottom")
+    ax.set_title(t, loc="left", fontsize=36, fontweight="bold", pad=62, color=INK)
+    ax.text(0, 1.05, s, transform=ax.transAxes, fontsize=28, color=MUTED, va="bottom")
 write(fig, "plot-terrain-maps")

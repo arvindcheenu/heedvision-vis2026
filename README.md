@@ -12,7 +12,7 @@ This one is for **HeedVision: Attention Awareness in Collaborative Immersive Ana
 4. **`slides/talk.md`**: the talk, in markdown. See [Slides](#slides).
 5. **`npm run dev`** to work with live reload, and to draw new layouts. See [Layouts](#layouts).
 
-To drop what's specific to HeedVision: delete `slides/plugins/hv-*` and `plugins: hv-live` in `talk.md`, and replace `slides/assets/`, `assets/`, `heedvision.pdf`, and `tools/figures/`.
+To drop what's specific to HeedVision: delete `slides/plugins/hv-*` and the `plugins:` line in `talk.md`, and replace `slides/assets/`, `assets/`, `heedvision.pdf`, and `tools/figures/`.
 
 ```
 site.config.js      title, authors, accent, fonts, logos
@@ -62,7 +62,11 @@ What you say. [click] marks a build.
 | `::video src= poster=` | plays while its slide is up |
 | `::stat value= label= sub=` | a number |
 | `:::quote who=` | a quote |
-| `:::row` `:::stack` | beside or under each other |
+| `:::card icon= title= who= tone=you\|partner\|both` | a card with an icon from `slides/assets/icons.svg` |
+| `:::block icon= step=` | any markdown, as one piece |
+| `:::heat` | a markdown table whose numbers tint their cells |
+| `:::magic steps=1` | [Shiki Magic Move](https://github.com/shikijs/shiki-magic-move): fenced blocks morph into each other, one per click; `lang=text` morphs sentences word by word |
+| `:::row` `:::stack` `:::grid cols=3` | beside, under, or in a grid |
 | `::qr label=auto` `::authors` `::logos` `::page` | from your config |
 
 Add `step` to any of them to show it on a click, and `step=2` to fix its click number. Slides with `backup: yes` are skipped when presenting; **B** opens them.
@@ -109,7 +113,9 @@ Keys: arrows nudge, ⌘Z undo, ⌘D duplicate, ⌫ delete, ⌘S save.
 
 Open the slides, press **P** for the presenter view or **S** for the speaker view (the script, large). They open in their own window and drive the slides; put that one on your laptop. Once one is open, the projected slides show no controls.
 
-Keys: arrows or space to move, **P**/**S** to switch view, **A** to choose what the QR code opens, **B** for backups. Click the time to reset it.
+Keys: arrows or space to move, **P**/**S** to switch view, **A** to choose what the QR code opens, **B** for backups, **T** for the theme. Click the time to reset it.
+
+On a phone, the slides scroll vertically, one under the other.
 
 To have the audience's pages follow you, open `slides/?present=<key>`. See below.
 
@@ -125,11 +131,11 @@ Audience pages can follow your slide, and take questions per slide. It's a Cloud
 
 ## Look
 
-`accent` in `site.config.js` is the only colour in the interface. Everything else is greys, in `shared/site.css`. Figures keep their own colours. Fonts are the system stacks: `fonts: { heading: "serif", body: "sans" }`, or any CSS font stack. Slides are always light; the other pages follow the system.
+Big two-tone type, soft rounded panels, and the colours of your content. `accent` and `font` are in `site.config.js`; the font is the system sans stack unless you set one. All the tokens, light and dark, are in `shared/site.css`. Every page has a light, dark and system control, and the choice is shared across pages and open tabs (**T** cycles it on the slides and in the presenter view).
 
 ## Figures
 
-`npm run figures` redraws the result plots in `slides/assets/fig/` from `tools/figures/data/`. The plots are SVG with live text, so they follow your fonts and accent. It needs Python with matplotlib and scipy.
+`npm run figures` redraws the result plots in `slides/assets/fig/` from `tools/figures/data/`. The plots are SVG with live text, so they follow your font, accent and theme. It needs Python with matplotlib and scipy.
 
 The HeedVision data: `per_pair.csv` and `conditions.csv` come from the OSF package, and reproduce the means reported in the paper. `attention_fig9.csv` is read back from the paper's Fig. 9 image, as the script that made it isn't in the package. Everything is at <https://osf.io/frsp8/>.
 
@@ -139,4 +145,4 @@ The HeedVision data: `per_pair.csv` and `conditions.csv` come from the OSF packa
 - `npm run dev`: the same, plus the editor, saving and live reload.
 - `npm run pdf`: a PDF of the slides, as a backup. Needs `npm start` and Google Chrome.
 
-reveal.js, marked, qrcode-generator, three.js and three-mesh-bvh are vendored in `slides/vendor/`, under their own MIT licenses.
+reveal.js, marked, qrcode-generator, Shiki, Shiki Magic Move, three.js and three-mesh-bvh are vendored in `slides/vendor/`, under their own MIT licenses.

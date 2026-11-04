@@ -23,6 +23,7 @@
         <button class="btn" data-act="undo" title="Undo (⌘Z)">Undo</button>
         <button class="btn" data-act="redo" title="Redo (⇧⌘Z)">Redo</button>
         <span class="state"></span>
+        <span data-theme-picker></span>
         <a class="btn" href="/slides/" target="_blank" rel="noopener">Open slides</a>
         <button class="btn accent" data-act="save" title="Save (⌘S)">Save</button>
       </header>
@@ -41,6 +42,7 @@
   const ed = $(".ed"), left = $(".ed-left"), right = $(".ed-right"), mid = $(".ed-mid"), stage = $(".stage"), wrap = $(".stage-wrap"), page = $(".canvas"), selBox = $(".sel"), stateEl = $(".state"), textEl = $(".ed-text textarea"), pick = $(".preview-pick select");
   const style = document.createElement("style");
   document.head.appendChild(style);
+  HVTheme.mountAll();
 
   // ---------------------------------------------------------- helpers
   const layout = () => layouts[cur];
@@ -51,7 +53,12 @@
   const uniqueName = (base) => { let id = base, n = 2; while (layouts[id]) id = `${base}-${n++}`; return id; };
   const ctx = () => ({ ...talk.ctx, placeholders: true, page: 1 });
 
+  // canvases draw a still, so what you place is what you see
   function hydrate(root) {
+    MDeck.runtimes.forEach((rt) => {
+      if (rt.selector.includes("voxdemo")) return;
+      root.querySelectorAll(rt.selector).forEach(async (el) => { try { const i = await rt.mount(el, { scale: () => 1 }); if (i.sync) i.sync(true); } catch {} });
+    });
     root.querySelectorAll("[data-plot]").forEach(async (el) => { el.innerHTML = await fetch(el.dataset.plot).then((r) => r.text()).catch(() => ""); });
     root.querySelectorAll("[data-qr]").forEach((el) => { const q = qrcode(0, "M"); q.addData(window.SITE?.url || "https://example.com"); q.make(); el.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); });
     root.querySelectorAll("[data-qr-label]").forEach((el) => (el.textContent = "Slides and script"));
@@ -249,10 +256,10 @@
   const blocks = () => layouts.$blocks || {};
   function template(key) {
     const [type, name] = key.split(":");
-    if (type === "slot") return { title: { kind: "slot", slot: "title", w: 1680, h: 130, font: "heading", size: 92, weight: 600, tracking: -0.01, line: 1.05 }, subtitle: { kind: "slot", slot: "subtitle", w: 1680, h: 70, size: 40, color: "muted" }, body: { kind: "slot", slot: "body", w: 840, h: 480, size: 36, line: 1.25 } }[name];
+    if (type === "slot") return { title: { kind: "slot", slot: "title", w: 1792, h: 110, size: 72, weight: 500, tracking: -0.022, line: 1.1, color: "muted" }, subtitle: { kind: "slot", slot: "subtitle", w: 1792, h: 70, size: 44, color: "muted" }, body: { kind: "slot", slot: "body", w: 840, h: 480, size: 44, line: 1.22, color: "muted" } }[name];
     if (type === "text") return { kind: "text", text: "Text", w: 720, h: 120, size: 36 };
     if (type === "image") return { kind: "image", src: "assets/fig/study-setup.jpg", fit: "contain", w: 840, h: 480 };
-    if (type === "shape") return { kind: "shape", fill: "soft", radius: 6, w: 480, h: 240 };
+    if (type === "shape") return { kind: "shape", fill: "panel", radius: 32, w: 480, h: 240 };
     if (type === "line") return { kind: "shape", fill: "line", w: 840, h: 2 };
     if (type === "comp") { const c = MDeck.catalog[name] || {}; return { kind: "component", component: name, attrs: c.attrs || "", w: c.w || 600, h: c.h || 300 }; }
     if (type === "def") return { kind: "component", component: name, attrs: "", w: 840, h: 480 };
@@ -320,7 +327,7 @@
   });
 
   // ---------------------------------------------------------- right: inspector
-  const COLORS = [["", "Default"], ["ink", "Ink"], ["muted", "Muted"], ["faint", "Faint"], ["accent", "Accent"], ["paper", "Paper"], ["soft", "Soft"], ["line", "Line"]];
+  const COLORS = [["", "Default"], ["ink", "Ink"], ["muted", "Muted"], ["faint", "Faint"], ["accent", "Accent"], ["paper", "Paper"], ["panel", "Panel"], ["line", "Line"], ["you", "Blue"], ["partner", "Orange"], ["both", "Pink"], ["you-tint", "Blue tint"], ["partner-tint", "Orange tint"], ["both-tint", "Pink tint"]];
   const pickOr = (opts, v) => { const known = opts.some(([k]) => k === (v ?? "")); return opts.map(([k, l]) => `<option value="${k}" ${k === (v ?? "") ? "selected" : ""}>${l}</option>`).join("") + (known ? "" : `<option selected value="${esc(v)}">${esc(v)}</option>`); };
   const fld = (label, html) => `<label class="fld"><span>${label}</span>${html}</label>`;
   const input = (k, v, type = "text", extra = "") => `<input data-k="${k}" type="${type}" value="${esc(v ?? "")}" ${extra}>`;
@@ -358,7 +365,6 @@
       <div class="ins-title"><span>Position</span></div>
       <div class="nums">${["x", "y", "w", "h"].map((k) => `<label>${k.toUpperCase()}<input data-k="${k}" data-num type="number" value="${r[k]}"></label>`).join("")}</div>
       ${text ? `<div class="ins-title"><span>Type</span></div>
-      ${fld("Font", `<select data-k="font">${pickOr([["", "Default"], ["heading", "Heading"], ["body", "Body"], ["sans", "Sans"], ["serif", "Serif"], ["mono", "Mono"]], r.font)}</select>`)}
       <div class="nums"><label>Sz<input data-k="size" data-num type="number" value="${r.size ?? ""}"></label><label>Wt<input data-k="weight" data-num type="number" step="100" value="${r.weight ?? ""}"></label><label>Ln<input data-k="line" data-num type="number" step="0.05" value="${r.line ?? ""}"></label><label>Tr<input data-k="tracking" data-num type="number" step="0.005" value="${r.tracking ?? ""}"></label></div>
       ${fld("Colour", `<select data-k="color">${pickOr(COLORS, r.color)}</select>`)}
       ${fld("Align", seg("align", [["left", "Left"], ["center", "Mid"], ["right", "Right"]], r.align || "left"))}

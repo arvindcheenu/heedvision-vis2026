@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="always-light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,7 +22,7 @@
     fetch("/__dev/session", { cache: "no-store" }).then(function (r) {
       if (r.status !== 204) throw 0;
       var load = function (src) { return new Promise(function (ok) { var s = document.createElement("script"); s.src = src; s.onload = ok; document.head.appendChild(s); }); };
-      [["stylesheet", "/shared/site.css"], ["stylesheet", "/slides/css/deck.css"], ["stylesheet", "/tools/editor/editor.css"]].forEach(function (l) {
+      [["stylesheet", "/shared/site.css"], ["stylesheet", "/slides/vendor/magic-move.css"], ["stylesheet", "/slides/css/deck.css"], ["stylesheet", "/tools/editor/editor.css"]].forEach(function (l) {
         var el = document.createElement("link"); el.rel = l[0]; el.href = l[1]; document.head.appendChild(el);
       });
       ["/site.config.js", "/shared/site.js", "/slides/vendor/marked.js", "/slides/vendor/qrcode.js", "/slides/js/mdeck.js", "/tools/editor/editor.js"].reduce(function (p, src) { return p.then(function () { return load(src); }); }, Promise.resolve());

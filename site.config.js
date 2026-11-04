@@ -4,11 +4,12 @@ window.SITE = {
   subtitle: "Attention Awareness in Collaborative Immersive Analytics Environments",
   venue: "IEEE VIS 2026 · Boston",
   url: "https://heedvision.arvindchee.nu/",
+  icon: "shared/logos/mark.svg",
+  keywords: ["Attention tracking", "Eyetracking", "Immersive analytics", "Ubiquitous analytics", "Post-WIMP interaction"],
 
-  // Look. `accent` is the only colour in the interface.
+  // Look. `accent` colours links and highlights. `font` is the system sans stack unless you set one.
   accent: "#d6246e",
-  // "sans" or "serif" (the system stacks in shared/site.css), or any CSS font stack.
-  fonts: { heading: "serif", body: "sans" },
+  // font: "Inter, sans-serif",
 
   // photo paths are relative to the site root
   authors: [

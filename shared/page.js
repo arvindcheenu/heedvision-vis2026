@@ -12,12 +12,12 @@
   const body = src.replace(/^\s*---[\s\S]*?\n---\n/, "");
 
   const pieces = {
-    authors: () => `<div class="people">${(S.authors || []).map((p) => (p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : `<span>${esc(p.name)}</span>`)).join("")}</div>`,
-    deck: () => `<div class="deck-frame"><iframe id="talk-iframe" src="slides/?embed" title="Talk slides" loading="lazy" allow="fullscreen; autoplay"></iframe></div>
-      <div class="deck-ctl"><button class="btn" type="button" data-go="prev" aria-label="Previous" disabled>‹</button><button class="btn" type="button" data-go="next" aria-label="Next">›</button><span class="pos" aria-live="polite"></span></div>`,
+    // page properties: authors, venue, keywords
+    authors: () => `<dl class="props"><dt>Authors</dt><dd>${(S.authors || []).map((p) => (p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : `<span>${esc(p.name)}</span>`)).join("")}</dd>${S.venue ? `<dt>Venue</dt><dd>${esc(S.venue)}</dd>` : ""}${S.keywords ? `<dt>Keywords</dt><dd style="gap:4px">${S.keywords.map((k, i) => `<span class="tag ${["you", "partner", "both", ""][i % 4]}">${esc(k)}</span>`).join("")}</dd>` : ""}</dl>`,
+    deck: () => `<div class="deck-wide"><div class="deck-frame"><iframe id="talk-iframe" src="slides/?embed" title="Talk slides" loading="lazy" allow="fullscreen; autoplay"></iframe></div>
+      <div class="deck-ctl"><button class="btn" type="button" data-go="prev" aria-label="Previous" disabled>‹</button><button class="btn" type="button" data-go="next" aria-label="Next">›</button><span class="pos" aria-live="polite"></span></div></div>`,
     logos: () => `<div class="foot-logos">${(S.logos || []).map((l) => `<img src="${esc(l.src)}" alt="${esc(l.alt || "")}">`).join("")}</div>`,
   };
-  let links = false;
   const html = body.split(/\n(?=::[a-z]+\s*\n)/).map((chunk) => {
     const m = chunk.match(/^::([a-z]+)\s*\n([\s\S]*)$/);
     if (!m) return marked.parse(chunk);
@@ -28,7 +28,9 @@
     return (pieces[m[1]] ? pieces[m[1]]() : "") + marked.parse(m[2]);
   }).join("");
 
-  root.innerHTML = `<h1>${esc(S.title)}</h1><p class="subtitle">${esc(S.subtitle)}</p>${html}`;
+  root.innerHTML = `${S.icon ? `<div><img class="page-icon" src="${esc(S.icon)}" alt=""></div>` : ""}<h1 class="intro"><b>${esc(S.title)}</b> ${esc(S.subtitle)}</h1>${html}`;
+  const name = document.querySelector(".top .name");
+  if (name) name.innerHTML = `${S.icon ? `<img src="${esc(S.icon)}" alt="">` : ""}${esc(S.title)}`;
   document.title = S.title ? `${S.title}: ${S.subtitle}` : "";
   if (doc.meta.description) document.querySelector('meta[name="description"]')?.setAttribute("content", doc.meta.description);
 

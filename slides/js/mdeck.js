@@ -171,18 +171,39 @@
     stack: (a, body, ctx) => wrap("div", a, "c-stack", blocks(body, ctx), a.gap ? ` style="gap:${cssLen(+a.gap)}"` : ""),
     row: (a, body, ctx) => wrap("div", a, "c-row", blocks(body, ctx), a.gap ? ` style="gap:${cssLen(+a.gap)}"` : ""),
 
-    figure: (a) => wrap("figure", a, `c-figure fit-${esc(a.fit || "contain")}`,
-      `<img src="${esc(a.src)}" alt="${esc(a.alt || "")}">${a.caption ? `<figcaption>${mdi(a.caption)}</figcaption>` : ""}`),
+    figure: (a) => wrap("figure", a, `c-figure fit-${esc(a.fit || "contain")}${a.plate ? " plate" : ""}`,
+      `<img src="${esc(a.src)}" alt="${esc(a.alt || "")}"${a.focus ? ` style="--focus:${esc(a.focus)}"` : ""}>${a.caption ? `<figcaption>${mdi(a.caption)}</figcaption>` : ""}`),
     // an SVG inlined into the slide, so it takes the site's fonts and accent colour
     plot: (a) => wrap("figure", a, "c-plot",
       `<div class="plot-svg" data-plot="${esc(a.src)}" role="img" aria-label="${esc(a.alt || "")}"></div>${a.caption ? `<figcaption>${mdi(a.caption)}</figcaption>` : ""}`),
-    video: (a) => wrap("figure", a, "c-figure fit-contain",
+    video: (a) => wrap("figure", a, `c-figure fit-${esc(a.fit || "contain")}`,
       `<video data-src="${esc(a.src)}" poster="${esc(a.poster || "")}" muted loop playsinline aria-label="${esc(a.alt || a.caption || "Video")}"></video>${a.caption ? `<figcaption>${mdi(a.caption)}</figcaption>` : ""}`),
 
     stat: (a, body, ctx) => wrap("div", a, "c-stat",
       `<div class="v">${mdi(a.value)}</div>${a.label ? `<div class="l">${mdi(a.label)}</div>` : ""}${a.sub ? `<div class="s">${mdi(a.sub)}</div>` : ""}${blocks(body, ctx)}`),
     quote: (a, body) => wrap("blockquote", a, "c-quote", `<p>${mdi((body || a.text || "").trim())}</p>${a.who ? `<cite>${mdi(a.who)}</cite>` : ""}`),
     note: (a, body) => wrap("p", a, "c-note", mdi((body || a.text || "").trim())),
+    // any markdown, as one piece: `:::block step=1`
+    block: (a, body, ctx) => wrap("div", a, `c-block${a.icon ? " has-icon" : ""}`, (a.icon ? ICON(a.icon) : "") + (a.icon ? `<div>${blocks(body, ctx)}</div>` : blocks(body, ctx))),
+    grid: (a, body, ctx) => wrap("div", a, "c-grid", blocks(body, ctx), ` style="--n:${+a.cols || 3}"`),
+    // a card: icon and title on top, text under; `tone=you|partner|both` tints it
+    card: (a, body, ctx) => wrap("div", { ...a, class: `${a.tone ? `tone-${a.tone} ` : ""}${a.class || ""}`.trim() }, "c-card",
+      `<div class="c-top">${a.icon ? ICON(a.icon) : ""}<span>${mdi(a.title || "")}</span></div>${blocks(body, ctx)}${a.who ? `<cite>${mdi(a.who)}</cite>` : ""}`),
+    tag: (a) => wrap("span", a, `tag${a.tone ? ` ${esc(a.tone)}` : ""}`, mdi(a.text || "")),
+    // a table whose numbers tint their cells: more is stronger
+    heat(a, body) {
+      const max = +a.max || Math.max(1, ...(String(body).match(/\|\s*\d+\s*(?=\|)/g) || []).map((m) => +m.replace(/\D/g, "")));
+      return wrap("div", a, "c-heat", md(body).replace(/<td([^>]*)>(\d+)<\/td>/g, (_, at, n) => `<td${at} style="background:color-mix(in srgb, var(--both) ${Math.round((+n / max) * 62)}%, transparent)">${n}</td>`));
+    },
+    // Shiki Magic Move: fenced blocks morph into each other, one per click (`steps=1` starts at click 1).
+    // lang=text morphs plain sentences word by word.
+    magic(a, body) {
+      const codes = [...String(body).matchAll(/^\s*```[^\n]*\n([\s\S]*?)\n\s*```\s*$/gm)].map((m) => m[1]);
+      const lang = a.lang || (String(body).match(/```(\w+)/) || [])[1] || "python";
+      const from = a.steps && a.steps !== true ? +a.steps : null;
+      const spans = codes.slice(1).map((_, i) => `<span class="fragment step"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("");
+      return wrap("div", a, `c-magic lang-${esc(lang)}`, `<pre data-magic="${esc(JSON.stringify(codes))}" data-lang="${esc(lang)}">${esc(codes[codes.length - 1] || "")}</pre>${spans}`);
+    },
 
     qr: (a) => wrap("div", a, "c-qr", `<div class="qr" data-qr></div>${a.label ? `<p${a.label === "auto" ? " data-qr-label" : ""}>${a.label === "auto" ? "" : mdi(a.label)}</p>` : ""}`),
     authors: (a, body, ctx) => wrap("div", a, "c-authors", (ctx.site.authors || []).map((p) => `<span class="author">${a.photos !== "off" && p.photo ? `<img src="${esc(rootPath(p.photo, ctx))}" alt="">` : ""}<b>${esc(p.name)}</b>${a.emails ? `<small>${esc(p.email || "")}</small>` : ""}</span>`).join("")),
@@ -191,6 +212,7 @@
     questions: (a, body, ctx) => wrap("div", a, "c-questions", `<div class="qa-board" data-qa-board></div><div class="qa-fallback">${blocks(body, ctx)}</div>`),
     spacer: () => `<div class="c-spacer"></div>`,
   };
+  const ICON = (name) => `<svg class="ic" aria-hidden="true" viewBox="0 0 48 48"><use href="assets/icons.svg#ic-${esc(name)}"/></svg>`;
   const rootPath = (p, ctx) => (/^(https?:|\/|data:)/.test(p) ? p : `${ctx.rootBase}${p}`);
 
   // How the editor offers a component in its palette
@@ -200,6 +222,7 @@
     video: { label: "Video", w: 900, h: 500, attrs: 'src=""' },
     stat: { label: "Number", w: 420, h: 200, attrs: 'value="78.5%" label="Targets"' },
     quote: { label: "Quote", w: 700, h: 200, attrs: 'text="A quote." who="P1"' },
+    magic: { label: "Magic Move", w: 800, h: 400, attrs: "steps" },
     qr: { label: "QR code", w: 240, h: 300, attrs: 'label="auto"' },
     authors: { label: "Authors", w: 900, h: 120, attrs: "" },
     logos: { label: "Logos", w: 700, h: 70, attrs: "" },
@@ -207,8 +230,8 @@
   };
 
   // ---------------------------------------------------------------- layouts
-  const COLORS = { ink: "var(--ink)", muted: "var(--muted)", faint: "var(--faint)", accent: "var(--accent)", paper: "var(--paper)", soft: "var(--soft)", line: "var(--line)", none: "transparent" };
-  const FONTS = { heading: "var(--font-heading)", body: "var(--font-body)", sans: "var(--font-sans)", serif: "var(--font-serif)", mono: "var(--font-mono)" };
+  const COLORS = { ink: "var(--ink)", muted: "var(--muted)", faint: "var(--faint)", accent: "var(--accent)", paper: "var(--paper)", soft: "var(--soft)", line: "var(--line)", panel: "var(--panel)", you: "var(--you)", partner: "var(--partner)", both: "var(--both)", "you-tint": "var(--you-tint)", "partner-tint": "var(--partner-tint)", "both-tint": "var(--both-tint)", none: "transparent" };
+  const FONTS = { body: "var(--font)", heading: "var(--font)" };
   const tok = (map, v) => map[v] ?? v;
 
   // Every look a region can have, as CSS. Anything else goes in `style`.
@@ -240,7 +263,7 @@
       case "slot": {
         const v = slots[r.slot || r.id];
         if (v == null) return ctx.placeholders ? `<span class="r-placeholder">${esc(r.slot || r.id)}</span>` : "";
-        return /^(title|subtitle)$/.test(r.slot) && !/\n/.test(v) ? mdi(v) : blocks(v, ctx);
+        return /^(title|subtitle)$/.test(r.slot) && !/\n/.test(v) ? `<div>${mdi(v)}</div>` : blocks(v, ctx);
       }
       case "text": return md(fill(r.text || "", ctx));
       case "image": return `<img src="${esc(r.src || "")}" alt="${esc(r.alt || "")}" style="object-fit:${esc(r.fit || "contain")}">`;
@@ -252,7 +275,7 @@
   function regionHTML(r, slots, ctx) {
     const empty = r.kind === "slot" && slots[r.slot || r.id] == null && !ctx.placeholders;
     if (empty) return "";
-    const cls = `r r-${esc(r.kind || "shape")}${r.step ? " fragment" : ""}`;
+    const cls = `r r-${esc(r.kind || "shape")}${r.fill ? " r-fill" : ""}${r.step ? " fragment" : ""}`;
     const idx = r.step && r.step !== true ? ` data-fragment-index="${+r.step}"` : "";
     return `<div class="${cls}" data-region="${esc(r.id)}"${idx} style="${esc(regionStyle(r))}">${regionInner(r, slots, ctx)}</div>`;
   }
