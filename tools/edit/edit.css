@@ -4,7 +4,7 @@ html, body { height: 100%; overflow: hidden; }
 .ed-top { grid-area: top; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--surface-2); }
 .ed-top .state { margin-left: auto; margin-right: 8px; font-size: 14px; color: var(--fg-2); }
 .ed-list { grid-area: list; overflow-y: auto; padding: 8px; }
-.ed-list button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; gap: 8px; width: 100%; padding: 6px 8px; font-size: 14px; line-height: 1.3; }
+.ed-list button { all: unset; border-radius: var(--radius); box-sizing: border-box; cursor: pointer; display: flex; gap: 8px; width: 100%; padding: 6px 8px; font-size: 14px; line-height: 1.3; }
 .ed-list button:hover { background: var(--surface-2); }
 .ed-list button[aria-current="true"] { background: var(--vis-brown); color: #fff; }
 .ed-list .n { flex: none; width: 2ch; text-align: right; opacity: 0.6; font-variant-numeric: tabular-nums; }
@@ -13,6 +13,6 @@ html, body { height: 100%; overflow: hidden; }
 .ed-text textarea { flex: 1; min-height: 0; padding: 10px 12px; border: 0; border-radius: var(--radius); resize: none; outline: 0; background: var(--surface-2); color: var(--fg); font: 400 14px/1.5 ui-monospace, Menlo, monospace; }
 .ed-text textarea:focus { box-shadow: inset 0 0 0 2px var(--vis-orange); }
 .ed-view { grid-area: view; padding: 12px 12px 12px 0; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-.ed-view .frame { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); }
+.ed-view .frame { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); border-radius: var(--radius); overflow: hidden; }
 .ed-view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .ed-view p { margin: 0; font-size: 14px; color: var(--fg-2); }

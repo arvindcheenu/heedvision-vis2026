@@ -5,9 +5,11 @@ authors: Arvind Srinivasan, Niklas Elmqvist
 photos: assets/people/arvind.jpg, assets/people/niklas.jpg
 venue: IEEE VIS 2026 · Boston · November 9–13
 contacts: **Arvind Srinivasan** · arvind@cs.au.dk; Niklas Elmqvist · elm@cs.au.dk
+open-to-work: Open to work · Postdoc · Industry
+slug: Third-year PhD student, open to postdoc and industry positions
 url: https://heedvision.arvindchee.nu/talk/
 site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
-duration: 9.7     # minutes, for presenter-view pacing
+duration: 9.9     # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
 questions: on      # on | off | a link to the venue's Q&A tool
@@ -133,17 +135,29 @@ So we took attention-aware visualization from one viewer to many.
 
 ---
 id: caav
-layout: full
+layout: three
 chapter: Idea
 time: 42
 ---
 
 # Collaborative attention-aware visualization
 
-:::items steps
-- **Capture.** Distinguish between users while tracking attention simultaneously. <span class="rq">How should the attention of multiple viewers on a visualization be captured in real time?</span>
-- **Record.** Identity-aware accumulators, with sum, maximum, difference and count. <span class="rq">How should the attention of multiple viewers on a visualization be recorded over time?</span>
-- **Display.** Encode both attention intensity and user identity. <span class="rq">How should the attention of multiple viewers on a visualization be displayed?</span>
+:::card icon=eye title="Capture" class=col
+Distinguish between users while tracking attention simultaneously.
+
+<span class="rq-tag">RQ1</span><span class="rq">How should the attention of multiple viewers on a visualization be captured in real time?</span>
+:::
+
+:::card icon=layers title="Record" class=col step=1
+Identity-aware accumulators, with sum, maximum, difference and count.
+
+<span class="rq-tag">RQ2</span><span class="rq">How should the attention of multiple viewers on a visualization be recorded over time?</span>
+:::
+
+:::card icon=palette title="Revisualize" class=col step=2
+Encode both attention intensity and user identity.
+
+<span class="rq-tag">RQ3</span><span class="rq">How should the attention of multiple viewers on a visualization be displayed?</span>
 :::
 
 :::notes
@@ -466,14 +480,14 @@ Our thematic analysis found six collaborative strategies. On the top row, in pin
 
 ---
 id: conditions
-layout: figure-text
+columns: 3 2
+rows: 3 2
 chapter: Results
 time: 32
 ---
 
 # By condition, and a clear preference
 
-:::stack
 :::heat
 | Strategy | Scatter No‑CAAV | Scatter CAAV | Terrain No‑CAAV | Terrain CAAV |
 |---|---|---|---|---|
@@ -484,12 +498,12 @@ time: 32
 | Visual feedback | 0 | 2 | 0 | 5 |
 | Physical synchronization | 2 | 0 | 0 | 0 |
 :::
+
 :::quote who="P8"
 we have no verbal communication during the condition where we have [CAAV]
 :::
-:::
 
-:::stack
+:::row wide
 ::stat value="93.8%" label="preferred CAAV conditions" tone=both
 ::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69" tone=both
 ::stat value="74.38" label="mean SUS" sub="benchmark 68" tone=both
@@ -502,13 +516,48 @@ And people liked it. 93.8 percent preferred the CAAV conditions. NASA TLX showed
 :::
 
 ---
+id: limits
+layout: two
+chapter: Takeaways
+time: 24
+---
+
+# Limitations and future work
+
+:::card title="Limitations" class=head-lg
+:::items
+- **Scale.** Voxels get expensive at high resolutions or with many users.
+- **Proxy.** Head orientation is coarser than eye tracking.
+- **Scope.** Synchronous, co-located pairs, in visual search.
+- **Baseline.** Only no attention visualization.
+:::
+:::
+
+:::card title="Future work" class=head-lg step=1
+:::items
+- **Tasks and teams.** Diverse tasks, larger teams, selective sharing.
+- **Baselines.** Shared gaze rays, pointer trails, manual markers, minimaps.
+- **Prototypes.** The other three quadrants, in networked AR.
+- **Semantic attention.** Recording at the level of data elements.
+:::
+:::
+
+:::notes
+This is an exploratory first step. Voxels get expensive at high resolutions or with many users, head orientation is a coarser proxy than eye tracking, these are co-located pairs doing visual search, and our only baseline was no attention visualization.
+
+[click] So next we want to look at diverse tasks, larger teams and selective sharing, compare against baselines like shared gaze rays or pointer trails, mature the other three quadrants for networked AR, and record attention at the level of data elements.
+:::
+
+---
 id: thanks
 layout: end
 chapter: Takeaways
-time: 36
+time: 34
 ---
 
 # Thank you
+
+## Takeaways
 
 :::items steps
 - **CAAV effectiveness depends critically on visualization context.**
@@ -523,7 +572,5 @@ So, to wrap up. We introduced collaborative attention-aware visualizations, a de
 
 [click] On terrain, we saw a large coordination gain, even as attention visualization sometimes interfered with natural coordination cues.
 
-These are co-located pairs doing visual search, so whether this extends to richer activities like sensemaking remains open. And we offer the design space as a preliminary generative framework rather than a prescription.
-
-The code takes you to the paper, the video and these slides. Thank you.
+[click] Thank you. The code takes you to the paper, the video and these slides. And I'm a third-year PhD student, open to both postdoc and industry positions, so please come talk to me.
 :::

@@ -35,7 +35,7 @@
   --font-body: var(--f-text);
   /* serif, only for quotes and research questions */
   --f-serif: ui-serif, "New York", Charter, "Iowan Old Style", Georgia, serif;
-  --radius: 3px;
+  --radius: 14px;
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --ease-emph: cubic-bezier(0.05, 0.7, 0.1, 1);
   color-scheme: light;
@@ -332,12 +332,12 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 .toc-title { display: none; }
 .toc .ch { margin: 18px 0 4px; font-size: 15px; font-weight: 700; color: var(--head); }
 .toc .ch:first-of-type { margin-top: 0; }
-.toc a { margin: 0; padding: 4px 8px; border-radius: var(--radius); min-width: 0; font-size: 14.5px; line-height: 1.3; overflow-wrap: anywhere; border-left: 3px solid transparent; }
+.toc a { margin: 0; padding: 4px 8px; border-radius: var(--radius); min-width: 0; font-size: 14.5px; line-height: 1.3; overflow-wrap: anywhere; }
 .toc a span { min-width: 0; }
 .toc a .ld { display: none; }
 .toc a:hover { background: var(--surface-2); }
-.toc a.here { background: none; color: #bb4a72; font-weight: 700; border-left-color: #bb4a72; }
-.dark .toc a.here { color: #ed74b5; border-left-color: #ed74b5; }
+.toc a.here { background: var(--surface-2); color: #bb4a72; font-weight: 700; }
+.dark .toc a.here { color: #ed74b5; }
 .toc a.live { color: var(--vis-orange); }
 
 /* cards and pages */
