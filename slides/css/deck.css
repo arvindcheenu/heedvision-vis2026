@@ -144,8 +144,10 @@
 /* a figure inside a card fills the space between the heading and the text */
 .c-card > .c-media { flex: 1; min-height: 0; margin: 6px 0; border: 0; border-radius: 14px; box-shadow: none; background: #fff; }
 .c-card > .c-media.fit-contain img { padding: 10px; }
-.c-card > blockquote + p.cite:last-child { margin-top: 0; padding-top: 14px; }
-.c-card blockquote { margin: 18px 0 0; padding-left: 20px; border-left: 3px solid color-mix(in oklab, var(--tone, var(--fg-3)) 70%, transparent); }
+/* every quote opens with one mark, in its tile's colour; the text carries no quotation marks */
+.c-quote::before, .c-card blockquote::before { content: ""; display: block; flex: none; width: 44px; height: 33px; margin-bottom: 14px; background: color-mix(in oklab, var(--tone, var(--fg-3)) 85%, transparent); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 36'%3E%3Cpath d='M0 36V22C0 10 7 2 20 0l2 6C14 9 11 13 11 18h9v18H0zM26 36V22C26 10 33 2 46 0l2 6c-8 3-11 7-11 12h9v18H26z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 36'%3E%3Cpath d='M0 36V22C0 10 7 2 20 0l2 6C14 9 11 13 11 18h9v18H0zM26 36V22C26 10 33 2 46 0l2 6c-8 3-11 7-11 12h9v18H26z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.c-card > blockquote + p.cite:last-child { margin-top: 0; padding-top: 14px; font-size: 22px; color: var(--fg-2); }
+.c-card blockquote { margin: 18px 0 0; }
 .c-card blockquote p { font-family: var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 0; font-style: italic; font-size: calc(var(--fs) * 30px); line-height: 1.26; color: var(--fg); }
 .c-card ul + p, .c-card ol + p { font-size: calc(var(--fs) * 25px); }
 .c-card .c-glyph { flex: 1; min-height: 0; display: flex; align-items: center; }
@@ -201,8 +203,7 @@
 
 .c-quote { --fq: 1; margin: 0; display: flex; flex-direction: column; justify-content: center; }
 .c-quote p { font-family: var(--f-display); font-variation-settings: "SOFT" 100, "WONK" 0; font-style: italic; font-size: calc(var(--fq) * 42px); line-height: 1.24; }
-.c-quote cite { margin-top: 22px; font-style: normal; font-size: 23px; line-height: 1.35; color: var(--fg-3); }
-.c-quote[class*="tone-"] cite { color: var(--fg-2); }
+.c-quote cite { margin-top: 14px; font-style: normal; font-size: 22px; line-height: 1.35; color: var(--fg-2); }
 
 /* steps: icon on top, title and text together at the bottom, a tag (RQ1…) in the corner */
 .c-step { --fs: 1; display: flex; flex-direction: column; }

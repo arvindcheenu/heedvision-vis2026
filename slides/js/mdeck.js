@@ -204,7 +204,7 @@
 
     quote(a, body) {
       const text = body && body.trim() ? mdi(body.trim()) : mdi(a.text);
-      return wrap("blockquote", a, "c-quote tile", `<p>“${text}”</p>${a.who ? `<cite>${mdi(a.who)}</cite>` : ""}`);
+      return wrap("blockquote", a, "c-quote tile", `<p>${text}</p>${a.who ? `<cite>${mdi(a.who)}</cite>` : ""}`);
     },
 
     steps(a, body) {
