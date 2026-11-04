@@ -1,0 +1,17 @@
+group,geometry,caav_label,condition_name,target_pct,coord_gain,normalized_redundancy,shannon_nr,tlx,duration_s,interaction_rate
+G1,scatter,No CAAV,scatter_no_voxels,0.5870,0.1739,0.2890,0.0226,3.8333,1321.3,37.24
+G1,terrain,CAAV,terrain_voxels,0.1829,0.3824,0.2393,0.0203,3.9167,841.7,91.74
+G2,terrain,No CAAV,terrain_no_voxels,0.1412,0.0000,0.0061,0.0102,2.5000,682.6,71.98
+G2,scatter,CAAV,scatter_voxels,0.7500,0.4348,0.1916,0.0123,3.1667,613.3,72.49
+G3,terrain,CAAV,terrain_voxels,0.3992,0.5846,0.0361,0.0067,4.0833,716.8,166.81
+G3,scatter,No CAAV,scatter_no_voxels,0.8409,0.1935,0.2551,0.0146,4.2500,628.4,84.59
+G4,scatter,CAAV,scatter_voxels,0.8837,0.0270,0.1079,0.0000,3.1667,2027.3,25.24
+G4,terrain,No CAAV,terrain_no_voxels,0.2171,0.3333,0.1845,0.0379,3.3333,791.2,101.54
+G5,terrain,No CAAV,terrain_no_voxels,0.1445,0.0571,0.0120,0.0139,3.8333,901.8,49.83
+G5,scatter,CAAV,scatter_voxels,0.7907,0.3600,0.2037,0.0252,2.8333,766.1,63.98
+G6,scatter,CAAV,scatter_voxels,0.7143,0.5000,0.1995,0.0168,4.0833,683.2,69.56
+G6,terrain,No CAAV,terrain_no_voxels,0.2802,0.3585,0.2054,0.0132,4.5000,666.8,146.76
+G7,terrain,CAAV,terrain_voxels,0.4047,0.4444,0.1292,0.0077,3.8333,1268.3,105.45
+G7,scatter,No CAAV,scatter_no_voxels,0.4545,0.0526,0.0680,0.0223,5.4167,892.1,33.63
+G8,scatter,No CAAV,scatter_no_voxels,0.6136,0.3500,0.2494,0.2264,2.8333,730.3,66.55
+G8,terrain,CAAV,terrain_voxels,0.0516,0.4444,0.0653,0.3895,5.0833,661.8,32.55

@@ -7,8 +7,8 @@
 *.eps
 diamondrule.pdf
 TODO.txt
-content/
-figures/
+/content/
+/figures/
 *.pptx
 
 # Generated backup (attach it to the VIS upload instead)
