@@ -260,8 +260,10 @@
     }
 
     if (set.follow) {
-      live.on("slide", (s) => { if (following) goTo(s); });
-      if (live.slide && following) goTo(live.slide); // the first update can arrive before the deck is ready
+      // an old slide left on the relay shouldn't pull someone off the link they opened
+      const fresh = (s) => s && (!s.ts || Date.now() - s.ts < 3 * 3600 * 1000);
+      live.on("slide", (s) => { if (following && fresh(s)) goTo(s); });
+      if (following && fresh(live.slide)) goTo(live.slide); // the first update can arrive before the deck is ready
       deck.on("slidechanged", () => {
         if (!applyingRemote && following && live.slide && live.status === "open" && deck.getCurrentSlide().id !== live.slide.id) setFollow(false);
       });
