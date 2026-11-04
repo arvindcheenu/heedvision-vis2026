@@ -123,7 +123,7 @@
     }
     text(s, x, y, { size = 20, weight = 600, color = this.c.muted, align = "left", alpha = 1 } = {}) {
       const g = this.ctx;
-      g.font = `${weight} ${size * 1.3}px ${this.font}`;
+      g.font = `${weight} ${size * 1.15}px ${this.font}`;
       g.textAlign = align; g.textBaseline = "alphabetic";
       g.fillStyle = rgba(color, alpha);
       g.fillText(s, x, y);
@@ -630,39 +630,3 @@
   };
 })();
 
-// As a plugin: `plugins: hv-explain` in talk.md, then `::bvh`, `::hunt` or `::hv` on a slide.
-// `steps` walks through an animation's phases on clicks; `steps=1` starts at click 1.
-(function () {
-  const PHASES = { bvh: 2, hunt: 3, hv: 1 };
-  const ALT = {
-    bvh: "Animation: a bounding volume hierarchy voxelizes a chart and head rays collect attention",
-    hunt: "Animation: two people search for hidden targets that light up only up close",
-    hv: "Animation: two people look at one shared voxelized sphere; voxels turn blue, orange or pink where they look",
-  };
-  Object.keys(PHASES).forEach((name) => MDeck.component(name, (a) => {
-    const from = a.steps && a.steps !== true ? +a.steps : null;
-    const spans = a.steps ? Array.from({ length: PHASES[name] }, (_, i) => `<span class="fragment step"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("") : "";
-    return MDeck.wrap("div", a, "c-canvas c-explain", `<canvas data-explain="${name}" aria-label="${a.alt || ALT[name]}"></canvas>${spans}`);
-  }, { label: `${name.toUpperCase()} animation`, w: 1100, h: 800, attrs: "steps" }));
-  MDeck.runtime({
-    selector: "canvas[data-explain]",
-    mount(cv, opts) {
-      const ex = Explain.create(cv, opts);
-      const box = cv.closest(".c-explain");
-      return {
-        start: () => ex.start(),
-        stop: () => ex.stop(),
-        enter: () => { if (ex.step === 0) ex.reset(); },
-        sync(poster) {
-          const at = box.querySelectorAll(poster ? ".step" : ".step.visible").length;
-          if (poster) ex.settle(at); else ex.setStep(at);
-        },
-        resize() {
-          if (Math.abs(Math.min(2.5, (devicePixelRatio || 1) * opts.scale()) - ex.k) < 0.01) return;
-          const s = ex.step;
-          ex.resize(); ex.reset(); ex.setStep(s, true); ex.draw();
-        },
-      };
-    },
-  });
-})();

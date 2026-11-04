@@ -6,6 +6,9 @@
 (async function () {
   const live = window.HVLive;
   const root = document.getElementById("transcript");
+  const tocList = document.querySelector(".toc ol");
+  const pill = document.querySelector(".live-pill");
+  const pillText = pill.querySelector(".live-text");
   const frame = document.getElementById("stage-deck");
   const stage = document.querySelector(".talk-stage");
   const pos = stage.querySelector(".pos");
@@ -14,7 +17,7 @@
 
   let talk;
   try {
-    talk = await MDeck.load("../slides/");
+    talk = MDeck.render(await fetch("../slides/talk.md", { cache: "no-cache" }).then((r) => r.text()));
   } catch {
     root.innerHTML = `<p class="loading">Couldn't load the talk. <a href="../slides/">Open the slides</a>.</p>`;
     return;
@@ -22,43 +25,60 @@
   const set = talk.settings;
   const useQuestions = set.questions === "on" && !!set.live;
   const useFollow = set.follow && !!set.live;
-  document.querySelectorAll("[data-site]").forEach((el) => (el.textContent = talk.meta[el.dataset.site] || ""));
-  document.title = `${set.title} · Talk`;
+  document.querySelectorAll("[data-meta]").forEach((el) => { const v = talk.meta[el.dataset.meta]; if (v) el.innerHTML = marked.parseInline(v); });
+  document.querySelector("[data-live-intro]").textContent = useFollow && useQuestions ? "During the talk it follows the speaker by itself, and every slide has its own question thread."
+    : useFollow ? "During the talk it follows the speaker by itself."
+    : set.questions === "link" ? "Questions go through the venue's Q&A." : "";
 
   // ---------------------------------------------------------- build
   root.innerHTML = "";
   const entries = [];
   const main = talk.slides.filter((s) => !s.backup);
+  let chapter = null, chEl = null;
   talk.slides.forEach((s) => {
-    const n = s.backup ? "B" : String(main.indexOf(s) + 1);
+    const n = s.backup ? "B" : String(main.indexOf(s) + 1).padStart(2, "0");
+    if (s.chapter !== chapter) {
+      chapter = s.chapter;
+      chEl = document.createElement("section");
+      chEl.className = "chapter";
+      chEl.innerHTML = `<h2 class="section-title">${esc(chapter)}${s.backup ? ` <span class="sub">Spare slides for questions</span>` : ""}</h2>`;
+      root.appendChild(chEl);
+      tocList.insertAdjacentHTML("beforeend", `<li class="ch">${esc(chapter)}</li>`);
+    }
     const art = document.createElement("article");
     art.className = "entry";
     art.id = `s-${s.id}`;
     art.innerHTML = `
-      <h3 data-f="-1"><span class="n">${n}</span>${esc(s.title)}<span class="live-tag">Live</span></h3>
-      <div class="script"></div>
-      ${useQuestions ? `<details class="qs">
-        <summary>Questions <span class="count">0</span></summary>
-        <div class="list"></div>
-        <form>
-          <textarea name="text" maxlength="600" placeholder="Ask about this slide" required></textarea>
-          <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button class="btn accent" type="submit">Ask</button></div>
-          <div class="note"></div>
-        </form>
-      </details>` : set.questions === "link" ? `<a class="btn accent" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask in the venue's Q&amp;A</a>` : ""}`;
+      <h3 data-f="-1"><span class="n">${n}</span>${esc(s.title)}<span class="live-tag">On screen now</span></h3>
+      <div class="prose script"></div>
+      ${useQuestions ? `<details class="qs card">
+        <summary>Questions on this slide <span class="count">0</span></summary>
+        <div class="qs-body">
+          <div class="list"></div>
+          <form>
+            <textarea name="text" maxlength="600" placeholder="Ask about this slide…" required></textarea>
+            <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button class="btn primary" type="submit">Ask</button></div>
+            <div class="note"></div>
+          </form>
+        </div>
+      </details>` : set.questions === "link" ? `<a class="btn" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask in the venue's Q&amp;A ↗</a>` : ""}`;
     const e = { id: s.id, slide: s, title: s.title, n, el: art };
-    root.appendChild(art);
+    chEl.appendChild(art);
+    tocList.insertAdjacentHTML("beforeend", `<li><a href="#s-${esc(s.id)}" data-slide="${esc(s.id)}"><span class="ld"></span><span>${esc(s.title)}</span><span class="qn"></span></a></li>`);
     entries.push(e);
     renderScript(e);
   });
   const byId = (id) => entries.find((x) => x.id === id);
 
+  // the script, with an edit from the presenter view if one applies
   function renderScript(e) {
+    const edit = live.noteFor ? live.noteFor(e.slide) : null;
     let k = 0;
-    e.el.querySelector(".script").innerHTML = MDeck.renderNotes(e.slide.notesMd)
+    e.el.querySelector(".script").innerHTML = MDeck.renderNotes(edit ? edit.md : e.slide.notesMd)
       .replace(/\[click\]/g, () => `<button type="button" class="click" data-f="${k++}" title="Show this build">click</button>`);
     e.markers = [...e.el.querySelectorAll("[data-f]")];
   }
+  live.on("notes", () => entries.forEach(renderScript));
 
   // ---------------------------------------------------------- the pinned slide
   let ready = false, shown = null, want = null;
@@ -88,7 +108,7 @@
     stage.querySelector('[data-go="prev"]').disabled = !s.prev;
     stage.querySelector('[data-go="next"]').disabled = !s.next;
     const e = byId(s.id);
-    pos.textContent = e ? `${e.n === "B" ? "Backup" : `${e.n} / ${main.length}`} · ${e.title}` : "";
+    pos.textContent = e ? `${e.n === "B" ? "Backup" : `${Number(e.n)} / ${main.length}`} · ${e.title}` : "";
     markReading(s.id, s.f);
     if (stepping) { stepping = false; want = { id: s.id, f: s.f }; scrollToMarker(s.id, s.f); }
     // the deck can report an in-between state while it changes slides; ask again (a little)
@@ -107,6 +127,8 @@
     document.querySelectorAll(".script .click.at").forEach((c) => c.classList.remove("at"));
     const m = markerOf(id, f);
     if (m && m.classList.contains("click")) m.classList.add("at");
+    tocList.querySelectorAll("a.here").forEach((a) => a.classList.remove("here"));
+    tocList.querySelector(`a[data-slide="${CSS.escape(id)}"]`)?.classList.add("here");
   }
   const readingLine = () => stageH() + Math.max(80, (innerHeight - stageH()) * 0.3);
   function scrollToMarker(id, f, smooth = true) {
@@ -188,6 +210,8 @@
       if (list) list.innerHTML = qs.length
         ? qs.map((q) => `<div class="q"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}" aria-label="Upvote">▲ ${q.votes}</button></div>`).join("")
         : `<div class="empty">No questions yet.</div>`;
+      const t = tocList.querySelector(`a[data-slide="${CSS.escape(id)}"] .qn`);
+      if (t) t.textContent = qs.length || "";
     });
   }
 
@@ -197,6 +221,7 @@
   function setFollow(on) {
     following = on && !!lastLive;
     liveBtn.hidden = !lastLive || following;
+    pill.classList.toggle("following", following);
     if (following) { show(lastLive.id, lastLive.f); scrollToMarker(lastLive.id, lastLive.f); }
   }
   function onLiveSlide(s) {
@@ -205,12 +230,16 @@
     lastLive = s;
     const e = byId(s.id);
     entries.forEach((x) => x.el.classList.toggle("live", x === e));
+    tocList.querySelectorAll("a").forEach((a) => a.classList.toggle("live", a.dataset.slide === s.id));
     if (!e) return;
+    pill.hidden = false;
+    pillText.textContent = `Live · ${e.n === "B" ? "Backup" : Number(e.n)}. ${e.title}`;
     if (first && !location.hash) setFollow(true);
     else if (following) { show(s.id, s.f); scrollToMarker(s.id, s.f); }
     else liveBtn.hidden = false;
   }
   liveBtn.addEventListener("click", () => setFollow(true));
+  pill.addEventListener("click", () => setFollow(true));
   // reading on your own pauses following
   ["wheel", "touchmove"].forEach((t) => addEventListener(t, () => { if (following && !programmatic) setFollow(false); }, { passive: true }));
   addEventListener("keydown", (ev) => {
@@ -220,6 +249,7 @@
   live.start({ endpoint: useFollow || useQuestions ? set.live : "", room: set.room });
   if (useFollow) {
     live.on("slide", onLiveSlide);
+    live.on("status", (s) => { if (s !== "open" && lastLive) pillText.textContent = s === "connecting" ? "Connecting…" : "Offline"; });
     if (live.slide) onLiveSlide(live.slide);
   }
 

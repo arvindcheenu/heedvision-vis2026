@@ -1,43 +1,60 @@
 ---
-talk: https://heedvision.arvindchee.nu/talk/
-site: https://heedvision.arvindchee.nu/
-duration: 9.5      # minutes, for presenter-view pacing
-plugins: hv-field, hv-explain, hv-live   # slides/plugins/<name>.js and .css
+title: HeedVision
+subtitle: Attention Awareness in Collaborative Immersive Analytics Environments
+authors: Arvind Srinivasan, Niklas Elmqvist
+photos: assets/people/arvind.jpg, assets/people/niklas.jpg
+venue: IEEE VIS 2026 · Boston · November 9–13
+contacts: **Arvind Srinivasan** · arvind@cs.au.dk; Niklas Elmqvist · elm@cs.au.dk
+url: https://heedvision.arvindchee.nu/talk/
+site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
+duration: 9.8     # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
-questions: off     # on | off | a link to the venue's Q&A tool
+questions: on      # on | off | a link to the venue's Q&A tool (the presenter view can also switch it off)
 follow: on         # audience pages follow your slide
 live: https://heedvision-live.arvindcheenu.workers.dev
 room: vis2026
 ---
 
 <!--
-Each slide starts with `---`, then `key: value` lines and a closing `---`.
-  id      stable name, used in links and questions
-  layout  a name from slides/layouts.json (draw new ones in the editor: npm run dev)
-  time    seconds you plan to spend
+HOW THIS FILE WORKS
 
-Then the slide's content, filling its layout's slots:
-  # Title         the `title` slot. **Bold** is black, the rest grey.
-  ::name::        everything after this line goes in the `name` slot
-  :::notes … :::  what you say; [click] marks a build
+Each slide starts with `---`. Settings go between two `---` lines:
+  id        stable name, used in links and questions
+  chapter   the section it belongs to, shown in the navigation at the top
+  layout    full | two | three | four | figure-text | text-figure | grid | figure-strip
+            title | section | photo | end
+  time      seconds you plan to spend (presenter view pacing)
+  columns, rows   optional: split the body differently, e.g. `columns: 3 2`
 
-Components work in any slot:
-  ::figure src= alt= caption= fit=contain|cover     ::plot src= alt= caption=
-  ::video src= poster=     ::stat value= label= sub=     :::quote who= … :::
-  :::heat … :::  a table whose numbers tint their cells
-  :::magic steps=1 …fenced blocks… :::  Shiki Magic Move, one block per click
-  :::block step=1 icon=eye … :::    :::card icon= title= who= tone= … :::
-  :::grid cols=3 … :::     :::row … :::    :::stack … :::
-  ::qr label=auto          ::authors       ::logos
-  ::demo  ::ambient  ::bvh  ::hunt  ::hv  ::live   (from the plugins)
-Add `step` to one to show it on a click, `step=2` to fix its click number.
+Then:
+  # Title            short
+  ## Subtitle        optional
+  blocks             one per cell of the layout, in order
+  :::notes … :::     what you say; [click] marks a build
+
+Blocks (add `step` to show one on a click, `step=2` to fix its click number,
+`wide` to span all columns, `tone=you|partner|both|brand|orange` for its colour):
+  :::card title="…" icon=eye cite="…"  … :::     a block of text; `> a quote` works inside
+  ::stat value="70%" label="…" sub="…"           a number
+  ::image src="…" alt="…" caption="…" fit=cover  a picture
+  ::plot src="…" alt="…"                         an SVG plot
+  ::clip src="…" poster="…" title="…"            a looping video
+  :::quote who="…" … :::                         a quote
+  :::heat … :::                                  a table whose numbers tint their cells
+  :::steps reveal tones="…" icons="…"  - **Title** — text {RQ1 | a question}  :::
+  ::caveat text="…"                              a small note under the body
+  :::stack … :::   :::row … :::                  under or beside each other
+  ::demo  ::bvh  ::hunt  ::hv  ::live  ::designspace   the animations
+
+Colours and type for every slide are at the top of shared/hv.css and the end of slides/css/deck.css.
 -->
+
 
 ---
 id: title
-title: Title
 layout: title
+chapter: Motivation
 time: 24
 ---
 
@@ -48,63 +65,57 @@ In this work, we show how people analyzing data together in augmented reality ca
 :::
 
 ---
-id: motive-cells
+id: hook-up
 layout: photo
+chapter: Motivation
+image: assets/fig/hook-cells.jpg
+alt: An illustrated UMAP of single-cell RNA-seq data on black: thousands of cells in coloured clusters, with a few green cells scattered between them.
+credit: Single Cell RNA Seq, illustrated UMAP · Ryan Kissinger, courtesy of NIAID (NIH BioArt 767), public domain · background changed
+cite: Legetth et al., CellexalVR, iScience 2021
 time: 9
 ---
 
-# **Some data has no up,**
+# Some data has no up,
 
-::figure::
-::figure src=assets/fig/motiv-cells.jpg fit=cover alt="An illustrated UMAP of single-cell RNA-seq data on black: thousands of cells in coloured clusters, with a few green cells scattered between them."
-
-::side::
-**A biologist** searches an embedding of thousands of cells for one rare type.
-
-::credit::
-Legetth et al., CellexalVR, iScience 2021. Image: Single Cell RNA Seq, illustrated UMAP, Ryan Kissinger, courtesy of NIAID (NIH BioArt 767), public domain, background changed.
+## A biologist searches an embedding of thousands of cells for one rare type.
 
 :::notes
 Picture a biologist in a headset, inside an embedding of thousands of cells, looking for one rare type. Nothing in there is up or down.
 :::
 
 ---
-id: motive-molecule
+id: hook-landmarks
 layout: photo
+chapter: Motivation
+image: assets/fig/hook-molecule.jpg
+alt: The grey molecular surface of the CHK2 kinase on black, with a small red inhibitor sitting in a pocket.
+credit: [Human CHK2 in complex with benzimidazole carboxamide inhibitor](https://commons.wikimedia.org/wiki/File:Human_CHK2_in_complex_with_benzimidazole_carboxamide_inhibitor.png) · BaptisteGrandGrand, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) · adapted: labels removed, background changed; adaptation CC BY-SA 4.0
+cite: O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018
 time: 10
 ---
 
-# **no landmarks,**
+# no landmarks,
 
-::figure::
-::figure src=assets/fig/motiv-molecule.jpg fit=cover alt="The grey molecular surface of the CHK2 kinase on black, with a small red inhibitor sitting in a pocket."
-
-::side::
-**A chemist** searches a protein's surface for the pocket where a drug fits.
-
-::credit::
-O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018. Image: [Human CHK2 in complex with benzimidazole carboxamide inhibitor](https://commons.wikimedia.org/wiki/File:Human_CHK2_in_complex_with_benzimidazole_carboxamide_inhibitor.png), BaptisteGrandGrand, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Adapted: labels removed, background changed; adaptation CC BY-SA 4.0.
+## A chemist searches a protein's surface for the pocket where a drug fits.
 
 :::notes
 Or a chemist going around a protein, looking for the pocket where a drug fits. Every bump looks like the next one, so there's nothing to navigate by.
 :::
 
 ---
-id: motive-network
+id: hook-alone
 layout: photo
+chapter: Motivation
+image: assets/fig/hook-network.jpg
+alt: The Opte Project's map of the Internet: a dense web of coloured lines between hosts, with one hub magnified.
+credit: [Partial map of the Internet, January 2005](https://commons.wikimedia.org/wiki/File:Internet_map_1024.jpg) · The Opte Project, [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/) · background changed
+cite: Pairs analysing networks in HMD and CAVE: Cordeil et al., TVCG 2017
 time: 10
 ---
 
-# **and too much to search alone.**
+# and too much to search alone.
 
-::figure::
-::figure src=assets/fig/motiv-network.jpg fit=cover alt="The Opte Project's map of the Internet: a dense web of coloured lines between hosts, with one hub magnified."
-
-::side::
-**An analyst** searches thousands of hosts for the one that's been compromised.
-
-::credit::
-Pairs analysing networks in HMD and CAVE: Cordeil et al., TVCG 2017. Image: [Partial map of the Internet, January 2005](https://commons.wikimedia.org/wiki/File:Internet_map_1024.jpg), The Opte Project, [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/), background changed.
+## An analyst searches thousands of hosts for the one that's been compromised.
 
 :::notes
 Or imagine a network analyst going through thousands of hosts for the one that's been compromised. That's too much for one person, so you bring in a colleague.
@@ -112,25 +123,23 @@ Or imagine a network analyst going through thousands of hosts for the one that's
 
 ---
 id: problem
-layout: canvas
+layout: figure-text
+chapter: Motivation
 time: 30
 ---
 
-# **Who looked where?** One space, two people.
+# Who looked where?
 
-::canvas::
-::demo modes="none,who" steps=1 alt="Two simulated gazes wander over a grid. First nothing records where they looked; then the cells show it in blue, orange and pink."
+::demo modes="none,who" steps=1 bare tag="Two analysts, simulated"
 
-::side::
 :::stack
-:::block icon=person
-**Group awareness.** The ability to perceive the activities of collaborators in a shared space.
+:::card title="Group awareness"
+The ability to perceive the activities of collaborators in a shared space.
 :::
-:::block icon=layers
-**Harder in immersive 3D.** Multiple viewpoints, distributed spatial attention, real-time coordination.
+:::card title="Harder in immersive 3D"
+Multiple viewpoints, distributed spatial attention, real-time coordination.
 :::
-:::block icon=palette step=1
-<strong class="accent">What if the space remembered?</strong>
+:::card title="What if the space remembered?" tone=both step=1
 :::
 :::
 
@@ -143,52 +152,42 @@ What's missing is group awareness, the ability to perceive the activities of col
 :::
 
 ---
-id: caav
-layout: columns
-time: 44
+id: part-idea
+layout: section
+chapter: Idea
+image: assets/fig/section-idea.jpg
+time: 4
 ---
 
-# **CAAV.** Collaborative Attention-Aware Visualization.
+# From one viewer to many
 
-::band::
-:::magic steps=1 lang=text
-```text
-How should the attention of multiple viewers on a visualization
-be captured in real time?
-```
-```text
-How should the attention of multiple viewers on a visualization
-be recorded over time?
-```
-```text
-How should the attention of multiple viewers on a visualization
-be displayed?
-```
+## Collaborative attention-aware visualization
+
+:::notes
+So we took attention-aware visualization from one viewer to many.
 :::
 
-::one::
-### Capture
+---
+id: caav
+layout: full
+chapter: Idea
+time: 42
+---
 
-**RQ1.** Distinguish between users while tracking attention simultaneously.
+# CAAV
 
-::two::
-:::block step=1
-### Record
+## Collaborative Attention-Aware Visualization
 
-**RQ2.** Identity-aware accumulators, with sum, maximum, difference and count.
-:::
-
-::three::
-:::block step=2
-### Display
-
-**RQ3.** Encode both attention intensity and user identity.
+:::steps reveal tones="you partner both" icons="eye layers palette"
+- **Capture** — Distinguish between users while tracking attention simultaneously. {RQ1 | How should the attention of multiple viewers on a visualization be **captured in real time**?}
+- **Record** — Identity-aware accumulators, with sum, maximum, difference and count. {RQ2 | How should the attention of multiple viewers on a visualization be **recorded over time**?}
+- **Display** — Encode both attention intensity and user identity. {RQ3 | How should the attention of multiple viewers on a visualization be **displayed**?}
 :::
 
 :::notes
-Attention-aware visualizations address part of this, but for one person. They measure a single viewer's attention over time and change the display to encourage exploration or support reflection. We extend that to many analysts, and we call these collaborative attention-aware visualizations, or CAAVs. They track, record and revisualize the collective attention of multiple users over time.
+Attention-aware visualizations measure a single viewer's attention over time and change the display to encourage exploration or support reflection. We extend that to many analysts, and we call these collaborative attention-aware visualizations, or CAAVs. They track, record and revisualize the collective attention of multiple users over time. That brings new problems, and three research questions.
 
-That brings new problems, and three research questions. How should the attention of multiple viewers on a visualization be captured in real time? Now you have to tell users apart while tracking them all at once.
+[click] How should the attention of multiple viewers be captured in real time? Now you have to tell users apart while tracking them all at once.
 
 [click] How should it be recorded over time? We keep attention per person, and add ways to aggregate it.
 
@@ -197,44 +196,14 @@ That brings new problems, and three research questions. How should the attention
 
 ---
 id: record
-layout: canvas
-time: 36
+layout: full
+chapter: Idea
+time: 34
 ---
 
-# **Record.** One session, five views.
+# Record: one session, five views
 
-::canvas::
-::demo steps=1 snapshot alt="One simulated session of two people's attention on a grid, shown as count, sum, maximum, difference and who."
-
-::side::
-:::magic steps=1 class=c-code
-```python
-# how many people looked
-a, b = voxel.attention
-show = count(a, b)
-```
-```python
-# total coverage
-a, b = voxel.attention
-show = a + b
-```
-```python
-# the strongest focus
-a, b = voxel.attention
-show = max(a, b)
-```
-```python
-# division of labor
-a, b = voxel.attention
-show = abs(a - b)
-```
-```python
-# whose attention
-a, b = voxel.attention
-show = blend(blue * a,
-             orange * b)
-```
-:::
+::demo steps snapshot tag="One simulated session"
 
 :::notes
 For recording, each voxel keeps one value per person, which grows while you look and decays when you stop. Here's one simulated session, shown five ways.
@@ -252,58 +221,68 @@ Count is how many people looked.
 
 ---
 id: design-space
-layout: side-figure
+layout: full
+chapter: Idea
 time: 38
 ---
 
-# **Design space.** Three dimensions.
+# Display: a design space
 
-::figure::
-::figure src=assets/fig/design-space.svg plate caption="Fig. 2" alt="Figure 2 of the paper: a two by two grid of world space or camera space against embedded or separated presentation, with triggering by always-on, explicit or implicit. The world-space embedded quadrant is marked evaluated; the others implemented."
-
-::side::
-**Presentation.** Embedded or separated.
-
-**Situatedness.** World space or camera space.
-
-**Triggering.** Always-on, explicit or implicit.
-
-<strong class="accent">HeedVision.</strong> <span class="ink">World-space, embedded, explicit.</span>
+::designspace steps badge="HeedVision" highlight=world-embedded trigger=explicit
 
 :::notes
 For display, we laid out this design space, along three dimensions.
 
-Presentation: attention can be embedded in the visualization, or separated into a view of its own. Situatedness: it can sit in world space, where it stays fixed in the space you share, or in camera space, where it follows your own view. And triggering: always on, explicit, where you ask to see it, or implicit, where the system decides.
+[click] Presentation: attention can be embedded in the visualization, or separated into a view of its own. Situatedness: it can sit in world space, where it stays fixed in the space you share.
 
-HeedVision is the top left, world-space and embedded, with explicit triggering. Embedding keeps attention on the chart itself, and because you share the world, you can say “look at that orange region.”
+[click] Or in camera space, where it follows your own view.
+
+[click] And triggering: always on, explicit, where you ask to see it, or implicit, where the system decides.
+
+[click] HeedVision is world-space and embedded, with explicit triggering. Embedding keeps attention on the chart itself, and because you share the world, you can say “look at that orange region.”
+:::
+
+---
+id: part-system
+layout: section
+chapter: System
+image: assets/fig/section-system.jpg
+time: 3
+---
+
+# HeedVision
+
+## One corner built and evaluated
+
+:::notes
+That corner is the one we built and evaluated.
 :::
 
 ---
 id: heedvision
-layout: canvas
+layout: figure-text
+chapter: System
 time: 28
 ---
 
-# **HeedVision.** Color per user, in the shared world.
+# Colour per user, in the shared world
 
-::canvas::
 ::hv steps=1
 
-::side::
 :::stack
-:::block icon=toggle step=1
-**Explicit.** A controller button shows or hides attention.
+:::card icon=toggle title="Explicit" step=1
+A controller button shows or hides attention.
 :::
-:::block icon=palette step=2
-In each headset, <span class="you">**blue**</span> is you, <span class="partner">**orange**</span> your partner, <span class="both">**pink**</span> both.
+:::card icon=palette title="Per headset" step=2
+<mark class="you">Blue</mark> is you, <mark class="partner">orange</mark> your partner, <mark class="both">pink</mark> both.
 :::
-:::block icon=fade step=3
-**Temporal decay.** Attention fades when you look away.
+:::card icon=fade title="Temporal decay" step=3
+Attention fades when you look away.
 :::
 :::
 
 :::notes
-That top-left corner is HeedVision. It's a standards-compliant WebXR system built with React Three Fiber, and it runs on consumer headsets like the Meta Quest 3.
+HeedVision is a standards-compliant WebXR system built with React Three Fiber, and it runs on consumer headsets like the Meta Quest 3.
 
 [click] Each of you leaves a trail of attention, and you press a controller button to show or hide it.
 
@@ -313,37 +292,26 @@ That top-left corner is HeedVision. It's a standards-compliant WebXR system buil
 :::
 
 ---
-id: voxels
-layout: canvas
-time: 34
+id: bvh
+layout: figure-text
+chapter: System
+time: 32
 ---
 
-# **Voxels.** Where attention is collected.
+# Voxels collect the attention
 
-::canvas::
 ::bvh steps=1
 
-::side::
-:::magic steps=1 class=c-code
-```python
-# wrap the chart's geometry
-bvh = build_bvh(chart)
-```
-```python
-# wrap the chart's geometry
-bvh = build_bvh(chart)
-
-# keep the cells touching it
-voxels = bvh.touching(grid)
-```
-```python
-# keep the cells touching it
-voxels = bvh.touching(grid)
-
-# from each head, at 10 Hz
-hit = voxels.nearest(head_ray)
-hit.attention[user] += gain
-```
+:::stack
+:::card title="Wrap the chart"
+A bounding volume hierarchy around its geometry.
+:::
+:::card title="Keep voxels that touch it" step=1
+Boxes rule out empty cells, so attention sticks to the chart.
+:::
+:::card title="A ray from each head, at 10 Hz" step=2
+It hits the nearest voxel, which gains that person's attention.
+:::
 :::
 
 :::notes
@@ -356,17 +324,14 @@ To make voxels for a chart, we first wrap its geometry in a bounding volume hier
 
 ---
 id: live
-layout: stage
-time: 32
+layout: full
+chapter: System
+time: 30
 ---
 
-# **Live.** Two headsets, one shared scene.
+# The real system, live
 
-::stage::
-::live
-
-::foot::
-Drag a view to move that person. Click the sphere to toggle their voxels.
+::live tag="Live · the HeedVision demo, forked"
 
 :::notes
 And this is the real system, running in the browser, with two headsets side by side over one shared set of voxels.
@@ -376,50 +341,66 @@ As I move this person around, you can see the trail build up in both views. And 
 
 ---
 id: prototypes
-layout: stage
-time: 16
+layout: three
+chapter: System
+align: center
+time: 14
 ---
 
-# **Prototypes.** The other three quadrants.
+# The other three quadrants
 
-::stage::
-:::row
-::video fit=cover src=assets/video/proto-world-separated.mp4 poster=assets/video/proto-world-separated.jpg caption="World, separated"
-::video fit=cover src=assets/video/proto-camera-embedded.mp4 poster=assets/video/proto-camera-embedded.jpg caption="Camera, embedded"
-::video fit=cover src=assets/video/proto-camera-separated.mp4 poster=assets/video/proto-camera-separated.jpg caption="Camera, separated"
-:::
-
-::foot::
-Proofs of concept, in VR only. Not part of the study.
+::clip src="assets/video/proto-world-separated.mp4" poster="assets/video/proto-world-separated.jpg" title="World, separated" caption="A movable miniature" ratio=8/5 step=1
+::clip src="assets/video/proto-camera-embedded.mp4" poster="assets/video/proto-camera-embedded.jpg" title="Camera, embedded" caption="Attention on the bounding box" ratio=8/5 step=2
+::clip src="assets/video/proto-camera-separated.mp4" poster="assets/video/proto-camera-separated.jpg" title="Camera, separated" caption="A 2D panel beside the data" ratio=8/5 step=3
+::caveat text="Proofs of concept, in VR only. Not part of the study." step=3
 
 :::notes
-We also built functional prototypes of the other three quadrants: a miniature you can move, attention projected onto the bounding box, and a 2D panel beside the data. These are proofs of concept, and they weren't part of the study.
+[click] We also built functional prototypes of the other three quadrants: a miniature you can move,
+
+[click] attention projected onto the bounding box,
+
+[click] and a 2D panel beside the data. These are proofs of concept, and they weren't part of the study.
+:::
+
+---
+id: part-study
+layout: section
+chapter: Study
+image: assets/fig/section-study.jpg
+time: 3
+---
+
+# Does it help?
+
+## An exploratory study with 8 pairs
+
+:::notes
+So, does any of this help?
 :::
 
 ---
 id: hunt
-layout: canvas
-time: 34
+layout: figure-text
+chapter: Study
+time: 32
 ---
 
-# **Treasure hunt.** A visual search task.
+# A treasure hunt
 
-::canvas::
 ::hunt steps=1
 
-::side::
 :::stack
-:::block icon=person
-**8 co-located pairs.** 16 participants, shared AR, 10-minute sessions.
+:::card title="8 co-located pairs"
+16 participants, shared AR, 10-minute sessions.
 :::
-:::block icon=search step=1
-**Targets.** 5% of voxels.
+:::card title="Targets" step=1
+5% of voxels.
 :::
-:::block icon=eye step=2
-**Visible up close.** From the correct angle, within 10 cm.
+:::card title="Visible up close" step=2
+From the correct angle, within 10 cm.
 :::
-:::block icon=palette step=3
-**With CAAV.** Each person's attention, colored on the voxels.
+:::card title="With CAAV" step=3 tone=both
+Each person's attention, coloured on the voxels.
 :::
 :::
 
@@ -435,26 +416,29 @@ We evaluated this with a treasure hunt. We had sixteen participants in eight co-
 
 ---
 id: study
-layout: pair
-time: 36
+layout: figure-strip
+chapter: Study
+time: 34
 ---
 
-# **Study.** 2×2 mixed design.
+# 2×2 mixed design
 
-::left::
-::figure src=assets/fig/study-terrain.jpg fit=cover focus="50% 22%" caption="Terrain × CAAV" alt="From Figure 5 of the paper: a pair in headsets looking at the terrain, with attention voxels coloured blue, orange and pink."
+:::row wide
+::image src="assets/fig/study-terrain.jpg" fit=cover caption="Terrain × CAAV" alt="From Figure 5 of the paper: a pair in headsets looking at the terrain, with attention voxels coloured blue, orange and pink."
+::image src="assets/fig/study-scatter.jpg" fit=cover caption="Scatter × No-CAAV" alt="From Figure 5 of the paper: a pair in headsets looking at the scatterplot, with nothing showing where either has looked."
+:::
 
-::right::
-::figure src=assets/fig/study-scatter.jpg fit=cover focus="50% 22%" caption="Scatter × No-CAAV" alt="From Figure 5 of the paper: a pair in headsets looking at the scatterplot, with nothing showing where either has looked."
-
-::one::
-**Within pairs.** Terrain or Scatter.
-
-::two::
-**Between pairs.** CAAV or No-CAAV, four pairs per cell.
-
-::three::
-**Measures.** Target discovery, coverage, normalized redundancy, target gain.
+:::row wide
+:::card title="Within pairs"
+Terrain or Scatter.
+:::
+:::card title="Between pairs"
+CAAV or No-CAAV, four pairs per cell.
+:::
+:::card title="Measures"
+Target discovery, coverage, normalized redundancy, target gain.
+:::
+:::
 
 :::notes
 Every pair searched a terrain of Mount Bruno and a scatterplot of a hundred uniformly distributed points. The terrain has natural landmarks. The scatterplot has none, which is why we chose uniform points. Each pair used CAAV for one and no CAAV for the other, so visualization type varies within pairs, attention visualization varies between pairs, and there are four pairs per cell.
@@ -464,17 +448,16 @@ We measured target discovery, the percentage of targets found. Coverage, the per
 
 ---
 id: scatter
-layout: stage
+layout: full
+chapter: Results
 time: 42
 ---
 
-# **Scatterplot.** Less redundancy, more targets.
+# Scatterplot: less redundancy, more targets
 
-::stage::
 ::plot src=assets/fig/plot-scatter.svg alt="Four panels, No-CAAV against CAAV on the scatterplot. Target discovery 62.4 versus 78.5 percent, with each pair shown as a dot. Coverage 67.1 versus 76.5 percent. Normalized redundancy 11.3 versus 3.3 percent. Target gain 1.19 versus 1.33, with each pair shown as a dot."
 
-::foot::
-Dots: pairs. Bars: means. Targets BCa 95% CI [−0.012, +0.293]. Redundancy Δ = −0.058, exact p = 0.257: directional. Redrawn from Figs. 7, 8, 12.
+::caveat text="Dots: pairs. Bars: means. Targets BCa 95% CI [−0.012, +0.293]. Redundancy Δ = −0.058, exact p = 0.257: directional. Redrawn from Figs. 7, 8, 12."
 
 :::notes
 First the scatterplot, where there's nothing to navigate by. Each dot here is a pair, and the bar is the mean.
@@ -486,20 +469,17 @@ Normalized redundancy dropped from 11.3 percent to 3.3 percent, about a 70 perce
 
 ---
 id: terrain
-layout: two-plots
-time: 56
+layout: two
+chapter: Results
+time: 54
 ---
 
-# **Terrain.** Largest gain, more redundancy.
+# Terrain: largest gain, more redundancy
 
-::left::
 ::plot src=assets/fig/plot-terrain.svg alt="Two panels, No-CAAV against CAAV on the terrain. Target gain 1.19 versus 1.46, with each pair shown as a dot and all four CAAV pairs above the No-CAAV mean. Normalized redundancy 4.0 versus 14.9 percent."
-
-::right::
 ::plot src=assets/fig/plot-terrain-maps.svg step alt="Figure 9 of the paper, redrawn. Left, the terrain's gradient, darker where it is steeper. Right, aggregated attention over all terrain conditions, brightest along the same ridge, with the steepest quarter of the terrain outlined."
 
-::foot::
-Target gain BCa 95% CI [0.112, 0.450], p = 0.029. Gradient and attention: Pearson r = 0.490, Spearman ρ = 0.561, both p < 0.0001. Redrawn from Figs. 8, 9, 12.
+::caveat text="Target gain BCa 95% CI [0.112, 0.450], p = 0.029. Gradient and attention: Pearson r = 0.490, Spearman ρ = 0.561, both p < 0.0001. Redrawn from Figs. 8, 9, 12."
 
 :::notes
 Terrain looks different. CAAV pairs found 26 percent of targets versus 19.6, and that interval spans zero as well. But target gain gives us our strongest result: 1.46 with CAAV against 1.19 without. That's a difference of 0.277, with a confidence interval from 0.112 to 0.450, a g of 1.67, and a permutation p of 0.029. All four CAAV pairs outperformed the no-CAAV mean.
@@ -510,33 +490,31 @@ At the same time, redundancy went up, from 4 percent to 14.9 percent. That's the
 :::
 
 ---
-id: strategies-cards
-layout: cards
-time: 28
+id: strategies
+layout: grid
+chapter: Results
+time: 26
 ---
 
-# **Six strategies.** In their own words.
+# Six strategies
 
-::cards::
-:::grid cols=3
-:::card icon=split title="Spatial division" tone=you who="P3"
-We cut the space into top and bottom, and one search for top another search for the bottom.
+:::card icon=split title="Spatial division" tone=you cite="P3"
+> We cut the space into top and bottom, and one search for top another search for the bottom.
 :::
-:::card icon=scan title="Systematic search" tone=both who="P12"
-I took one half and systematically searched through it.
+:::card icon=scan title="Systematic search" tone=both cite="P12"
+> I took one half and systematically searched through it.
 :::
-:::card icon=palette title="Visual feedback" tone=partner who="P14"
-Used the voxel system to avoid redundant searches.
+:::card icon=palette title="Visual feedback" tone=partner cite="P14"
+> Used the voxel system to avoid redundant searches.
 :::
-:::card icon=chat title="Verbal coordination" who="P13"
-We tried to coordinate verbally by describing positions relative to the Scatter structure.
+:::card icon=chat title="Verbal coordination" cite="P13"
+> We tried to coordinate verbally by describing positions relative to the Scatter structure.
 :::
-:::card icon=flag title="Landmark navigation" who="P10"
-We used landmarks and described roughly in which area we found the targets.
+:::card icon=flag title="Landmark navigation" cite="P10"
+> We used landmarks and described roughly in which area we found the targets.
 :::
-:::card icon=align title="Physical synchronization" who="P6"
-We placed the Scatter in the same location in the room using the yellow triangle.
-:::
+:::card icon=align title="Physical synchronization" cite="P6"
+> We placed the Scatter in the same location in the room using the yellow triangle.
 :::
 
 :::notes
@@ -544,14 +522,15 @@ Our thematic analysis found six collaborative strategies. On the top row are the
 :::
 
 ---
-id: strategies
-layout: side-figure
-time: 34
+id: conditions
+layout: figure-text
+chapter: Results
+time: 32
 ---
 
-# **By condition.** And a clear preference.
+# By condition, and a clear preference
 
-::figure::
+:::stack
 :::heat
 | Strategy | Scatter No‑CAAV | Scatter CAAV | Terrain No‑CAAV | Terrain CAAV |
 |---|---|---|---|---|
@@ -562,16 +541,15 @@ time: 34
 | Visual feedback | 0 | 2 | 0 | 5 |
 | Physical synchronization | 2 | 0 | 0 | 0 |
 :::
-
 :::quote who="P8"
 we have no verbal communication during the condition where we have [CAAV]
 :::
+:::
 
-::side::
 :::stack
-::stat value="93.8%" label="preferred CAAV conditions" class=tone-both
-::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69" class=tone-you
-::stat value="74.38" label="mean SUS" sub="benchmark 68" class=tone-partner
+::stat value="93.8%" label="preferred CAAV conditions" tone=both
+::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69" tone=you
+::stat value="74.38" label="mean SUS" sub="benchmark 68" tone=orange
 :::
 
 :::notes
@@ -581,21 +559,23 @@ And people liked it. 93.8 percent preferred the CAAV conditions. NASA TLX showed
 :::
 
 ---
-id: takeaways
-layout: closing
+id: thanks
+layout: end
+chapter: Takeaways
 time: 34
 ---
 
-# **It depends on context.**
+# Thank you
 
-::body::
-**CAAV effectiveness depends critically on visualization context.**
-
-<span class="both">**Scatterplots.**</span> Reduced redundant exploration, and emergent coordination strategies.
-
-<span class="partner">**Terrain.**</span> A large coordination gain, even as attention visualization sometimes interfered with natural coordination cues.
-
-Exploratory study of co-located pairs in visual search.
+:::card title="It depends on context" tone=orange
+CAAV effectiveness depends critically on visualization context.
+:::
+:::card title="Scatterplots" tone=both
+Reduced redundant exploration, and emergent coordination strategies.
+:::
+:::card title="Terrain" tone=partner
+A large coordination gain, even as attention visualization sometimes interfered with natural coordination cues.
+:::
 
 :::notes
 So, to wrap up. We introduced collaborative attention-aware visualizations, a design space for them, and HeedVision as one concrete instance.

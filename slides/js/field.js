@@ -266,34 +266,3 @@
   window.VoxelField = VoxelField;
 })();
 
-// As a plugin: `plugins: hv-field` in talk.md, then `::ambient` or `::demo` on a slide.
-(function () {
-  const ALL = ["none", "count", "sum", "max", "diff", "who"];
-  MDeck.component("ambient", (a) => MDeck.wrap("div", a, "c-canvas", `<canvas data-field="ambient" aria-hidden="true"></canvas>`), { label: "Attention field", w: 800, h: 800 });
-  // modes play in the order given, one per click; `steps=1` starts at click 1; `snapshot` freezes one session
-  MDeck.component("demo", (a) => {
-    const modes = String(a.modes || "count,sum,max,diff,who").split(/[\s,]+/).filter((m) => ALL.includes(m));
-    const from = a.steps && a.steps !== true ? +a.steps : null;
-    const steps = a.steps ? modes.slice(1).map((m, i) => `<span class="fragment step" data-mode="${m}"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("") : "";
-    return MDeck.wrap("div", a, `c-canvas c-demo${a.snapshot ? " snapshot" : ""}`, `<canvas data-field="demo" data-first="${modes[0]}" aria-label="${a.alt || "Simulation of two people's attention"}"></canvas>${steps}`);
-  }, { label: "Attention demo", w: 1100, h: 800, attrs: "snapshot" });
-  MDeck.runtime({
-    selector: "canvas[data-field]",
-    mount(cv, opts) {
-      const demo = cv.closest(".c-demo");
-      const field = new VoxelField(cv, { ambient: cv.dataset.field === "ambient", snapshot: !!demo && demo.classList.contains("snapshot"), scale: opts.scale });
-      const set = (m) => field.setMode(m === "who" ? "identity" : m);
-      return {
-        start: () => field.start(),
-        stop: () => field.stop(),
-        resize: () => { field.resize(); field.draw(); },
-        sync(poster) {
-          if (!demo) return;
-          const all = demo.querySelectorAll(".step"), shown = demo.querySelectorAll(".step.visible");
-          const pick = poster && all.length ? all[all.length - 1] : shown[shown.length - 1];
-          set(pick ? pick.dataset.mode : cv.dataset.first);
-        },
-      };
-    },
-  });
-})();
