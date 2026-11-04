@@ -260,7 +260,7 @@
       const dimBoxes = this.step >= 2 ? 0.2 : this.step >= 1 ? 0.45 : 1;
 
       // tree
-      this.text("Bounding volume hierarchy", this.tree.x0, this.tree.y0 - 14, { size: 19, weight: 650 });
+      this.text("Bounding volume hierarchy", this.tree.x0, this.tree.y0 - 14, { size: 21, weight: 650 });
       for (const n of this.nodes) for (const k of n.kids) {
         const a = levelIn(k.depth);
         if (a <= 0) continue;
@@ -339,7 +339,7 @@
             g.fillStyle = rgba(col, 1); g.beginPath(); g.arc(e.ray.x, e.ray.y, 4, 0, Math.PI * 2); g.fill();
           }
           this.head(e.x, e.y, e.ang, col, r);
-          this.text(e.color, e.x, e.y + r + 30, { size: 18, color: col, align: "center", weight: 650 });
+          this.text(e.color, e.x, e.y + r + 30, { size: 20, color: col, align: "center", weight: 650 });
         }
         this.text("a ray from each head, 10 times a second", this.scene.x0, h - 14, { size: 21, color: C.muted });
       }
@@ -614,7 +614,7 @@
         g.beginPath(); g.moveTo(ex + Math.cos(ta - 2.5) * 9, ey + Math.sin(ta - 2.5) * 9); g.lineTo(ex, ey); g.lineTo(ex + Math.cos(ta + 2.5) * 9, ey + Math.sin(ta + 2.5) * 9); g.stroke();
       }
       const ly = my + this.R + 44;
-      this.text("Each headset shows a copy of one shared scene, synced by Spatialstrates", mx, ly, { size: 19, color: C.muted, align: "center", weight: 600 });
+      this.text("Each headset shows a copy of one shared scene, synced by Spatialstrates", mx, ly, { size: 21, color: C.muted, align: "center", weight: 600 });
       // the button: the trail is recorded all along, and shown only on request
       const bx = 24, by = h - 26;
       g.fillStyle = rgba(show > 0.5 ? C.ink : C.muted, show > 0.5 ? 1 : 0.6);

@@ -290,7 +290,7 @@
         return `<div class="tile quad${on ? " hv" : ""}${was ? " done" : ""}${a.steps ? ` fragment rise" data-fragment-index="${f}` : ""}"><span class="q-label">${label}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ""}${svg}</div>`;
       };
       const trig = (id, label, sub, icon) => `<div class="tile trig-item${id === (a.trigger || "explicit") ? " hv" : ""}"><svg><use href="#i-${icon}"/></svg><div><b>${label}</b><span>${sub}</span></div></div>`;
-      return wrap("div", a, "c-ds", `
+      return wrap("div", a, `c-ds${a.trigger === "none" ? " no-trig" : ""}`, `
         <div></div><div class="axis-x">Embedded in the vis</div><div class="axis-x">Separate view</div><div class="axis-x${a.steps ? ' fragment rise" data-fragment-index="3' : ""}">Triggering</div>
         <div class="axis-y">World space</div>${q("world-embedded", "World · embedded", DS.we, 1)}${q("world-separated", "World · separated", DS.ws, 1)}
         <div class="trig${a.steps ? ' fragment rise" data-fragment-index="3' : ""}">${trig("always", "Always on", "risks Midas touch", "loop")}${trig("explicit", "Explicit", "you ask to see it", "hand")}${trig("implicit", "Implicit", "the system decides", "bolt")}</div>

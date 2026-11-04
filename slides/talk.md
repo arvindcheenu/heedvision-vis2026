@@ -85,13 +85,13 @@ Make your own with :::define, then use it like any other component.
 id: title
 layout: title
 chapter: Motivation
-time: 15
+time: 26
 ---
 
 :::notes
-Hi everyone, I'm Arvind Srinivasan, and this is work with Niklas Elmqvist.
+Hi everyone, I'm Arvind Srinivasan, and I will be presenting this work titled HeedVision, Attention Awareness in Collaborative Immersive Analytics Environments, coauthored with Niklas Elmqvist.
 
-HeedVision shows people analyzing data together in mixed reality where each of them has already looked. The code takes you to the paper, the video and these slides.
+In this work, we show how people analyzing data together in augmented reality can see where each of them has already looked, by colouring the data itself, and we study when that helps. The QR code takes you to the paper, the video and these slides.
 :::
 
 ---
@@ -99,8 +99,8 @@ id: hook-up
 layout: photo
 chapter: Motivation
 image: assets/fig/hook-cells.jpg
-alt: A UMAP of single-cell RNA-seq data on black: thousands of cells in coloured clusters, with a few green cells scattered between them.
-credit: UMAP of single-cell data · NIAID, public domain
+alt: An illustrated UMAP of single-cell RNA-seq data on black: thousands of cells in coloured clusters, with a few green cells scattered between them.
+credit: Single Cell RNA Seq, illustrated UMAP · Ryan Kissinger, courtesy of NIAID (NIH BioArt 767), public domain · background changed
 cite: Legetth et al., CellexalVR, iScience 2021
 time: 9
 ---
@@ -119,7 +119,7 @@ layout: photo
 chapter: Motivation
 image: assets/fig/hook-molecule.jpg
 alt: The grey molecular surface of the CHK2 kinase on black, with a small red inhibitor sitting in a pocket.
-credit: CHK2 kinase with an inhibitor in its pocket · BaptisteGrandGrand, CC BY-SA 4.0
+credit: [Human CHK2 in complex with benzimidazole carboxamide inhibitor](https://commons.wikimedia.org/wiki/File:Human_CHK2_in_complex_with_benzimidazole_carboxamide_inhibitor.png) · BaptisteGrandGrand, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) · adapted: labels removed, background changed; adaptation CC BY-SA 4.0
 cite: O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018
 time: 10
 ---
@@ -138,8 +138,8 @@ layout: photo
 chapter: Motivation
 image: assets/fig/hook-network.jpg
 alt: The Opte Project's map of the Internet: a dense web of coloured lines between hosts, with one hub magnified.
-credit: Partial map of the Internet, 2005 · The Opte Project, CC BY 2.5
-cite: Cordeil et al., collaborative network analysis in VR, TVCG 2017
+credit: [Partial map of the Internet, January 2005](https://commons.wikimedia.org/wiki/File:Internet_map_1024.jpg) · The Opte Project, [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/) · background changed
+cite: Pairs analysing networks in HMD and CAVE: Cordeil et al., TVCG 2017
 time: 10
 ---
 
@@ -155,7 +155,7 @@ Or imagine a network analyst going through thousands of hosts for the one that's
 id: scenario
 chapter: Motivation
 columns: 7 5
-time: 22
+time: 24
 ---
 
 # Two analysts search one 3D space, but neither can see where the other has looked
@@ -177,30 +177,30 @@ What if the space remembered **who looked where**?
 :::
 
 :::notes
-So now there are two of you in the same space, and these circles show where you're each looking.
+Now there are two of you. These circles show where you're each looking, but you can't see each other's.
 
-[click] Two minutes in: “Did you check the back?” “Which back?” An embedding doesn't have a back.
+[click] Two minutes in, one of you asks, “Did you check the back?” and the other says, “Which back?”
 
 [click] Ten minutes in, you've both searched one cluster twice, and nobody's looked underneath it.
 
-[click] So we asked, what if the space remembered who looked where?
+[click] So we asked, what if the space remembered who looked where, and coloured it like this?
 :::
 
 ---
 id: gap
 chapter: Motivation
 columns: 5 7
-time: 27
+time: 30
 ---
 
-# Teams split up work by seeing each other. Headsets take that away.
+# Teams split up work by seeing each other's work. Separate 3D viewpoints make that harder.
 
 :::stack
-:::card label="At a desk" title="Group awareness" cite="Gutwin & Greenberg, CHI 1998"
-Seeing what others are doing is how a team divides the work.
+:::card label="At a desk" title="Workspace awareness" cite="Gutwin & Greenberg, CHI 1998"
+Knowing who is where and what they are doing is how a team coordinates.
 :::
 :::card label="In a headset" title="Separate viewpoints" tone=partner step
-Everyone stands somewhere else, with no shared screen to point at.
+Everyone sees the data from somewhere else, and seeing your partner doesn't show what they've covered.
 :::
 :::
 
@@ -210,19 +210,19 @@ Tracks where *one* viewer looks over time, and changes the display in response. 
 :::
 
 :::notes
-At a desk, you can see what the other person is doing, and that's how a team divides up work. Gutwin and Greenberg called that group awareness.
+Why does this happen? At a desk, you can see where the other person is working and what they're doing, and that's how a team coordinates. Gutwin and Greenberg called that workspace awareness.
 
-[click] In a headset it's harder. You each stand somewhere else, with no shared screen to point at.
+[click] In a headset it's harder. You each see the data from somewhere else, and even side by side, seeing your partner doesn't show you what they've covered.
 
-[click] We'd already worked on part of this. Our attention-aware visualizations track where someone looks over time and change the display in response, but we built those for one person.
+[click] Our earlier attention-aware visualizations track where someone looks over time and change the display in response, but we built them for one person.
 :::
 
 ---
 id: part-idea
 layout: section
 chapter: Idea
-image: assets/fig/section-pair.jpg
-time: 7
+image: assets/fig/section-idea.jpg
+time: 6
 ---
 
 # From one viewer to many
@@ -230,7 +230,7 @@ time: 7
 ## Collaborative attention-aware visualization
 
 :::notes
-So we took that idea from one viewer to many. We call it collaborative attention-aware visualization, or CAAV.
+So we took that idea from one viewer to many, and we call it collaborative attention-aware visualization.
 :::
 
 ---
@@ -239,7 +239,7 @@ chapter: Idea
 time: 28
 ---
 
-# Every stage of attention-aware vis gets a new job when a group is watching
+# Capture, record and display each need new answers when several people are viewing
 
 :::steps reveal tones="you partner both" icons="eye layers palette"
 - **Capture** — Track everyone at once, and know who is who. {RQ1 | How should the attention of multiple viewers on a visualization be **captured in real time**?}
@@ -248,13 +248,13 @@ time: 28
 :::
 
 :::notes
-Attention-aware vis captures attention, records it and displays it. With a group, each stage changes, and that gave us our three research questions: how should the attention of multiple viewers be captured in real time, recorded over time, and displayed?
+Attention-aware vis captures, records and displays attention, and with a group each stage changes. That gives us our three research questions.
 
-[click] Capture has to track everyone at once and know who is who.
+[click] First, how should the attention of multiple viewers be captured in real time? You have to track everyone at once and know who is who.
 
-[click] Recording keeps one memory per person per spot, and combines them.
+[click] Second, how should it be recorded over time, with one value per person?
 
-[click] And the display has to show whose attention it is, as well as how much.
+[click] And third, how should it be displayed, so you see whose attention it is as well as how much?
 :::
 
 ---
@@ -262,7 +262,7 @@ id: kinds
 chapter: Idea
 kicker: RQ1 · Capture
 columns: 1 1 1 1
-time: 21
+time: 23
 ---
 
 # Two viewers create four kinds of attention that one viewer never has
@@ -292,30 +292,30 @@ Everything the team has covered
 :::
 
 :::notes
-Start with capture. Two people create four kinds of attention that one viewer can't.
+Start with capture, because two people create four kinds of attention that one viewer can't.
 
-[click] Joint: we look at the same thing.
+[click] Joint is when we look at the same thing.
 
-[click] Distributed: we split up the space.
+[click] Distributed is when we split up the space.
 
-[click] Sequential: I build on where you looked.
+[click] Sequential is when I build on where you looked.
 
-[click] And cumulative: everything the team has covered. You capture it through pointing, head direction or eye tracking, tagged with who it came from.
+[click] And cumulative is everything the team has covered. You capture them through pointing, head direction or eye tracking, tagged by person.
 :::
 
 ---
 id: record
 chapter: Idea
 kicker: RQ2 · Record
-time: 30
+time: 29
 ---
 
-# One recorded session, combined five ways: each way shows a different pattern
+# One simulated session, combined five ways: each way shows a different pattern
 
-::demo steps snapshot tag="One recorded session"
+::demo steps snapshot tag="One simulated session"
 
 :::notes
-For recording, each spot keeps one value per person, which grows while you look and fades when you stop. This is one session of two people, shown five ways.
+For recording, each spot keeps one value per person, which grows while you look and fades when you stop. Here is one simulated session, combined five ways.
 
 Count is how many people looked.
 
@@ -340,22 +340,22 @@ time: 32
 ::designspace steps badge="HeedVision · tested" highlight=world-embedded trigger=explicit
 
 :::notes
-Then where do you show all this? For display, we laid out a design space.
+For display, we laid out a design space of where attention can appear.
 
-[click] Attention can sit in the visualization or in a separate view,
+[click] Attention can be embedded in the visualization or separated into its own view. In world space, both stay fixed in the space you share.
 
-[click] anchored in the shared world or to your own camera. So that's four placements.
+[click] In camera space, they follow your own view instead, so that's four placements.
 
-[click] Then three triggers: always on, on request, or automatic.
+[click] Each can be triggered three ways: always on, on request, or automatically.
 
-[click] HeedVision is world-space, embedded, on request. Embedding keeps attention on the data, a shared world lets you say “look at that orange patch,” and your partner knows where you mean. The button keeps the trail out of the way.
+[click] HeedVision is world-space, embedded, on request. Embedding keeps attention on the chart, and in a shared world you can say “look at that orange region.”
 :::
 
 ---
 id: part-system
 layout: section
 chapter: System
-image: assets/fig/terrain-caav-photo.jpg
+image: assets/fig/section-system.jpg
 time: 4
 ---
 
@@ -371,10 +371,10 @@ That corner is the one we built and tested.
 id: heedvision
 chapter: System
 columns: 7 5
-time: 28
+time: 31
 ---
 
-# HeedVision colours the data wherever each person has looked
+# HeedVision colours the chart wherever each person has looked
 
 ::hv steps=1
 
@@ -391,9 +391,9 @@ The longer you look, the more solid a voxel gets. Leave it, and it fades.
 :::
 
 :::notes
-HeedVision runs in the browser on a Quest 3, on a framework called Spatialstrates, so both headsets share one scene. When you look at something, both copies change.
+HeedVision divides each chart into small cubes called voxels, which collect attention. It runs in the browser on a Quest 3, and a framework called Spatialstrates keeps both headsets in one scene.
 
-[click] The trail is recorded all along, but it stays hidden until you press a button.
+[click] Each of you leaves a trail of where you've looked, and it stays hidden until you press a button.
 
 [click] Then <mark class="you">blue</mark> is you, <mark class="partner">orange</mark> is your partner, <mark class="both">pink</mark> is both. Those colours hold up under common colour blindness.
 
@@ -404,10 +404,10 @@ HeedVision runs in the browser on a Quest 3, on a framework called Spatialstrate
 id: bvh
 chapter: System
 columns: 7 5
-time: 37
+time: 33
 ---
 
-# A bounding volume hierarchy turns any chart into voxels that collect attention
+# A bounding volume hierarchy turns a chart's geometry into voxels that collect attention
 
 ::bvh steps=1
 
@@ -416,7 +416,7 @@ time: 37
 Nested boxes around its geometry, built once.
 :::
 :::card label="2 · Keep voxels that touch it" step=1
-Boxes rule out empty space fast, so attention sticks to the data.
+Boxes rule out empty space fast, so attention sticks to the chart.
 :::
 :::card label="3 · A ray, 10 times a second" step=2
 Straight out of each headset, it hits the nearest voxel, which gains attention, then fades.
@@ -424,11 +424,11 @@ Straight out of each headset, it hits the nearest voxel, which gains attention, 
 :::
 
 :::notes
-Under the hood, when a chart loads, we wrap its geometry in a bounding volume hierarchy, which is just boxes inside boxes. We only have to build that once.
+To make voxels for a chart, we first wrap its geometry in a bounding volume hierarchy, which is just boxes inside boxes.
 
-[click] Then we lay a grid over it. The boxes rule out most cells without testing a triangle, and only cells touching the geometry become voxels. So attention sticks to the data.
+[click] Then we lay a grid over it. The boxes quickly rule out most cells, and only cells touching the geometry become voxels, so attention sticks to the chart.
 
-[click] Ten times a second, a ray goes straight out of the centre of each headset's view. It hits the nearest voxel, which gains attention for that person and then fades. We use head direction because the Quest 3 has no eye tracking.
+[click] Ten times a second, a ray goes out from the centre of each headset's view and hits the nearest voxel, which gains attention for that person and then fades. We use head direction because the Quest 3 has no eye tracking.
 :::
 
 ---
@@ -450,33 +450,33 @@ id: quadrants
 chapter: System
 columns: 1 1 1
 align: center
-time: 20
+time: 16
 ---
 
-# Each prototype suits a different kind of teamwork
+# Each prototype is aimed at a different kind of teamwork
 
-::clip src="assets/video/proto-world-separated.mp4" poster="assets/video/proto-world-separated.jpg" title="World · separated" caption="A miniature you can move, for cluttered scenes" ratio=8/5 step
+::clip src="assets/video/proto-world-separated.mp4" poster="assets/video/proto-world-separated.jpg" title="World · separated" caption="A movable miniature, for cluttered scenes" ratio=8/5 step=1
 
-::clip src="assets/video/proto-camera-embedded.mp4" poster="assets/video/proto-camera-embedded.jpg" title="Camera · embedded" caption="Attention projected onto the box, for guided tours" ratio=8/5 step
+::clip src="assets/video/proto-camera-embedded.mp4" poster="assets/video/proto-camera-embedded.jpg" title="Camera · embedded" caption="Attention on the box, for guided tours" ratio=8/5 step=2
 
-::clip src="assets/video/proto-camera-separated.mp4" poster="assets/video/proto-camera-separated.jpg" title="Camera · separated" caption="A 2D panel beside the data, for handoffs" ratio=8/5 step
+::clip src="assets/video/proto-camera-separated.mp4" poster="assets/video/proto-camera-separated.jpg" title="Camera · separated" caption="A 2D panel beside the data, for handoffs" ratio=8/5 step=3
 
-::caveat text="VR only, synced locally between browser tabs, and not part of the study."
+::caveat text="VR only, synced locally between browser tabs, and not part of the study." step=3
 
 :::notes
-[click] There's a miniature you can move, like a minimap, for cluttered scenes.
+[click] There's a miniature you can move, for cluttered scenes.
 
-[click] There's attention projected onto the bounding box, which suits a guided tour, where everyone shares one viewpoint.
+[click] There's attention projected onto the bounding box, which is aimed at guided tours.
 
-[click] And there's a 2D panel beside the data, good for handoffs, when someone joins later. These run in VR only, and they weren't in the study.
+[click] And there's a 2D panel beside the data, aimed at handoffs. These run in VR only, and they weren't in the study.
 :::
 
 ---
 id: part-study
 layout: section
 chapter: Study
-image: assets/video/eval-scatter.jpg
-time: 6
+image: assets/fig/section-study.jpg
+time: 9
 ---
 
 # Does it help?
@@ -484,7 +484,7 @@ time: 6
 ## An exploratory study with 8 pairs
 
 :::notes
-So, does any of this help? We ran an exploratory study with eight pairs to find out.
+So, does any of this help? We ran an exploratory study with eight pairs, and from here on I'll call the coloured trail the cues.
 :::
 
 ---
@@ -492,7 +492,7 @@ id: task
 chapter: Study
 columns: 1 1 1
 rows: 5 2
-time: 30
+time: 29
 ---
 
 # The task: a treasure hunt for targets that light up only up close
@@ -501,14 +501,14 @@ time: 30
 
 ::stat value="10 min" label="per hunt, as a pair"
 
-::stat value="5%" label="of voxels hide a target, lit only from within 10 cm"
+::stat value="5%" label="of voxels hide a target" sub="lit only from within 10 cm"
 
 ::stat value="1 of 2" label="hunts had the cues on"
 
 :::notes
-The task was a treasure hunt. This is our demo, running live: two headsets, one shared scene. Wherever someone looks, voxels fill in. Your own are blue, your partner's are gold here, and shared ones are pink. Clicking the sphere hides your voxels, and participants had that same switch. Pairs got ten minutes per hunt.
+The task was a treasure hunt, where a pair searches a 3D chart for hidden targets. This is our demo, running live with two headsets. Wherever someone looks, voxels fill in, blue for you, gold here for your partner, and pink for both. Clicking the sphere hides your voxels, and participants had that same switch.
 
-Five percent of voxels hid a target, and a target lit up only from within ten centimetres. And one of their two hunts had the cues on.
+Five percent of voxels hid a target, which lit up only from within ten centimetres. Each pair did two ten-minute hunts, one with the cues on.
 :::
 
 ---
@@ -516,21 +516,21 @@ id: why-task
 chapter: Study
 columns: 1 1
 rows: 1 1
-time: 24
+time: 15
 ---
 
 # A treasure hunt isolates what cues should change: how a pair splits up a space
 
 :::card icon=pin label="The unknown is where" tone=you
-Targets could be anywhere, so the pair must decide who covers what. A filter would skip the search entirely.
+Targets could be anywhere, so the pair must decide who covers what. We study the cases a filter can't solve.
 :::
 
-:::card icon=person label="No expertise needed" tone=partner step cite="Synthetic tasks: Cockburn et al. 2006 · Wong et al. 2015"
+:::card icon=person label="No expertise needed" tone=partner step cite="Synthetic tasks: Wong et al. 2015 · Prouzeau et al. 2017"
 A simple probe of moving, sharing attention and dividing work, with no domain knowledge to muddy it.
 :::
 
-:::card icon=search label="Like real exploration" tone=both step cite="Grinstein et al. 2002 · Pirolli & Card 2005 · Prouzeau et al. 2017 · Marguet et al. 2025"
-Needle-in-a-haystack search is common in exploratory analysis, and visual search is a standard probe in immersive analytics.
+:::card icon=search label="Abstracts real foraging" tone=both step cite="Pirolli & Card 2005"
+Hunting through masses of data for what matters is the foraging loop of analysis. This keeps the coverage problem, not the analysis.
 :::
 
 :::card icon=gauge label="Clear to measure" step
@@ -538,13 +538,13 @@ Targets found, space covered and overlap give plain numbers from a 10-minute hun
 :::
 
 :::notes
-Why a treasure hunt? The only unknown is where the targets are, so the pair has to decide who covers what. If they could filter the data, there'd be no search at all.
+Why a treasure hunt? The only unknown is where the targets are, so the pair has to decide who covers what.
 
 [click] It needs no domain expertise.
 
-[click] It's like the needle-in-a-haystack search in exploratory analysis, and it's a standard probe in immersive analytics.
+[click] It abstracts the foraging in real analysis.
 
-[click] And it gives us plain numbers: targets found, space covered, overlap.
+[click] And it gives us plain numbers to compare.
 :::
 
 ---
@@ -552,31 +552,31 @@ id: study
 chapter: Study
 columns: 1 1
 rows: 2 1
-time: 32
+time: 31
 ---
 
 # 16 people in 8 pairs searched two spaces, with cues in one and not the other
 
-::video src="assets/video/eval-scatter.mp4" poster="assets/video/eval-scatter.jpg" caption="Scatterplot · 100 random points"
+::video src="assets/video/eval-scatter.mp4" poster="assets/video/eval-scatter.jpg" caption="Scatterplot · 100 random points" fit=contain
 
-::video src="assets/video/eval-terrain.mp4" poster="assets/video/eval-terrain.jpg" caption="Terrain · Mt. Bruno"
+::video src="assets/video/eval-terrain.mp4" poster="assets/video/eval-terrain.jpg" caption="Terrain · Mt. Bruno" fit=contain
 
 :::card label="Why random points" step
-No clusters or landmarks, so nothing but the cues can guide the split. **4 pairs** with cues, **4** without.
+No clusters, so the data itself offers no obvious way to split it. **4 pairs** with cues, **4** without.
 :::
 
 :::card label="Why terrain" step
 Peaks and valleys to talk about: do cues still help when a space has landmarks? **4 pairs** with cues, **4** without.
 :::
 
-::caveat text="Space–cue pairing and order counterbalanced. Exploratory: 4 pairs per cell."
+::caveat text="Co-located AR, free to talk. Space varied within pairs, cues between pairs; pairing and order counterbalanced. Exploratory."
 
 :::notes
 We had sixteen graduate students in eight pairs, in the same room, in AR, free to talk. Each pair searched two spaces, with cues in one.
 
-[click] A scatterplot of a hundred random points, with no landmarks, so only the cues could guide the split.
+[click] One was a scatterplot of a hundred random points, with no clusters to guide the split.
 
-[click] And a terrain of Mount Bruno, to ask whether cues still help when a space has landmarks of its own. We counterbalanced which space had the cues, and the order. That leaves four pairs per condition, so please read these numbers as trends.
+[click] The other was a terrain of Mount Bruno, to ask whether cues still help when a space has landmarks of its own. Cues on versus off compares different pairs, four against four, so please read my numbers as directional, except one I'll point out.
 :::
 
 ---
@@ -584,21 +584,21 @@ id: scatter
 chapter: Study
 kicker: Result 1 · Scatterplot
 columns: 1 1
-time: 15
+time: 13
 ---
 
-# Without landmarks, pairs duplicated 70% less and found more targets
+# On random points, pairs with cues tended to duplicate less and find more
 
-::compare label="Duplicated search" a=11.3 b=3.3 a-label="Cues off" b-label="Cues on" change="−70%" tone=both
+::compare label="Duplicated search" a=11.3 b=3.3 max=17 a-label="Cues off" b-label="Cues on" change="−70%" tone=both
 
-::compare label="Targets found" a=62.4 b=78.5 a-label="Cues off" b-label="Cues on" change="+16 pts" tone=you step
+::compare label="Targets found" a=62.4 b=78.5 max=100 a-label="Cues off" b-label="Cues on" change="+16 pts" tone=you step
 
-::caveat text="Exploratory: 4 pairs per condition, so a trend, not a significant result."
+::caveat text="Exploratory: 4 vs 4 pairs. A direction, not a reliable difference (targets p = .11, duplicated search p = .26)."
 
 :::notes
-In the scatterplot, the trend favours the cues. Duplicated search dropped from 11.3 percent to 3.3, about 70 percent less.
+We measured duplicated search, which is how much partners looked at the same places. On the scatterplot, pairs with cues had 3.3 percent, against 11.3 without.
 
-[click] And pairs found more targets: 78.5 percent against 62.4, so sixteen points more. Again, these are trends, not significant results.
+[click] Pairs with cues also found more targets: 78.5 percent against 62.4.
 :::
 
 ---
@@ -606,25 +606,25 @@ id: terrain
 chapter: Study
 kicker: Result 2 · Terrain
 columns: 1 1
-time: 23
+time: 27
 ---
 
-# On a landscape, overlap went up 3.7×, because peaks pulled both partners in
+# On terrain, pairs with cues tended to duplicate more, and attention gathered on the peaks
 
-::compare label="Duplicated search" a=4.0 b=14.9 a-label="Cues off" b-label="Cues on" change="×3.7" tone=partner
+::compare label="Duplicated search" a=4.0 b=14.9 max=17 a-label="Cues off" b-label="Cues on" change="×3.7" tone=partner
 
 ::layers src="assets/fig/terrain-gradient.png, assets/fig/terrain-attention.png, assets/fig/terrain-overlay.png" captions="Steepness: the landmarks | Where pairs looked | Both together" steps alt="A 24 by 24 map of terrain steepness; an attention heatmap from all terrain sessions builds over it, then their overlay shows attention gathered on the steep parts."
 
-::caveat text="Exploratory: 4 pairs per condition."
+::caveat text="Exploratory: 4 vs 4 pairs, not a reliable difference (p = .77). The map pools all terrain sessions."
 
 :::notes
-On the terrain it went the other way. Duplicated search went from 4 percent to about 15, so 3.7 times as much.
+On the terrain the direction flipped. Pairs with cues had about 15 percent duplicated search, against 4 without, though that difference isn't reliable.
 
-This map shows why. Here's the terrain's steepness, which is where its landmarks are.
+This map offers a clue. Here's the terrain's steepness, which is where its landmarks are.
 
-[click] Over it, where pairs looked.
+[click] Over it is where pairs looked, across all terrain sessions.
 
-[click] And both together. Peaks pulled both people to the same places, the voxels showed that, and pairs went back for second passes.
+[click] And here are both together. Attention gathers on the peaks, which drew both people to the same places, and pairs with cues often made deliberate second passes.
 :::
 
 ---
@@ -636,16 +636,16 @@ align: center
 time: 21
 ---
 
-# Yet terrain is where working together paid off most
+# On terrain, pairs with cues got more out of working together
 
-::compare label="Targets found by the pair, vs. its average member" a=1.19 b=1.46 unit="×" a-label="Cues off" b-label="Cues on" change="+23%" tone=you
+::compare label="Targets found by the pair, vs. its stronger member" a=1.19 b=1.46 unit="×" a-label="Cues off" b-label="Cues on" change="+0.28" tone=you
 
-::venn a=1.19 b=1.46 a-label="Cues off" b-label="Cues on" label="What that means: less overlap in what partners found" note="If both partners found as many, the pink share is what each found that the other also found." step
+::stat value="p = .029" label="exact permutation test, 4 vs 4 pairs" sub="Δ +0.28, 95% CI [0.11, 0.45]. The one result where the interval and the exact test agree. Uncorrected, so a lead to replicate." tone=you step
 
 :::notes
-But terrain also gave us our clearest result. With cues, a pair found 1.46 times what its average member found, against 1.19 without, so 23 percent higher.
+But terrain also gave us our one result with statistical support. With cues, a pair found 1.46 times the targets its stronger member found, against 1.19 without.
 
-[click] Put another way, partners' finds overlapped by about half with cues, instead of four fifths. So the cues helped here too. The landscape just already gave people a lot to go on.
+[click] That difference has an interval clear of zero and an exact p of .029. It's uncorrected, so a lead to replicate, but partners seem to have complemented each other more.
 :::
 
 ---
@@ -656,10 +656,10 @@ columns: 1 1 1
 time: 31
 ---
 
-# With cues, pairs split the space and let the colours keep score
+# With cues, people split the space, swept it in order and read the colours
 
 :::card icon=split title="Spatial division" tone=you cite="P3 · scatterplot, with cues"
-Each takes a region. Pairs did it in every condition, most with cues on the scatterplot.
+Each takes a region. People did it in every condition, most with cues on the scatterplot.
 
 > We cut the space into top and bottom, and one search for top another search for the bottom.
 :::
@@ -677,11 +677,11 @@ Read the colours to see what is covered. Only possible with cues; most common on
 :::
 
 :::notes
-We also wanted to know how pairs actually worked together, and from questionnaires and interviews we found six strategies. With cues, they split the space. Pairs did that in every condition, but most of all with cues on the scatterplot. As one person put it, “We cut the space into top and bottom.”
+From questionnaires and interviews we also found six strategies, and three stood out with cues. The first is spatial division, where each person takes a region. As one person put it, “We cut the space into top and bottom.”
 
-[click] They swept their own part in order.
+[click] The second is systematic search, where you sweep your own region in order.
 
-[click] And they read the colours to stay out of each other's way. On the scatterplot, one participant told us they didn't talk at all.
+[click] The third is reading the colours to stay out of each other's way. On the scatterplot, one participant told us they didn't talk at all, which could mean less effort or less discussion.
 :::
 
 ---
@@ -692,32 +692,32 @@ columns: 1 1 1
 time: 23
 ---
 
-# Without cues, pairs fell back on talk, the room, and any landmarks the data had
+# Without cues, some pairs fell back on talk, landmarks and lining up in the room
 
 :::card icon=chat title="Verbal coordination" cite="P13 · scatterplot, no cues"
-Describe positions out loud. Common without cues on the scatterplot; gone with them.
+Describe positions out loud. 3 of 8 people on the scatterplot without cues; none with them.
 
 > We tried to coordinate verbally by describing positions relative to the Scatter structure.
 :::
 
 :::card icon=flag title="Landmark navigation" step cite="P10 · terrain, no cues"
-Use peaks and clusters as reference points: on terrain always, on the scatterplot only without cues.
+Use peaks and clusters as reference points: on terrain with or without cues, on the scatterplot only without them.
 
 > We used landmarks and described roughly in which area we found the targets.
 :::
 
 :::card icon=align title="Physical synchronization" step cite="P6 · scatterplot, no cues"
-Line both copies up in the room, so pointing means the same thing. Only without cues.
+Line both copies up in the room, so pointing means the same thing. One pair, without cues.
 
 > We placed the Scatter in the same location in the room using the yellow triangle.
 :::
 
 :::notes
-Without cues, pairs fell back on what they had. They talked positions through, which was common on the scatterplot and disappeared once the cues were on.
+Without cues, some pairs fell back on the other three. They talked positions through, which was common on the scatterplot without cues and absent with them.
 
 [click] They used landmarks: on the terrain with or without cues, and on the scatterplot only with the cues off.
 
-[click] And some lined up both copies in the room, so that pointing meant the same thing to both.
+[click] And one pair lined up their two copies in the room, so pointing meant the same to both.
 :::
 
 ---
@@ -725,14 +725,14 @@ id: people
 chapter: Study
 columns: 1 1 1
 rows: 1 1
-time: 24
+time: 23
 ---
 
 # 15 of 16 people preferred working with the cues
 
-::dots n=15 of=16 label="preferred the conditions with cues" tone=both tall
+::dots n=15 of=16 label="preferred working with cues" tone=both tall
 
-::stat value="−24%" label="workload overall (NASA TLX)" sub="but it trended higher in terrain"
+::stat value="−19 / +19%" label="workload with cues: scatterplot / terrain (NASA TLX)" sub="neither reliable"
 
 ::stat value="75%" label="of the time, people kept the cues on"
 
@@ -745,23 +745,23 @@ It increase[d] redundant search due to visual noise
 :::
 
 :::notes
-People liked it. Fifteen of sixteen preferred the conditions with cues. Workload was about a quarter lower overall on the NASA TLX, though higher on terrain, and people kept the cues on three quarters of the time.
+Fifteen of sixteen people preferred working with cues, and they kept the cues on three quarters of the time. Workload trended a fifth lower with cues on the scatterplot and a fifth higher on terrain, neither reliably.
 
 [click] One said, “I can see what the other guy and I did!”
 
-[click] The one person who preferred no cues said they increased redundant search because of visual noise.
+[click] The one person who preferred no cues said they added redundant search through visual noise.
 :::
 
 ---
 id: takeaway
 chapter: Takeaways
 columns: 7 5
-time: 25
+time: 29
 ---
 
-# Show attention where the space gives you nothing to point at
+# Our hypothesis: cues help most where the space gives you little to point at
 
-:::card label="Likely helps" tone=you
+:::card label="Where we'd expect help" tone=you
 - Abstract spaces without landmarks
 - Large spaces you must cover fully
 - Places that are hard to describe out loud
@@ -769,61 +769,62 @@ time: 25
 *e.g. t-SNE and UMAP embeddings, molecules, 3D networks*
 :::
 
-:::card label="Less so" step
+:::card label="Where we'd expect less" step
 - Data with its own landmarks
 - Scenes that are already busy
 :::
 
 :::notes
-So back to our biologist, chemist and analyst. Cues look most useful where the space gives you nothing to point at, where you have to cover all of it, and where it's hard to describe a place out loud. Embeddings, molecules and 3D networks are all like that.
+So back to our biologist, chemist and analyst. We didn't test those domains, so this is a hypothesis: cues should help most where the space gives you little to point at, where you have to cover all of it, and where a place is hard to describe out loud.
 
-[click] Where the data has its own landmarks, or the scene is already busy, they add less, and they add clutter.
+[click] Where the data has its own landmarks, or the scene is already busy, we'd expect less benefit and more clutter, although our one supported result did come from the terrain.
 :::
 
 ---
 id: next
 chapter: Takeaways
 columns: 1 1
-time: 27
+time: 20
 ---
 
 # A first step, with clear limits
 
 :::card label="Limits"
-- Pairs only; colours stop scaling past ~4 people
-- Head direction, not eye tracking
-- One task, 4 pairs per condition
-- Only baseline: no cues at all
+- Tested with pairs only; we expect colour to stop scaling past ~4
+- Head direction, a coarse proxy for eye gaze
+- One search task, one dataset per space, 4 vs 4 pairs
+- Measures are proxies: awareness itself wasn't tested
+- A no-cue baseline can't separate history from live gaze
 :::
 
 :::card label="Next" tone=both step
 - Test the three prototypes
-- Cues that fade or appear on their own
+- Gentler decay, and cues that appear on their own
 - Attention to data items, not just space
 - Remote and asynchronous teams
 :::
 
 :::notes
-This is a first step. We only looked at pairs, and the colours stop scaling past about four people. We used head direction, not eye tracking. And it was one task, with four pairs per condition, and our only baseline was no cues at all.
+This is a first step. We tested pairs only, we used head direction as a proxy for gaze, and it was one search task with no cues as our only baseline.
 
-[click] Next we want to test the three prototypes, try cues that fade or appear on their own, track attention to data items, and look at remote and asynchronous teams.
+[click] Next we want to test the prototypes, gentler decay and cues that appear on their own, attention to data items, and remote teams.
 :::
 
 ---
 id: thanks
 layout: end
 chapter: Takeaways
-time: 7
+time: 5
 ---
 
 # Thank you
 
-## Slides, script and your questions
+## Paper, video and slides
 
 ::image src="assets/fig/terrain-caav-photo.jpg" alt="Two study participants in headsets look up at a terrain covered in blue, orange and pink attention voxels." caption="Terrain with HeedVision cues"
 
 :::notes
-Thanks for listening. The paper, the video and these slides are behind the code, and I'm happy to take questions.
+Thanks for listening. Everything is behind the QR code, and I'm happy to take questions.
 :::
 
 ---
@@ -843,7 +844,13 @@ Two people search 100 random points. Targets are hidden until one of them gets c
 :::
 
 :::notes
-The hunt, step by step: the hidden targets, the rule that a target lights up only up close and from its open side, and how cues let the pair split the space.
+Here's the hunt, step by step.
+
+[click] These are the hidden targets, shown here for you.
+
+[click] A target lights up only up close and from the correct angle.
+
+[click] And with cues on, each person sees where the other has looked, so the pair splits the space.
 :::
 
 ---
@@ -862,7 +869,7 @@ The Quest 3 has no eye tracking. Head and gaze direction correlate strongly in V
 :::
 
 :::card label="Why random scatter points?"
-To remove clusters that could guide the split on their own. Real embeddings have structure, so this is the hard case.
+To remove clusters that could guide the split on their own. Real embeddings have structure, so this is an edge case: a pure abstract space.
 :::
 
 :::card label="Why a button?"
@@ -874,7 +881,7 @@ It's a first step. Gaze rays, pointer trails or markers are the next comparison,
 :::
 
 :::card label="More than two people?"
-Colours hold for 2–4. Beyond that, colour per sub-group, or texture and outlines instead.
+We expect colours to hold for 2–4; we tested two. Beyond that, colour per sub-group, or texture and outlines instead.
 :::
 
 :::card label="Data already uses colour?"
@@ -953,7 +960,7 @@ columns: 5 7
 :::card label="Measures"
 **Duplicated search** · normalized redundancy, from the Shannon entropy of where the pair looked
 
-**Pair gain** · the pair's targets ÷ the mean of its two members' targets
+**Pair gain** · the pair's targets ÷ its stronger member's targets
 
 **Efficiency** · % targets found ÷ % space covered; above 1 beats a random search
 
@@ -973,7 +980,7 @@ Terrain pair gain +0.28, 95% CI [0.11, 0.45], *p* = .029 · scatter duplication 
 :::
 
 :::notes
-Duplicated search is normalized redundancy from Shannon entropy. Pair gain divides the pair's targets by the mean of its members'. Coverage efficiency divides the share of targets found by the share of space covered. Statistics are bootstrap confidence intervals and exact permutation tests with four pairs per cell; the terrain pair gain is the one result with an interval clear of zero. These measures are proxies for group awareness: we did not test recall of the partner's activity.
+Duplicated search is normalized redundancy from Shannon entropy. Pair gain divides the pair's targets by its stronger member's. Coverage efficiency divides the share of targets found by the share of space covered. Statistics are bootstrap confidence intervals and exact permutation tests with four pairs per cell; the terrain pair gain is the one result that holds on both the interval and the exact test. These measures are proxies for group awareness: we did not test recall of the partner's activity.
 :::
 
 ---
@@ -1050,7 +1057,7 @@ rows: 1 1
 # The rest of the design space
 
 :::card label="Capture"
-Taps or clicks, pointer movement, head direction, eye tracking: more precise means more intrusive.
+Taps or clicks, pointer movement, head direction, eye tracking: each trades off precision, implementation complexity and intrusiveness.
 :::
 
 :::card label="Record"

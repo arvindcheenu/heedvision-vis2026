@@ -167,7 +167,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261109", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261110", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -208,8 +208,10 @@
     [[".c-card, .c-step", "--fs"], [".c-quote", "--fq"]].forEach(([sel, prop]) => {
       const els = [...sec.querySelectorAll(sel)];
       if (!els.length) return;
-      const over = () => els.some((el) => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1);
-      let v = 1.5;
+      const over = () => els.some((el) => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1
+        || [...el.querySelectorAll("h3")].some((h) => h.scrollWidth > h.clientWidth + 1));
+      // lists read best near their natural size, so they don't grow as far
+      let v = els.some((el) => el.querySelector("ul, ol")) ? 1.25 : 1.5;
       for (; v > 0.72; v -= 0.05) {
         els.forEach((el) => el.style.setProperty(prop, v.toFixed(2)));
         alignRows(els);
@@ -235,6 +237,7 @@
       kids[0].forEach((_, i) => {
         const col = kids.map((k) => k[i]);
         if (parseFloat(getComputedStyle(col[0]).flexGrow) > 0) return; // pictures take what's left
+        if (col[0].matches("ul, ol")) return; // two lists side by side say different things
         align(col);
         const h = Math.max(...col.map((c) => c.offsetHeight));
         col.forEach((c) => { c.style.minHeight = `${h}px`; c.dataset.aligned = ""; });
@@ -545,6 +548,16 @@
   });
   deck.on("slidechanged", (e) => { onSlide(e.currentSlide); broadcast(); postConsole(); });
   ["fragmentshown", "fragmenthidden"].forEach((t) => deck.on(t, () => { syncDesignSpace(); syncSteppers(); broadcast(); postConsole(); }));
-  deck.on("resize", () => fields.forEach((f) => { f.resize(); f.draw(); }));
+  deck.on("resize", () => {
+    fields.forEach((f) => { f.resize(); f.draw(); });
+    // the projector's size is only known now: redraw the explainers sharply for it
+    explainers.forEach((ex) => {
+      if (Math.abs(Math.min(2.5, (devicePixelRatio || 1) * deck.getScale()) - ex.k) < 0.01) return;
+      const s = ex.step;
+      ex.resize();
+      if (isPoster) ex.settle(s);
+      else { ex.reset(); ex.setStep(s, true); ex.draw(); }
+    });
+  });
   addEventListener("hv-theme", () => fields.forEach((f) => f.draw()));
 })();

@@ -234,6 +234,9 @@
         if (!this.ambient) {
           ctx.font = "600 20px 'Google Sans Flex', system-ui";
           ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+          ctx.lineJoin = "round"; ctx.lineWidth = 6;
+          ctx.strokeStyle = document.documentElement.classList.contains("dark") ? "#0b0c10" : "#ffffff";
+          ctx.strokeText(ag.name, px + cell * 0.5, py - cell * 0.45);
           ctx.fillStyle = `rgb(${R},${G},${B})`;
           ctx.fillText(ag.name, px + cell * 0.5, py - cell * 0.45);
         }
