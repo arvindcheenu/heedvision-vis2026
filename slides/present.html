@@ -6,15 +6,13 @@
   <title>HeedVision · Presenter</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <script src="../shared/site.js?v=20261123"></script>
-  <link rel="stylesheet" href="../shared/hv.css?v=20261123">
-  <link rel="stylesheet" href="css/present.css?v=20261123">
+  <script src="../shared/site.js?v=20261127"></script>
+  <link rel="stylesheet" href="../shared/hv.css?v=20261127">
+  <link rel="stylesheet" href="css/present.css?v=20261127">
 </head>
-<!-- Press P on the slides for the presenter view, S for the speaker view. This window drives them. -->
-<body class="view-presenter">
+<!-- Press P on the slides for this view. It drives them. -->
+<body>
   <header class="pv-head">
-    <button type="button" class="btn" data-view="presenter">Presenter</button>
-    <button type="button" class="btn" data-view="speaker">Speaker</button>
     <div class="pv-timer">
       <b class="elapsed" title="Time so far">0:00</b>
       <span class="pace"></span>
@@ -30,13 +28,6 @@
     <section class="pv-current">
       <div class="pv-frame"><iframe title="Current slide" data-role="current" tabindex="-1"></iframe></div>
       <div class="pv-meta"><span class="pos"></span><span class="title"></span></div>
-    </section>
-    <section class="pv-next">
-      <div class="pv-frame"><iframe title="Next build" data-role="next" tabindex="-1"></iframe><div class="end" hidden>End of the talk</div></div>
-      <div class="next-title"></div>
-    </section>
-    <section class="pv-notes"><div class="notes"></div></section>
-    <section class="pv-side">
       <nav class="pv-ctl">
         <button type="button" class="btn" data-go="prev" title="Previous (←)">Back</button>
         <button type="button" class="btn" data-go="next" title="Next (→, space)">Next</button>
@@ -47,11 +38,18 @@
       <div class="pv-backups" hidden><ol></ol></div>
       <div class="pv-questions" hidden><ol></ol></div>
     </section>
+    <section class="pv-right">
+      <div class="pv-next">
+        <div class="pv-frame"><iframe title="Next build" data-role="next" tabindex="-1"></iframe><div class="end" hidden>End of the talk</div></div>
+        <div class="next-title"></div>
+      </div>
+      <div class="pv-notes"><div class="notes"></div></div>
+    </section>
   </main>
 
-  <script src="vendor/marked.js?v=20261123"></script>
-  <script src="js/mdeck.js?v=20261123"></script>
-  <script src="js/live.js?v=20261123"></script>
-  <script src="js/present.js?v=20261123"></script>
+  <script src="vendor/marked.js?v=20261127"></script>
+  <script src="js/mdeck.js?v=20261127"></script>
+  <script src="js/live.js?v=20261127"></script>
+  <script src="js/present.js?v=20261127"></script>
 </body>
 </html>

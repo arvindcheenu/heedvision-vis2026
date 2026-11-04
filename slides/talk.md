@@ -557,7 +557,7 @@ chapter: Takeaways
 time: 34
 ---
 
-# Thank you
+# Thank you for your attention
 
 ## Takeaways
 

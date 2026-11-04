@@ -61,7 +61,7 @@ Math works anywhere as `$x^2$` and `$$x^2$$`. A fenced ` ```mermaid ` block draw
 
 ### Sections on the pages
 
-The project page and the script page have no rules or native scrollbars. Each section has its own colour from `--c1` to `--c6` in `shared/hv.css`, on its heading, a tinted block, its contents entries and its progress segment. `shared/progress.js` draws the scroll progress.
+The project page and the script page have no rules or native scrollbars: a quiet tint separates sections. `--c1` to `--c6` in `shared/hv.css` set the colour, all orange for now. `shared/progress.js` draws the scroll progress.
 
 ### Styles
 
@@ -82,12 +82,12 @@ The plain `node tools/serve.mjs` is read-only. In dev mode, only this machine, h
 ## Presenting
 
 1. Open `https://heedvision.arvindchee.nu/slides/?present=<key>`. The key is in `worker/.presenter-key` (git-ignored).
-2. Press **P** for the presenter view or **S** for the speaker view. Either opens in its own window and drives the slides. The browser you present from never shows audience controls; add `?audience` to a slides link to undo that.
+2. Press **P** for the presenter view. It opens in its own window and drives the slides. The browser you present from never shows audience controls; add `?audience` to a slides link to undo that.
 3. The audience scans the QR code. `/talk/` follows you, with the slide pinned above the script, and takes questions per slide.
 
 The presenter view has a timer you can pause. **Auto-resume** starts or resumes it when the slides move; turn it off to control it yourself.
 
-Keys on the slides: **→ / space** next, **←** back, **B** backups, **T** theme, **Q** questions. In the presenter view, **Q** shows or hides questions on the projected slide.
+Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **B** backups, **T** theme, **Q** questions. In the presenter view, **Q** shows or hides questions on the projected slide.
 
 ### Questions
 

@@ -1,4 +1,4 @@
-// Presenter and speaker views. Drive the slides window over a BroadcastChannel, and show the
+// Presenter view. Drives the slides window over a BroadcastChannel, and show the
 // current and next build, the time against talk.md's `time:` values, and the script.
 (async function () {
   const params = new URLSearchParams(location.search);
@@ -16,18 +16,6 @@
   const set = talk.settings;
   const slides = new Map(talk.slides.map((s) => [s.id, s]));
   const main = () => talk.slides.filter((s) => !s.backup);
-
-  // ---------------------------------------------------------- view
-  let view = params.get("view") === "speaker" ? "speaker" : "presenter";
-  function setView(v) {
-    view = v;
-    document.body.className = `view-${v}`;
-    document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
-    document.title = `${set.title} · ${v === "speaker" ? "Speaker" : "Presenter"}`;
-    const u = new URL(location.href); u.searchParams.set("view", v); history.replaceState(null, "", u);
-    renderNotes(true);
-  }
-  document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
 
   // ---------------------------------------------------------- link to the slides
   const channel = new BroadcastChannel(`hv-present-${set.room}`);
@@ -166,12 +154,11 @@
     else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(k)) { e.preventDefault(); go({ dir: "prev" }); }
     else if (k === "b" || k === "B") channel.postMessage({ t: "backups" });
     else if (k === "q" || k === "Q") channel.postMessage({ t: "qa", on: !qa });
-    else if (k === "s" || k === "S") setView("speaker");
-    else if (k === "p" || k === "P") setView("presenter");
     else if (k === "t" || k === "T") HVTheme.cycle();
   });
 
-  setView(view);
+  document.title = `${set.title} · Presenter`;
+  renderNotes(true);
   renderQuestions();
   tick();
 })();

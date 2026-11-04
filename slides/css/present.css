@@ -1,39 +1,39 @@
-/* Presenter and speaker views. */
+/* The presenter view: the slide and its controls on the left; the next build and the script on the right. */
 html, body { height: 100%; }
 body { overflow: hidden; display: flex; flex-direction: column; }
-.pv-head { flex: none; display: flex; align-items: center; gap: 6px; height: 56px; padding: 0 16px; }
-.pv-timer { display: flex; align-items: center; gap: 6px; margin-left: 16px; font-variant-numeric: tabular-nums; }
+.pv-head { flex: none; display: flex; align-items: center; gap: 6px; padding: 10px 16px 0; }
+.pv-timer { display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
 .pv-timer .elapsed { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; min-width: 3ch; margin-right: 6px; }
 .pv-timer .pace { font-size: 14px; font-weight: 600; color: var(--fg-2); margin-right: 8px; min-width: 7ch; }
 .pv-timer .pace.late { color: #bb4a72; }
 .pv-link { margin-left: auto; margin-right: 10px; font-size: 13px; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pv-main { flex: 1; min-height: 0; display: grid; gap: 16px; padding: 16px; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "current next" "side notes"; }
-.pv-current { grid-area: current; }
-.pv-next { grid-area: next; display: flex; flex-direction: column; gap: 8px; }
-.pv-notes { grid-area: notes; overflow-y: auto; }
-.pv-side { grid-area: side; min-height: 0; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.pv-main { flex: 1; min-height: 0; display: grid; gap: 16px; padding: 10px 16px 16px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: stretch; }
+.pv-current { min-width: 0; min-height: 0; overflow-y: auto; }
+.pv-right { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.pv-next { flex: none; display: flex; flex-direction: column; gap: 6px; }
+.pv-notes { flex: 1; min-height: 0; overflow-y: auto; }
 .pv-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--surface-2); border-radius: var(--radius); }
 .pv-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
 .pv-frame .end { position: absolute; inset: 0; display: grid; place-content: center; font-weight: 600; color: var(--fg-2); }
 .pv-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 15px; }
 .pv-meta .pos { font-weight: 700; font-variant-numeric: tabular-nums; }
 .pv-meta .title { color: var(--fg-2); }
-.next-title { font-size: 15px; color: var(--fg-2); }
-.pv-ctl { display: flex; flex-wrap: wrap; gap: 6px; }
-.notes { font-size: 22px; line-height: 1.5; }
-.notes p { margin: 0 0 14px; }
-.notes .click { display: inline-block; padding: 0 7px; font-size: 13px; font-weight: 700; color: var(--fg-3); background: var(--surface-2); border-radius: var(--radius); vertical-align: 2px; }
+.next-title { font-size: 14px; color: var(--fg-2); }
+.pv-ctl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.notes { font-size: 24px; line-height: 1.45; }
+.notes p { margin: 0 0 12px; }
+.notes .click { display: inline-block; padding: 0 8px; font-size: 13px; font-weight: 700; color: var(--fg-3); background: var(--surface-2); border-radius: var(--radius); vertical-align: 2px; }
 .notes .click.passed { opacity: 0.45; }
 .notes .click.next { color: #fff; background: #bb4a72; }
+.pv-questions, .pv-backups { margin-top: 12px; }
 .pv-questions ol, .pv-backups ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 15px; }
 .pv-questions b { color: #bb4a72; margin-right: 8px; }
 .pv-questions small { display: block; color: var(--fg-3); }
-.view-speaker .pv-main { grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto auto minmax(0, 1fr); grid-template-areas: "notes current" "notes next" "notes side"; }
-.view-speaker .notes { font-size: clamp(26px, 2.8vw, 42px); line-height: 1.4; }
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   html, body { height: auto; overflow: auto; }
-  .pv-head { height: auto; flex-wrap: wrap; padding: 8px; }
-  .pv-main, .view-speaker .pv-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "current" "next" "notes" "side"; }
-  .pv-notes { overflow: visible; }
-  .notes, .view-speaker .notes { font-size: 19px; }
+  .pv-head { flex-wrap: wrap; }
+  .pv-main { grid-template-columns: minmax(0, 1fr); align-content: start; }
+  .pv-current, .pv-notes { overflow: visible; }
+  .pv-next { order: 2; }
+  .notes { font-size: 19px; }
 }

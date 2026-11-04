@@ -1,5 +1,5 @@
 // Deck controller: renders talk.md, starts reveal, and wires the footer band,
-// QR codes, the animations, embeds, the presenter/speaker windows and the
+// QR codes, the animations, embeds, the presenter window and the
 // audience follow/ask controls.
 (async function () {
   const live = window.HVLive;
@@ -144,7 +144,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261123"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261127"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -200,7 +200,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261123", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261127", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -333,7 +333,7 @@
     goTo({ id: first.id, f: -1 });
   }
 
-  // ---------------------------------------------------------- presenter + speaker windows
+  // ---------------------------------------------------------- presenter windows
   // present.html talks to this deck over a BroadcastChannel (same browser).
   const channel = !isEmbed && !isPoster && !isReceiver && "BroadcastChannel" in window ? new BroadcastChannel(`hv-present-${set.room}`) : null;
   function postConsole() {
@@ -354,10 +354,10 @@
       else if (m.t === "qa") setQa(!!m.on);
     };
   }
-  function openConsole(view) {
+  function openConsole() {
     markPresenter();
-    const u = `present.html?view=${view}${hasKey ? `&present=${encodeURIComponent(live.presenterKey)}` : ""}`;
-    window.open(u, `hv-${view}`, "popup,width=1440,height=900");
+    const u = `present.html${hasKey ? `?present=${encodeURIComponent(live.presenterKey)}` : ""}`;
+    window.open(u, "hv-presenter", "popup,width=1440,height=900");
   }
 
   // ---------------------------------------------------------- live: follow + ask
@@ -533,8 +533,7 @@
     deck.addKeyBinding({ keyCode: 84, key: "T", description: "Light or dark" }, toggleTheme);
     deck.addKeyBinding({ keyCode: 66, key: "B", description: "Backup slides" }, toggleBackups);
     if (!isEmbed && !isPoster && !isReceiver) {
-      deck.addKeyBinding({ keyCode: 83, key: "S", description: "Speaker view (script)" }, () => openConsole("speaker"));
-      deck.addKeyBinding({ keyCode: 80, key: "P", description: "Presenter view" }, () => openConsole("presenter"));
+      deck.addKeyBinding({ keyCode: 80, key: "P", description: "Presenter view" }, openConsole);
     }
     if (isPresenting) document.body.classList.add("presenting");
     if (!isPoster && !isReceiver && !isPresenting && !isEmbed) buildAudienceUI();

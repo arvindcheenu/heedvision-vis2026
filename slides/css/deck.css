@@ -2,7 +2,7 @@
    at the top of shared/hv.css.
 
    What the colours mean
-     orange   the talk's own voice: slide titles, section, title and end pages, bullet marks,
+     orange   the talk's own voice: slide titles, the big title, section numbers and thank you,
               and where you are in the section navigation
      brown    block headings
      pink     alert: the current bullet, and CAAV in the results
@@ -66,11 +66,6 @@
 .f-logos { margin-left: auto; display: flex; align-items: center; gap: 24px; height: 30px; }
 .f-logos img { height: 100%; width: auto; }
 .count { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 4ch; text-align: right; }
-
-/* over a solid colour page: the same, in white */
-.layout-section .headline, .layout-section .footline { color: rgba(255, 255, 255, 0.82); }
-.layout-section .sec.now { color: #fff; }
-.layout-section .f-logos img { filter: brightness(0) invert(1); opacity: 0.95; }
 
 /* ---------- slide title: text, no bar ---------- */
 .frametitle { position: absolute; left: 72px; right: 72px; top: 56px; height: 88px; display: flex; align-items: center; gap: 28px; }
@@ -189,7 +184,7 @@
 .hvd-pane { position: relative; min-height: 0; overflow: hidden; background: #dedddc; border-radius: var(--radius); }
 .hvd-pane canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
 .hvd-pane canvas:active { cursor: grabbing; }
-.hvd-pane .who { position: absolute; left: 14px; top: 10px; font-size: 26px; font-weight: 700; color: #3b352f; pointer-events: none; }
+.hvd-pane .who { position: absolute; left: 14px; top: 14px; padding: 6px 16px; font-size: 26px; font-weight: 700; color: #3b352f; background: #fff; border-radius: var(--radius); pointer-events: none; }
 .live-bar { display: flex; align-items: center; gap: 14px; font-size: 24px; }
 .live-bar .tag { position: static; padding: 0; font-weight: 700; color: var(--alert); background: none; }
 .live-bar .hint { color: var(--fg-2); margin-right: auto; }
@@ -224,33 +219,32 @@
 .embed iframe, .embed video, .embed img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
 .embed-badge { display: none; }
 
-/* ---------- title page: Swiss, in the common colours ---------- */
-.t-block { position: absolute; left: 0; right: 0; top: 0; height: 560px; display: flex; align-items: flex-end; padding: 0 72px 44px; background: var(--frame-bg); }
-.t-block h1 { font-size: 236px; line-height: 0.9; letter-spacing: -0.045em; color: #fff; }
-.t-grid { position: absolute; left: 72px; right: 72px; top: 604px; bottom: 56px; display: grid; grid-template-columns: 6fr 3fr 3fr; grid-template-rows: auto 1fr; gap: 28px 48px; }
-.t-sub { grid-column: 1; font-size: 48px; line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; color: var(--vis-brown); }
-.dark .t-sub { color: var(--vis-amber); }
+/* ---------- title page: big type, flush left, no colour field ---------- */
+.t-block { position: absolute; left: 72px; right: 72px; top: 96px; height: 300px; display: flex; align-items: flex-end; }
+.t-block h1 { font-size: 248px; line-height: 0.9; letter-spacing: -0.045em; color: var(--title); }
+.t-grid { position: absolute; left: 72px; right: 72px; top: 456px; bottom: 64px; display: grid; grid-template-columns: 6fr 3fr 3fr; grid-template-rows: auto 1fr; gap: 36px 48px; }
+.t-sub { grid-column: 1; font-size: 52px; line-height: 1.12; font-weight: 700; letter-spacing: -0.02em; color: var(--fg); }
 .t-people { grid-column: 1; grid-row: 2; display: flex; gap: 40px; align-items: flex-start; }
 .author { display: flex; align-items: center; gap: 16px; font-size: 32px; }
 .author img { width: 76px; height: 76px; object-fit: cover; display: block; border-radius: var(--radius); }
 .author b { font-weight: 600; }
-.t-people .author { font-size: 32px; padding: 0; }
-.t-people .author b { font-size: 32px; font-weight: 600; color: var(--fg); }
-.t-people .author img { width: 76px; height: 76px; border-radius: var(--radius); }
-.t-venue { grid-column: 2; grid-row: 1 / span 2; font-size: 32px; line-height: 1.25; font-weight: 500; }
-.t-qr { grid-column: 3; grid-row: 1 / span 2; justify-self: end; width: 260px; }
-.t-qr p { margin-top: 10px; font-size: 24px; line-height: 1.2; color: var(--fg-2); }
-.t-logos { position: absolute; left: 72px; bottom: 56px; height: 64px; display: flex; gap: 40px; align-items: center; }
+.t-people .author { font-size: 34px; padding: 0; }
+.t-people .author b { font-size: 34px; font-weight: 600; color: var(--fg); }
+.t-people .author img { width: 96px; height: 96px; border-radius: var(--radius); }
+.t-venue { grid-column: 2; grid-row: 1 / span 2; font-size: 34px; line-height: 1.25; font-weight: 500; }
+.t-qr { grid-column: 3; grid-row: 1 / span 2; justify-self: end; width: 300px; }
+.t-qr p { margin-top: 10px; font-size: 26px; line-height: 1.2; color: var(--fg-2); }
+.t-logos { position: absolute; left: 72px; bottom: 64px; height: 76px; display: flex; gap: 44px; align-items: center; }
 .t-logos img { height: 100%; width: auto; }
 .logo-mono { filter: var(--logo-filter); }
 .qr { background: #fff; padding: 12px; border-radius: var(--radius); }
 .qr svg { display: block; width: 100%; height: auto; }
 
-/* ---------- section page: plain colour, a big number, flush left ---------- */
-.s-page { position: absolute; inset: 0; display: grid; grid-template-rows: 1fr auto auto; padding: 96px 72px 96px; background: var(--frame-bg); color: #fff; }
-.s-num { font-size: 400px; line-height: 0.82; font-weight: 700; letter-spacing: -0.05em; }
-.s-page h2 { font-size: 132px; line-height: 1; letter-spacing: -0.035em; color: #fff; }
-.s-page p { margin-top: 18px; font-size: 44px; line-height: 1.15; opacity: 0.95; }
+/* ---------- section page: number and title together, in the middle, no colour field ---------- */
+.s-page { position: absolute; left: 72px; right: 72px; top: 56px; bottom: 56px; display: flex; flex-direction: column; justify-content: center; }
+.s-num { font-size: 300px; line-height: 0.86; font-weight: 700; letter-spacing: -0.05em; color: var(--title); }
+.s-page h2 { margin-top: 24px; font-size: 170px; line-height: 1; letter-spacing: -0.04em; color: var(--fg); }
+.s-page p { margin-top: 20px; font-size: 56px; line-height: 1.15; color: var(--fg-2); }
 
 /* ---------- end page: takeaways on the left; thank you, people and logos build in on the right ---------- */
 .layout-end .frametitle { right: auto; }
@@ -258,8 +252,7 @@
 .e-body .c-items { font-size: 40px; line-height: 1.24; }
 .e-body .c-items > ul { gap: 44px; }
 .e-side { position: absolute; left: 816px; right: 72px; top: 64px; bottom: 64px; display: flex; flex-direction: column; justify-content: space-between; }
-.e-thanks { display: flex; align-items: center; padding: 28px 48px 36px; background: var(--frame-bg); border-radius: var(--radius); }
-.e-thanks h1 { font-size: 176px; line-height: 1; letter-spacing: -0.04em; color: #fff; }
+.e-thanks h1 { font-size: 128px; line-height: 1; letter-spacing: -0.04em; text-align: right; color: var(--title); }
 .e-people { display: flex; flex-direction: column; gap: 14px; }
 .e-person { display: flex; align-items: center; gap: 36px; }
 .e-face { position: relative; flex: none; width: 270px; display: flex; justify-content: center; }

@@ -100,7 +100,7 @@ a { color: var(--accent); }
 .site-nav { display: flex; gap: 4px; margin-left: 6px; }
 .site-nav a { padding: 6px 12px; border-radius: var(--radius); color: var(--fg-2); text-decoration: none; font-size: 15px; font-weight: 550; }
 .site-nav a:hover { background: var(--surface-2); color: var(--fg); }
-.site-nav a[aria-current="page"] { background: var(--surface); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
+.site-nav a[aria-current="page"] { background: var(--surface); color: var(--fg); box-shadow: none; }
 .head-end { margin-left: auto; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .icon-btn {
   all: unset;
@@ -157,7 +157,7 @@ a { color: var(--accent); }
 .btn[disabled] { opacity: 0.4; pointer-events: none; }
 .theme-picker { display: inline-flex; gap: 2px; }
 .theme-picker button { width: 36px; padding: 0; }
-.chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); font-size: 13px; font-weight: 550; color: var(--fg-2); }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: var(--radius); border: 0; background: var(--surface); font-size: 13px; font-weight: 550; color: var(--fg-2); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .card { background: none; }
@@ -204,7 +204,7 @@ a { color: var(--accent); }
 /* the slide is pinned under the header; the script scrolls beneath it */
 .talk-stage { position: sticky; top: 0; z-index: 25; padding: 12px 16px 10px; background: color-mix(in oklab, var(--bg) 92%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
 .talk-stage-inner { width: min(100%, calc(min(48vh, 560px) * 16 / 9)); margin: 0 auto; }
-.talk-stage .deck-frame { border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface-2); }
+.talk-stage .deck-frame { border-radius: var(--radius); border: 0; background: var(--surface-2); }
 .stage-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13.5px; color: var(--fg-2); }
 .stage-bar .btn { height: 32px; }
 .stage-bar [data-go] { width: 36px; padding: 0; justify-content: center; font-size: 19px; }
@@ -223,7 +223,7 @@ a { color: var(--accent); }
 .entry h3 .n { font-family: var(--f-text); font-size: 13px; font-weight: 650; color: var(--fg-3); font-variant-numeric: tabular-nums; }
 .entry .live-tag { display: none; margin-left: auto; font-family: var(--f-text); font-size: 11.5px; font-weight: 700; color: var(--accent); }
 .entry.live .live-tag { display: inline; }
-.script .click { all: unset; cursor: pointer; display: inline-block; font-size: 11px; font-weight: 700; line-height: 1.6; color: var(--fg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 6px; margin-right: 4px; vertical-align: 0.15em; transition: background 200ms var(--ease), color 200ms var(--ease); }
+.script .click { all: unset; cursor: pointer; display: inline-block; font-size: 11px; font-weight: 700; line-height: 1.6; color: var(--fg-3); border: 0; border-radius: var(--radius); padding: 0 6px; margin-right: 4px; vertical-align: 0.15em; transition: background 200ms var(--ease), color 200ms var(--ease); }
 .script .click:hover { color: var(--fg); border-color: var(--fg-3); }
 .script .click.at { color: #fff; background: var(--accent); border-color: var(--accent); }
 .loading { color: var(--fg-3); padding: 40px 0; }
@@ -251,7 +251,7 @@ a { color: var(--accent); }
 
 .q button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 .qs form { display: grid; gap: 8px; }
-.qs textarea, .qs input { font: inherit; font-size: 15.5px; width: 100%; padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--bg); color: var(--fg); resize: vertical; }
+.qs textarea, .qs input { font: inherit; font-size: 15.5px; width: 100%; padding: 10px 12px; border-radius: var(--radius); border: 0; background: var(--bg); color: var(--fg); resize: vertical; }
 .qs textarea { min-height: 70px; }
 .qs .row { display: flex; gap: 8px; }
 .qs .row input { flex: 1; min-width: 0; }
@@ -267,7 +267,7 @@ a { color: var(--accent); }
 .toc a .ld { width: 6px; height: 6px; border-radius: var(--radius); flex: none; }
 .toc a.live .ld { background: #2fbf71; }
 
-.live-pill { display: flex; align-items: center; gap: 10px; padding: 3px 3px 3px 12px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); font-size: 13.5px; min-width: 0; }
+.live-pill { display: flex; align-items: center; gap: 10px; padding: 3px 3px 3px 12px; border-radius: var(--radius); background: var(--surface); border: 0; font-size: 13.5px; min-width: 0; }
 .live-pill .dot { width: 8px; height: 8px; border-radius: var(--radius); background: #2fbf71; flex: none; }
 .live-pill .live-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--fg-2); }
 .live-pill .follow { all: unset; cursor: pointer; padding: 5px 12px; border-radius: var(--radius); font-weight: 650; font-size: 12.5px; background: var(--surface-2); }
@@ -355,10 +355,9 @@ html, .toc-inner, .page-toc { scrollbar-width: none; }
 html::-webkit-scrollbar, .toc-inner::-webkit-scrollbar, .page-toc::-webkit-scrollbar { display: none; }
 /* a rail beside a contents list, filling as you read */
 .toc ol, .page-toc ol { position: relative; list-style: none; margin: 0; padding: 0 0 0 16px; }
-.toc ol::before, .page-toc ol::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: var(--radius); background: var(--line); }
 .toc ol::after, .page-toc ol::after { content: ""; position: absolute; left: 0; top: 0; width: 3px; height: var(--fill, 0); border-radius: var(--radius); background: var(--vis-orange); }
 /* the bar across the project page */
-.page-bar { position: fixed; left: 0; right: 0; top: 0; height: 4px; z-index: 40; background: var(--line); }
+.page-bar { position: fixed; left: 0; right: 0; top: 0; height: 4px; z-index: 40; }
 .page-bar i { display: block; height: 100%; background: var(--vis-orange); transform-origin: left; transform: scaleX(0); }
 /* the project page's contents */
 .page-toc { position: fixed; top: 96px; left: calc(50% + 420px); width: 210px; max-height: calc(100vh - 140px); overflow-y: auto; font-size: 14.5px; line-height: 1.3; }
@@ -372,15 +371,14 @@ html::-webkit-scrollbar, .toc-inner::-webkit-scrollbar, .page-toc::-webkit-scrol
 .slide-progress i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: var(--radius); background: var(--vis-orange); }
 .slide-progress b { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: var(--fg-3); }
 
-/* ---------- sections are told apart by colour alone, no rules ----------
-   Each section has its own colour from the VIS 2026 palette, on its heading, a tinted block,
-   its contents entries and its segment of the progress bar. */
-:root { --c1: #df6824; --c2: #bb4a72; --c3: #693a19; --c4: #f8a45a; --c5: #ed74b5; --c6: #8a817a; --sec-ink: #000; }
-.dark { --c3: #b0805a; --sec-ink: #fff; }
+/* ---------- sections are told apart by a quiet tint, no rules ----------
+   Give --c2 to --c6 their own colours if you want each section to have its own. */
+:root { --c1: var(--vis-orange); --c2: var(--c1); --c3: var(--c1); --c4: var(--c1); --c5: var(--c1); --c6: var(--c1); --sec-ink: #000; }
+.dark { --sec-ink: #fff; }
 .page > .section:has(.section-title), .chapter {
   --sec-text: color-mix(in srgb, var(--sec, var(--c1)) 78%, var(--sec-ink));
   margin: 18px -28px 0; padding: 26px 28px 28px; border-radius: var(--radius);
-  background: color-mix(in srgb, var(--sec, var(--c1)) 9%, var(--bg));
+  background: color-mix(in srgb, var(--sec, var(--c1)) 5%, var(--bg));
 }
 .section-title, .chapter > .section-title { margin: 0 0 14px; padding: 0; border: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--sec-text); }
 .chapter .entry { padding: 14px 0 6px; }
@@ -399,7 +397,7 @@ html::-webkit-scrollbar, .toc-inner::-webkit-scrollbar, .page-toc::-webkit-scrol
 .toc ol::after, .page-toc ol::after { background: var(--rail, var(--c1)); }
 /* slide progress: one coloured segment per section */
 .slide-progress { display: flex; gap: 4px; height: 6px; background: none; border-radius: 0; }
-.slide-progress span { position: relative; overflow: hidden; border-radius: var(--radius); background: color-mix(in srgb, var(--sec) 22%, var(--bg)); }
+.slide-progress span { position: relative; overflow: hidden; border-radius: var(--radius); background: color-mix(in srgb, var(--sec) 12%, var(--bg)); }
 .slide-progress i { display: block; position: absolute; left: 0; top: 0; bottom: 0; width: var(--p, 0%); background: var(--sec); border-radius: 0; }
 /* the pinned slide shows at once */
 .deck-frame iframe { opacity: 1 !important; transition: none !important; }
