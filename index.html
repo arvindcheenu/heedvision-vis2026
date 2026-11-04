@@ -20,25 +20,12 @@
 <meta property="og:image" content="assets/teaser.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="shared/logos/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="shared/hv.css?v=20261105">
-<script src="shared/site.js?v=20261105"></script>
+<link rel="stylesheet" href="shared/hv.css?v=20261110">
+<script src="shared/site.js?v=20261110"></script>
 </head>
 <body>
 
-<header class="site-head">
-  <a class="brand" href="./"><img src="shared/logos/mark.svg" alt=""><span>HeedVision</span></a>
-  <nav class="site-nav">
-    <a class="opt" href="./" aria-current="page">Paper</a>
-    <a href="talk/">Talk</a>
-    <a href="slides/" target="_blank" rel="noopener">Slides</a>
-  </nav>
-  <div class="head-end">
-    <span data-theme-picker></span>
-  </div>
-</header>
-
 <main class="page">
-  <div class="kicker">IEEE VIS 2026 · TVCG special issue</div>
   <h1 class="page-title">HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</h1>
   <p class="page-sub">Tracking, recording, and revisualizing the collective attention of collaborators in shared immersive environments.</p>
 
@@ -53,10 +40,11 @@
 
   <div class="actions">
     <!-- ARXIV_URL: replace the href once the preprint is posted. -->
-    <a class="btn primary" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg> arXiv</a>
+    <a class="btn" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg> arXiv</a>
     <a class="btn" id="pdf-btn" href="heedvision.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg> PDF</a>
     <a class="btn" href="talk/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg> Talk</a>
     <a class="btn" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg> OSF</a>
+    <a class="btn" href="slides/?view=print&amp;autoprint" target="_blank" rel="noopener">Slides as PDF</a>
   </div>
 
   <figure class="figure card section">
@@ -128,6 +116,7 @@
 </main>
 
 <footer class="site-foot">
+  <div class="foot-end"><span data-theme-picker></span></div>
   <div class="logos">
     <img src="shared/logos/vis2026.png" alt="IEEE VIS 2026">
     <img class="mono" src="shared/logos/au.svg" alt="Aarhus University">
@@ -144,7 +133,7 @@
       var el = document.getElementById(id);
       if (el && el.getAttribute('href') === 'ARXIV_URL') { el.hidden = true; pending = true; }
     });
-    if (pending) document.getElementById('pdf-btn').classList.add('primary');
+    if (pending) 
   })();
 
   // Copy BibTeX.
@@ -160,7 +149,7 @@
   (function () {
     var frame = document.getElementById('talk-iframe');
     var pos = document.getElementById('talk-pos');
-    frame.addEventListener('load', function () { frame.parentNode.classList.add('ready'); });
+    frame.addEventListener('load', function () { frame.parentNode.classList.add('ready'); frame.contentWindow.postMessage({ hv: 'hello' }, location.origin); });
     document.querySelectorAll('.deck-ctl [data-go]').forEach(function (b) {
       b.addEventListener('click', function () {
         frame.contentWindow.postMessage({ hv: 'go', dir: b.getAttribute('data-go') }, location.origin);

@@ -4,9 +4,19 @@
 (async function () {
   const live = window.HVLive;
   const params = new URLSearchParams(location.search);
-  const isPoster = params.has("poster");
+  // stills and PDF export show every build
+  const isPrint = params.get("view") === "print" || params.has("print-pdf");
+  const isPoster = params.has("poster") || isPrint;
   const isReceiver = params.has("receiver");
-  const isPresenting = !!live.presenterKey;
+  const hasKey = !!live.presenterKey;
+  // once this browser has presented, it never shows audience controls (?audience undoes it)
+  const PRESENTER = "hv.presenter";
+  const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
+  if (params.has("audience")) lsSet(PRESENTER, null);
+  if (hasKey) lsSet(PRESENTER, "1");
+  const isPresenting = hasKey || lsGet(PRESENTER) === "1";
+  function markPresenter() { lsSet(PRESENTER, "1"); document.body.classList.add("presenting"); if (fab) fab.remove(); if (sheet) sheet.remove(); fab = sheet = null; }
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   // ?embed shows the deck inside another page; ?embed=<id> shows just that slide
   const isEmbed = params.has("embed");
@@ -17,16 +27,14 @@
   document.body.classList.toggle("is-embed", isEmbed);
   document.body.classList.toggle("poster", isPoster);
   document.body.classList.toggle("receiver", isReceiver);
-  document.body.classList.toggle("presenting", isPresenting);
-
+  
   // ---------------------------------------------------------- render talk.md
   const src = await fetch("talk.md", { cache: "no-cache" }).then((r) => r.text());
+  await MDeck.prepare(src);
   const talk = MDeck.render(src);
   const set = talk.settings;
   const slidesEl = document.querySelector(".reveal .slides");
-  slidesEl.innerHTML = talk.slides.filter((s) => !single || s.id === single).map((s) => s.html).join("") +
-    `<div class="hv-chrome"><nav class="headline" aria-label="Sections"></nav><div class="footline"><span class="who"></span><span class="what"></span><img src="../shared/logos/vis2026.png" alt=""><span class="count"></span></div></div>`;
-  document.documentElement.style.setProperty("--qr-fg", "#000");
+  slidesEl.innerHTML = talk.slides.filter((x) => !single || x.id === single).map((x) => x.html).join("");
   // on a phone the deck scrolls: every build is showing, so reveal adds no extra scrolling for them
   const flat = !isEmbed && !isPoster && innerWidth < 700;
   if (flat) {
@@ -64,14 +72,17 @@
     slideNumber: false,
     fragments: !isPoster,
     // embedded in the talk page, the slide follows scrolling: switch instantly, no cross-fades
-    transition: isPoster || isEmbed ? "none" : "slide",
+    transition: isPoster || isEmbed ? "none" : "fade",
+    transitionSpeed: "fast",
     backgroundTransition: "none",
+    overview: false,
+    pdfSeparateFragments: false,
     // phones scroll through the slides instead of stepping
     ...(isEmbed || isPoster ? {} : { scrollActivationWidth: 700, scrollLayout: "compact", scrollSnap: false, scrollProgress: false }),
     autoAnimate: !isPoster && !isEmbed && !reduceMotion,
     autoAnimateEasing: "cubic-bezier(0.2, 0, 0, 1)",
     autoAnimateDuration: 0.8,
-    viewDistance: 3,
+    viewDistance: 40,
     preloadIframes: false,
     keyboard: { 32: advance, 34: advance, 39: advance, 78: advance, 13: advance },
   });
@@ -110,35 +121,39 @@
   }
   addEventListener("storage", (e) => { if (e.key === askKey) renderQR(); });
 
-  // ---------------------------------------------------------- section navigation
-  // As in Beamer: every section with one dot per slide, the current one marked, and a footline.
-  const chrome = slidesEl.querySelector(".hv-chrome");
-  const nav = chrome.querySelector(".headline");
-  const count = chrome.querySelector(".count");
-  chrome.querySelector(".who").textContent = talk.meta.authors || "";
-  chrome.querySelector(".what").textContent = talk.meta.title || "";
-  const chapters = [];
-  mainSlides().forEach((s) => {
-    const c = s.dataset.chapter;
-    let ch = chapters.find((x) => x.name === c);
-    if (!ch) chapters.push((ch = { name: c, slides: [] }));
-    ch.slides.push(s);
-  });
-  nav.innerHTML = chapters.map((c) => `<div class="sec"><b>${esc(c.name)}</b><span class="dots">${c.slides.map((s) => `<button type="button" data-to="${esc(s.id)}" title="${esc(s.dataset.title)}" aria-label="${esc(s.dataset.title)}"></button>`).join("")}</span></div>`).join("");
-  nav.addEventListener("click", (e) => { const b = e.target.closest("[data-to]"); if (b) goTo({ id: b.dataset.to, f: -1 }); });
+  // the dots in the section navigation go to their slide
+  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("[data-to]"); if (b) goTo({ id: b.dataset.to, f: -1 }); });
 
-  function updateChrome(cur) {
-    const all = mainSlides();
-    const idx = all.indexOf(cur);
-    const backup = cur.hasAttribute("data-backup");
-    chrome.classList.toggle("hidden", cur.classList.contains("layout-title") || !!single);
-    chrome.classList.toggle("over", cur.classList.contains("layout-photo") || cur.classList.contains("layout-section"));
-    count.textContent = backup ? "Backup" : `${idx + 1} / ${all.length}`;
-    nav.querySelectorAll("[data-to]").forEach((d, i) => {
-      d.classList.toggle("done", i < idx);
-      d.classList.toggle("now", i === idx);
+  // ---------------------------------------------------------- bullets
+  // :::items: the current bullet is highlighted, later ones wait (or stay visible with uncover=off)
+  function syncItems() {
+    document.querySelectorAll("[data-items]").forEach((box) => {
+      const lis = [...box.querySelectorAll(":scope > ul > li, :scope > ol > li")];
+      const still = isPoster || flat;
+      const at = box.querySelectorAll(".fragment.step.visible").length;
+      lis.forEach((li, i) => { li.classList.toggle("now", !still && i === at); li.classList.toggle("later", !still && i > at); });
     });
-    nav.querySelectorAll(".sec").forEach((sec, i) => sec.classList.toggle("now", chapters[i].slides.includes(cur)));
+  }
+
+  // ---------------------------------------------------------- diagrams
+  async function renderDiagrams() {
+    const blocks = [...document.querySelectorAll("code.language-mermaid")];
+    if (!blocks.length) return;
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261110"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    if (!window.mermaid) return;
+    mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
+      ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
+      : { primaryColor: "#f3dfcf", primaryTextColor: "#3b352f", primaryBorderColor: "#df6824", lineColor: "#693a19", fontSize: "32px" } });
+    for (let i = 0; i < blocks.length; i++) {
+      const pre = blocks[i].parentElement;
+      try {
+        const { svg } = await mermaid.render(`diagram-${i}`, blocks[i].textContent);
+        const box = document.createElement("div");
+        box.className = "c-diagram";
+        box.innerHTML = svg;
+        pre.replaceWith(box);
+      } catch (err) { console.warn("[diagram]", err); }
+    }
   }
 
   // ---------------------------------------------------------- simulations and animations
@@ -148,7 +163,7 @@
   const fields = new Map();
   const explainers = new Map();
   const lives = new Map(); // live 3D demos (js/hvdemo.js), loaded only when a slide has one
-  const SWATCH = { none: "var(--dot-off)", count: "var(--field-swatch)", sum: "linear-gradient(90deg,transparent,var(--field-swatch))", max: "linear-gradient(90deg,color-mix(in oklab,var(--field-swatch) 40%,transparent),var(--field-swatch))", diff: "linear-gradient(90deg,var(--field-swatch),transparent,var(--field-swatch))", who: "linear-gradient(135deg,var(--you),var(--both),var(--partner))" };
+  const SWATCH = { none: "var(--dot-off)", count: "var(--field-swatch)", sum: "var(--field-swatch)", max: "var(--field-swatch)", diff: "var(--field-swatch)", who: "var(--both)" };
   function initFields() {
     document.querySelectorAll("canvas[data-field]").forEach((cv) => {
       const demo = cv.closest(".c-demo");
@@ -180,7 +195,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261105", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261110", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -212,56 +227,6 @@
     });
     lastSlide = cur;
   }
-
-  // ---------------------------------------------------------- fit text to tiles
-  // Each slide's cards (and quotes) share one type scale: the largest, up to 1.5×,
-  // at which no tile overflows. Runs once a slide is laid out, and again after fonts load.
-  function fitText(sec) {
-    if (!sec || sec.dataset.fitted || !sec.offsetHeight) return;
-    [[".c-card, .c-step", "--fs"], [".c-quote", "--fq"]].forEach(([sel, prop]) => {
-      const els = [...sec.querySelectorAll(sel)];
-      if (!els.length) return;
-      const over = () => els.some((el) => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1
-        || [...el.querySelectorAll("h3")].some((h) => h.scrollWidth > h.clientWidth + 1));
-      // lists read best near their natural size, so they don't grow as far
-      let v = els.some((el) => el.querySelector("ul, ol")) ? 1.25 : 1.5;
-      for (; v > 0.72; v -= 0.05) {
-        els.forEach((el) => el.style.setProperty(prop, v.toFixed(2)));
-        alignRows(els);
-        if (!over()) break;
-      }
-    });
-    sec.dataset.fitted = "1";
-  }
-  // Cards side by side line up: each title, text and quote starts on the same line
-  // as its neighbours', however many lines the one above it took.
-  function alignRows(els) {
-    const rows = new Map();
-    els.forEach((el) => {
-      el.querySelectorAll("[data-aligned]").forEach((c) => { c.style.minHeight = ""; delete c.dataset.aligned; });
-      const r = el.getBoundingClientRect(), key = `${Math.round(r.top)}:${Math.round(r.height)}`;
-      rows.set(key, [...(rows.get(key) || []), el]);
-    });
-    const parts = (el) => [...el.children].filter((c) => { const cs = getComputedStyle(c); return cs.position !== "absolute" && cs.display !== "none"; });
-    const sig = (c) => `${c.tagName}.${c.className}`;
-    const align = (group) => {
-      const kids = group.map(parts);
-      if (kids.some((k) => k.length !== kids[0].length || k.some((c, i) => sig(c) !== sig(kids[0][i])))) return;
-      kids[0].forEach((_, i) => {
-        const col = kids.map((k) => k[i]);
-        if (parseFloat(getComputedStyle(col[0]).flexGrow) > 0) return; // pictures take what's left
-        if (col[0].matches("ul, ol")) return; // two lists side by side say different things
-        align(col);
-        const h = Math.max(...col.map((c) => c.offsetHeight));
-        col.forEach((c) => { c.style.minHeight = `${h}px`; c.dataset.aligned = ""; });
-      });
-    };
-    rows.forEach((group) => group.length > 1 && align(group));
-  }
-  document.fonts && document.fonts.ready.then(() => {
-    slides().forEach((s) => delete s.dataset.fitted);
-    if (deck.isReady()) fitText(deck.getCurrentSlide());
-  });
 
   // ---------------------------------------------------------- design space
   function syncDesignSpace() {
@@ -324,7 +289,7 @@
       if (Math.abs(all.indexOf(s) - i) <= 1 && !el._video.src && el._video.dataset.src) { el._video.src = el._video.dataset.src; el._video.preload = "auto"; }
       if (s === cur) {
         if (el.dataset.live && demoUrl(el.dataset.live) && !el.dataset.userMode) setEmbedMode(el, "live");
-        if (el.dataset.mode === "video") el._video.play().catch(() => {});
+        if (el.dataset.mode === "video") el._video.play().catch(() => el._video.addEventListener("canplay", () => { if (deck.getCurrentSlide() === s) el._video.play().catch(() => {}); }, { once: true }));
       } else el._video.pause();
     });
   }
@@ -369,23 +334,24 @@
   function postConsole() {
     if (!channel) return;
     const cur = deck.getCurrentSlide();
-    channel.postMessage({ t: "state", ...currentState(), builds: builds(cur), backup: cur.hasAttribute("data-backup"), ask: askOn() });
+    channel.postMessage({ t: "state", ...currentState(), builds: builds(cur), backup: cur.hasAttribute("data-backup"), ask: askOn(), qa: qaOn() });
   }
   if (channel) {
     channel.onmessage = (e) => {
       const m = e.data || {};
-      if (m.t === "hello") { document.body.classList.add("presenting"); postConsole(); if (isPresenting) channel.postMessage({ t: "key", key: live.presenterKey }); }
+      if (m.t === "hello") { markPresenter(); postConsole(); if (hasKey) channel.postMessage({ t: "key", key: live.presenterKey }); }
       else if (m.t === "go") {
         if (m.dir === "next") advance();
         else if (m.dir === "prev") deck.prev();
         else if (m.id) goTo(m);
       } else if (m.t === "backups") toggleBackups();
       else if (m.t === "ask") setAsk(!!m.on);
+      else if (m.t === "qa") setQa(!!m.on);
     };
   }
   function openConsole(view) {
-    document.body.classList.add("presenting");
-    const u = `present.html?view=${view}${isPresenting ? `&present=${encodeURIComponent(live.presenterKey)}` : ""}`;
+    markPresenter();
+    const u = `present.html?view=${view}${hasKey ? `&present=${encodeURIComponent(live.presenterKey)}` : ""}`;
     window.open(u, `hv-${view}`, "popup,width=1440,height=900");
   }
 
@@ -397,23 +363,20 @@
     fab = document.createElement("div");
     fab.className = "hv-fab";
     const ask = set.questions === "link"
-      ? `<a class="ask" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask</a>`
-      : useQuestions ? `<button type="button" class="ask" aria-expanded="false" title="Questions on this slide (Q)">Ask <span class="badge" hidden>0</span></button>` : "";
-    fab.innerHTML = (set.follow && live.enabled ? `<button type="button" class="follow" aria-pressed="true"><span class="dot"></span><span class="lbl">Following</span></button>` : "") +
-      ask + `<a class="script" href="../talk/">Script</a>` +
-      `<span data-theme-picker></span>`;
+      ? `<a class="btn ask" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask</a>`
+      : useQuestions ? `<button type="button" class="btn ask" aria-expanded="false" title="Questions on this slide (Q)">Ask <span class="badge" hidden>0</span></button>` : "";
+    fab.innerHTML = (set.follow && live.enabled ? `<button type="button" class="btn follow" hidden>Rejoin live</button>` : "") +
+      ask + `<a class="btn script" href="../talk/">Script</a><span data-theme-picker></span>`;
     document.body.appendChild(fab);
     HVTheme.mountAll();
-
     const followBtn = fab.querySelector(".follow");
     const setFollow = (on) => {
       following = on;
       if (!followBtn) return;
-      followBtn.setAttribute("aria-pressed", String(on));
-      followBtn.querySelector(".lbl").textContent = on ? "Following" : "Rejoin live";
+      followBtn.hidden = on;
       if (on && live.slide) goTo(live.slide);
     };
-    if (followBtn) followBtn.addEventListener("click", () => setFollow(!following));
+    if (followBtn) followBtn.addEventListener("click", () => setFollow(true));
     const scriptLink = fab.querySelector(".script");
     const syncScript = () => (scriptLink.href = `../talk/#s-${deck.getCurrentSlide().id}`);
     deck.on("slidechanged", syncScript);
@@ -428,7 +391,7 @@
         <div class="list"></div>
         <form>
           <textarea name="text" maxlength="600" placeholder="Ask something about this slide…" required></textarea>
-          <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)"><button type="submit">Send</button></div>
+          <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)"><button type="submit" class="btn">Send</button></div>
           <div class="note"></div>
         </form>`;
       document.body.appendChild(sheet);
@@ -464,7 +427,6 @@
       deck.on("slidechanged", () => {
         if (!applyingRemote && following && live.slide && live.status === "open" && deck.getCurrentSlide().id !== live.slide.id) setFollow(false);
       });
-      live.on("status", (s) => { if (followBtn) followBtn.disabled = s !== "open"; });
     }
   }
 
@@ -472,14 +434,29 @@
     if (!sheet) return;
     const cur = deck.getCurrentSlide();
     const qs = live.forSlide(cur.id);
+    if (!fab) return;
     const badge = fab.querySelector(".badge");
     badge.hidden = !qs.length;
     badge.textContent = qs.length;
     if (sheet.hidden) return;
     sheet.querySelector(".sheet-title").textContent = titleOf(cur.id);
     sheet.querySelector(".list").innerHTML = qs.length
-      ? qs.map((q) => `<div class="q-item"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}">▲ ${q.votes}</button></div>`).join("")
+      ? qs.map((q) => `<div class="q-item"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" class="btn" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}">▲ ${q.votes}</button></div>`).join("")
       : `<div class="q-empty">No questions yet. Be the first.</div>`;
+  }
+
+  const qaKey = `hv.qa.${set.room}`;
+  const qaOn = () => lsGet(qaKey) === "on";
+  function setQa(on) { lsSet(qaKey, on ? "on" : "off"); renderQa(); postConsole(); }
+  let qaPanel = null;
+  function renderQa() {
+    if (isEmbed || isPoster || isReceiver || !useQuestions) return;
+    const cur = deck.getCurrentSlide();
+    const show = qaOn() || (cur && cur.hasAttribute("data-qa"));
+    const top = show ? live.top(4) : [];
+    if (!qaPanel) { qaPanel = document.createElement("aside"); qaPanel.className = "hv-qa"; document.body.appendChild(qaPanel); }
+    qaPanel.hidden = !top.length;
+    qaPanel.innerHTML = top.map((q) => `<p><b>${q.votes}</b> ${esc(q.text)}</p>`).join("");
   }
 
   // Live board (a :::questions block); falls back to what talk.md wrote inside it.
@@ -495,11 +472,11 @@
   }
   // presenter: double-click a question on the board to hide it
   document.addEventListener("dblclick", (e) => {
-    const it = isPresenting && e.target.closest(".qa-item");
+    const it = hasKey && e.target.closest(".qa-item");
     if (it) live.hide(it.dataset.id);
   });
 
-  function broadcast() { if (isPresenting && set.follow) live.broadcast(currentState()); }
+  function broadcast() { if (hasKey && set.follow) live.broadcast(currentState()); }
 
   // ---------------------------------------------------------- embed bridge
   // The host page steps through builds with {hv:"go", dir} or jumps with {hv:"go", id, f},
@@ -520,7 +497,9 @@
   }
   if (isEmbed) {
     addEventListener("message", (e) => {
-      if (e.origin !== location.origin || !e.data || e.data.hv !== "go") return;
+      if (e.origin !== location.origin || !e.data) return;
+      if (e.data.hv === "hello") return postState();
+      if (e.data.hv !== "go") return;
       if (e.data.id) jump(e.data);
       else if (e.data.dir === "next") deck.next();
       else if (e.data.dir === "prev") deck.prev();
@@ -535,8 +514,7 @@
 
   // ---------------------------------------------------------- wiring
   function onSlide(cur) {
-    fitText(cur);
-    updateChrome(cur);
+    syncItems();
     syncSteppers();
     runAnimations(cur);
     runEmbeds(cur);
@@ -553,8 +531,17 @@
       deck.addKeyBinding({ keyCode: 83, key: "S", description: "Speaker view (script)" }, () => openConsole("speaker"));
       deck.addKeyBinding({ keyCode: 80, key: "P", description: "Presenter view" }, () => openConsole("presenter"));
     }
+    if (isPresenting) document.body.classList.add("presenting");
     if (!isPoster && !isReceiver && !isPresenting && !isEmbed) buildAudienceUI();
     live.on("questions", renderBoard);
+    live.on("questions", renderQa);
+    renderDiagrams();
+    if (isPrint) setTimeout(() => {
+      fields.forEach((f) => { f.resize(); f.draw(); });
+      explainers.forEach((ex, cv) => { const box = cv.closest("[data-stepper]"); ex.resize(); ex.settle(box ? box.querySelectorAll(".step").length : 0); });
+      lives.forEach((d) => d.settle && d.settle());
+    }, 1200);
+    if (params.has("autoprint")) setTimeout(() => print(), 3000);
     live.on("status", (s) => { if (s === "open") broadcast(); });
     live.on("error", (m) => console.warn("[live]", m));
     renderBoard();
@@ -562,8 +549,8 @@
     postState();
     postConsole();
   });
-  deck.on("slidechanged", (e) => { onSlide(e.currentSlide); broadcast(); postConsole(); });
-  ["fragmentshown", "fragmenthidden"].forEach((t) => deck.on(t, () => { syncDesignSpace(); syncSteppers(); broadcast(); postConsole(); }));
+  deck.on("slidechanged", (e) => { onSlide(e.currentSlide); renderQa(); broadcast(); postConsole(); });
+  ["fragmentshown", "fragmenthidden"].forEach((t) => deck.on(t, () => { syncDesignSpace(); syncItems(); syncSteppers(); broadcast(); postConsole(); }));
   deck.on("resize", () => {
     fields.forEach((f) => { f.resize(); f.draw(); });
     // the projector's size is only known now: redraw the explainers sharply for it

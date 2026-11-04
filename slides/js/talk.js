@@ -5,10 +5,9 @@
 // follows the presenter and takes questions per slide.
 (async function () {
   const live = window.HVLive;
+  const preRender = (src) => MDeck.prepare(src, "../slides/");
   const root = document.getElementById("transcript");
   const tocList = document.querySelector(".toc ol");
-  const pill = document.querySelector(".live-pill");
-  const pillText = pill.querySelector(".live-text");
   const frame = document.getElementById("stage-deck");
   const stage = document.querySelector(".talk-stage");
   const pos = stage.querySelector(".pos");
@@ -17,7 +16,9 @@
 
   let talk;
   try {
-    talk = MDeck.render(await fetch("../slides/talk.md", { cache: "no-cache" }).then((r) => r.text()));
+    const md = await fetch("../slides/talk.md", { cache: "no-cache" }).then((r) => r.text());
+    await preRender(md);
+    talk = MDeck.render(md);
   } catch {
     root.innerHTML = `<p class="loading">Couldn't load the talk. <a href="../slides/">Open the slides</a>.</p>`;
     return;
@@ -52,12 +53,12 @@
       <h3 data-f="-1"><span class="n">${n}</span>${esc(s.title)}<span class="live-tag">On screen now</span></h3>
       <div class="prose script"></div>
       ${useQuestions ? `<details class="qs card">
-        <summary>Questions on this slide <span class="count">0</span></summary>
+        <summary>Questions <span class="count">0</span></summary>
         <div class="qs-body">
           <div class="list"></div>
           <form>
             <textarea name="text" maxlength="600" placeholder="Ask about this slide…" required></textarea>
-            <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button class="btn primary" type="submit">Ask</button></div>
+            <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button class="btn" type="submit">Ask</button></div>
             <div class="note"></div>
           </form>
         </div>
@@ -95,6 +96,9 @@
     stepping = true;
     frame.contentWindow.postMessage({ hv: "go", dir: b.dataset.go }, location.origin);
   }));
+  // the deck may have said it's ready before this listener existed: ask it again until it answers
+  const askDeck = () => { try { frame.contentWindow.postMessage({ hv: "hello" }, location.origin); } catch {} };
+  const helloTimer = setInterval(() => { if (ready) clearInterval(helloTimer); else askDeck(); }, 250);
   let stepping = false; // the reader moved the slide itself (buttons or a click on it)
   frame.addEventListener("load", () => {
     // a click inside the slide steps it too
@@ -128,7 +132,16 @@
     const m = markerOf(id, f);
     if (m && m.classList.contains("click")) m.classList.add("at");
     tocList.querySelectorAll("a.here").forEach((a) => a.classList.remove("here"));
-    tocList.querySelector(`a[data-slide="${CSS.escape(id)}"]`)?.classList.add("here");
+    // keep the current entry in view in the sidebar, without moving the page
+    const here = tocList.querySelector(`a[data-slide="${CSS.escape(id)}"]`);
+    if (here) {
+      here.classList.add("here");
+      const box = document.querySelector(".toc-inner");
+      if (box && box.scrollHeight > box.clientHeight) {
+        const a = here.getBoundingClientRect(), b = box.getBoundingClientRect();
+        if (a.top < b.top + 40 || a.bottom > b.bottom - 40) box.scrollTop += a.top - b.top - box.clientHeight / 2 + a.height / 2;
+      }
+    }
   }
   const readingLine = () => stageH() + Math.max(80, (innerHeight - stageH()) * 0.3);
   function scrollToMarker(id, f, smooth = true) {
@@ -208,7 +221,7 @@
       if (c) { c.textContent = qs.length; c.classList.toggle("has", qs.length > 0); }
       const list = el.querySelector(".list");
       if (list) list.innerHTML = qs.length
-        ? qs.map((q) => `<div class="q"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}" aria-label="Upvote">▲ ${q.votes}</button></div>`).join("")
+        ? qs.map((q) => `<div class="q"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" class="btn" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}" aria-label="Upvote">▲ ${q.votes}</button></div>`).join("")
         : `<div class="empty">No questions yet.</div>`;
       const t = tocList.querySelector(`a[data-slide="${CSS.escape(id)}"] .qn`);
       if (t) t.textContent = qs.length || "";
@@ -221,7 +234,6 @@
   function setFollow(on) {
     following = on && !!lastLive;
     liveBtn.hidden = !lastLive || following;
-    pill.classList.toggle("following", following);
     if (following) { show(lastLive.id, lastLive.f); scrollToMarker(lastLive.id, lastLive.f); }
   }
   function onLiveSlide(s) {
@@ -232,14 +244,13 @@
     entries.forEach((x) => x.el.classList.toggle("live", x === e));
     tocList.querySelectorAll("a").forEach((a) => a.classList.toggle("live", a.dataset.slide === s.id));
     if (!e) return;
-    pill.hidden = false;
-    pillText.textContent = `Live · ${e.n === "B" ? "Backup" : Number(e.n)}. ${e.title}`;
     if (first && !location.hash) setFollow(true);
     else if (following) { show(s.id, s.f); scrollToMarker(s.id, s.f); }
     else liveBtn.hidden = false;
   }
   liveBtn.addEventListener("click", () => setFollow(true));
-  pill.addEventListener("click", () => setFollow(true));
+  // this browser is presenting: it never needs to rejoin itself
+  try { if (localStorage.getItem("hv.presenter") === "1") document.body.classList.add("presenting"); } catch {}
   // reading on your own pauses following
   ["wheel", "touchmove"].forEach((t) => addEventListener(t, () => { if (following && !programmatic) setFollow(false); }, { passive: true }));
   addEventListener("keydown", (ev) => {
@@ -249,7 +260,6 @@
   live.start({ endpoint: useFollow || useQuestions ? set.live : "", room: set.room });
   if (useFollow) {
     live.on("slide", onLiveSlide);
-    live.on("status", (s) => { if (s !== "open" && lastLive) pillText.textContent = s === "connecting" ? "Connecting…" : "Offline"; });
     if (live.slide) onLiveSlide(live.slide);
   }
 

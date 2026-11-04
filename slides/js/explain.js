@@ -74,7 +74,7 @@
       new ResizeObserver(() => {
         // only a real size change needs a new layout (the first callback just confirms it)
         if (Math.abs((canvas.clientWidth || 900) - this.w) < 2 && Math.abs((canvas.clientHeight || 600) - this.h) < 2) return;
-        const s = this.step; this.resize(); this.reset(); this.setStep(s, true); this.draw();
+        const s = this.step; this.resize(); if (document.body.classList.contains("poster")) return this.settle(s); this.reset(); this.setStep(s, true); this.draw();
       }).observe(canvas);
       addEventListener("hv-theme", () => { this.readTheme(); this.draw(); });
     }
@@ -108,9 +108,7 @@
       const g = this.ctx;
       g.save(); g.translate(x, y); g.rotate(ang);
       if (cone) {
-        const fr = g.createLinearGradient(r, 0, r * 7, 0);
-        fr.addColorStop(0, rgba(col, 0.16)); fr.addColorStop(1, rgba(col, 0));
-        g.fillStyle = fr; g.beginPath(); g.moveTo(r * 0.95, -r * 0.62); g.lineTo(r * 7, -r * 3.2); g.lineTo(r * 7, r * 3.2); g.lineTo(r * 0.95, r * 0.62); g.closePath(); g.fill();
+        g.fillStyle = rgba(col, 0.08); g.beginPath(); g.moveTo(r * 0.95, -r * 0.62); g.lineTo(r * 7, -r * 3.2); g.lineTo(r * 7, r * 3.2); g.lineTo(r * 0.95, r * 0.62); g.closePath(); g.fill();
       }
       g.fillStyle = rgba(this.c.person, 1); g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.fill(); // people are grey: colour means attention
       g.strokeStyle = rgba(this.c.bg, 0.55); g.lineWidth = Math.max(1.5, r * 0.16);
@@ -449,9 +447,7 @@
         if (t.found) {
           found++;
           const pop = ease(t.at / 0.4);
-          const glow = g.createRadialGradient(x, y, 0, x, y, s * 0.9);
-          glow.addColorStop(0, rgba([255, 255, 255], 0.75 * pop)); glow.addColorStop(1, rgba([255, 255, 255], 0));
-          g.fillStyle = glow; g.beginPath(); g.arc(x, y, s * 0.9, 0, Math.PI * 2); g.fill();
+          g.fillStyle = rgba([255, 255, 255], 0.4 * pop); g.beginPath(); g.arc(x, y, s * 0.9, 0, Math.PI * 2); g.fill();
           g.fillStyle = "#fff"; g.fillRect(x - s * 0.22, y - s * 0.22, s * 0.44, s * 0.44);
           g.strokeStyle = rgba(C[t.found], 1); g.lineWidth = 3; g.strokeRect(x - s * 0.22, y - s * 0.22, s * 0.44, s * 0.44);
         } else if (this.step >= 1) {
@@ -468,9 +464,7 @@
       for (const ag of this.agents) {
         const [x, y] = this.cellXY(ag.x, ag.y), col = C[ag.color];
         if (this.step >= 2) { g.setLineDash([3, 5]); g.strokeStyle = rgba(col, 0.75); g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, s * 1.1, 0, Math.PI * 2); g.stroke(); g.setLineDash([]); }
-        const glow = g.createRadialGradient(x, y, 0, x, y, s * 0.9);
-        glow.addColorStop(0, rgba(col, 0.4)); glow.addColorStop(1, rgba(col, 0));
-        g.fillStyle = glow; g.beginPath(); g.arc(x, y, s * 0.9, 0, Math.PI * 2); g.fill();
+        g.fillStyle = rgba(col, 0.2); g.beginPath(); g.arc(x, y, s * 0.9, 0, Math.PI * 2); g.fill();
         g.strokeStyle = rgba(col, 1); g.lineWidth = 3; g.beginPath(); g.arc(x, y, s * 0.3, 0, Math.PI * 2); g.stroke();
       }
       // header line: clock, and what this phase shows
@@ -549,9 +543,7 @@
     }
     sphere(S, show, local) {
       const g = this.ctx, C = this.c, R = this.R;
-      const sh = g.createRadialGradient(S.x - R * 0.35, S.y - R * 0.4, R * 0.1, S.x, S.y, R * 1.05);
-      sh.addColorStop(0, rgba(C.geo, 0.55)); sh.addColorStop(1, rgba(C.geo, 1));
-      g.fillStyle = sh; g.beginPath(); g.arc(S.x, S.y, R, 0, Math.PI * 2); g.fill();
+      g.fillStyle = rgba(C.geo, 1); g.beginPath(); g.arc(S.x, S.y, R, 0, Math.PI * 2); g.fill();
       g.save(); g.beginPath(); g.arc(S.x, S.y, R, 0, Math.PI * 2); g.clip();
       const cs = this.cell, x0 = S.x - R, y0 = S.y - R;
       for (const c of this.cells) {
@@ -566,10 +558,6 @@
         g.strokeStyle = rgba(C.bg, 0.22); g.lineWidth = 1;
         g.strokeRect(x + 0.5, y + 0.5, cs - 1, cs - 1);
       }
-      // shading so the disc reads as a ball
-      const rim = g.createRadialGradient(S.x - R * 0.3, S.y - R * 0.35, R * 0.2, S.x, S.y, R);
-      rim.addColorStop(0, "rgba(255,255,255,0.18)"); rim.addColorStop(0.7, "rgba(0,0,0,0)"); rim.addColorStop(1, "rgba(0,0,0,0.22)");
-      g.fillStyle = rim; g.fillRect(S.x - R, S.y - R, R * 2, R * 2);
       g.restore();
     }
     person(p) {

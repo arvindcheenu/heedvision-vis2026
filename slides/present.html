@@ -6,29 +6,23 @@
   <title>HeedVision · Presenter</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <script src="../shared/site.js?v=20261105"></script>
-  <link rel="stylesheet" href="../shared/hv.css?v=20261105">
-  <link rel="stylesheet" href="css/present.css?v=20261105">
+  <script src="../shared/site.js?v=20261110"></script>
+  <link rel="stylesheet" href="../shared/hv.css?v=20261110">
+  <link rel="stylesheet" href="css/present.css?v=20261110">
 </head>
-<!--
-  Presenter view (P from the slides) and speaker view (S): open the slides first,
-  then this window drives them. Both run in the same browser and talk over a
-  BroadcastChannel. On another device the speaker view follows the live room.
--->
+<!-- Press P on the slides for the presenter view, S for the speaker view. This window drives them. -->
 <body class="view-presenter">
   <header class="pv-head">
-    <div class="pv-tabs" role="tablist">
-      <button type="button" data-view="presenter" role="tab">Presenter</button>
-      <button type="button" data-view="speaker" role="tab">Speaker</button>
-    </div>
+    <button type="button" class="btn" data-view="presenter">Presenter</button>
+    <button type="button" class="btn" data-view="speaker">Speaker</button>
     <div class="pv-timer">
-      <b class="elapsed" title="Time since you started">0:00</b>
+      <b class="elapsed" title="Time so far">0:00</b>
       <span class="pace"></span>
-      <span class="clock"></span>
-      <button type="button" class="btn small start">Start</button>
-      <button type="button" class="btn small reset" title="Reset the timer">Reset</button>
+      <button type="button" class="btn toggle">Start</button>
+      <button type="button" class="btn reset">Reset</button>
+      <button type="button" class="btn auto" aria-pressed="true" title="Start and resume the timer when the slides move">Auto-resume</button>
     </div>
-    <div class="pv-link"><span class="dot"></span><span class="txt">Looking for the slides…</span></div>
+    <span class="pv-link"></span>
     <span data-theme-picker></span>
   </header>
 
@@ -36,51 +30,28 @@
     <section class="pv-current">
       <div class="pv-frame"><iframe title="Current slide" data-role="current" tabindex="-1"></iframe></div>
       <div class="pv-meta"><span class="pos"></span><span class="title"></span></div>
-      <div class="pv-bar" aria-hidden="true"><i></i></div>
     </section>
-
     <section class="pv-next">
-      <div class="lbl">Next</div>
-      <div class="pv-frame"><iframe title="Next build" data-role="next" tabindex="-1"></iframe><div class="end" hidden>End of the talk.<br><small>Backups: press B</small></div></div>
+      <div class="pv-frame"><iframe title="Next build" data-role="next" tabindex="-1"></iframe><div class="end" hidden>End of the talk</div></div>
       <div class="next-title"></div>
     </section>
-
-    <section class="pv-notes">
-      <header>
-        <span class="lbl">Script</span>
-        <span class="save-state" aria-live="polite"></span>
-        <button type="button" class="btn small edit" title="Edit this slide's script (E)">Edit</button>
-      </header>
-      <div class="notes"></div>
-      <div class="editing" hidden>
-        <textarea spellcheck="true" aria-label="Script for this slide (markdown; [click] marks a build)"></textarea>
-        <div class="edit-bar">
-          <button type="button" class="btn small primary save">Save</button>
-          <button type="button" class="btn small cancel">Cancel</button>
-          <button type="button" class="btn small revert" title="Go back to the text in talk.md">Use talk.md</button>
-          <span class="hint">Markdown · <code>[click]</code> marks a build · ⌘↵ saves · Esc cancels</span>
-        </div>
-      </div>
-    </section>
-
+    <section class="pv-notes"><div class="notes"></div></section>
     <section class="pv-side">
       <nav class="pv-ctl">
-        <button type="button" class="btn" data-go="prev" title="Previous (←)">‹ Back</button>
-        <button type="button" class="btn primary" data-go="next" title="Next (→, space)">Next ›</button>
-        <button type="button" class="btn" data-backups title="Backup slides (B)">Backups</button>
-        <button type="button" class="btn" data-ask aria-pressed="true" title="On: the QR code opens the talk page, to follow along and ask. Off: it opens the project site.">Ask: on</button>
-        <button type="button" class="btn" data-download title="talk.md with every edit applied">Download talk.md</button>
+        <button type="button" class="btn" data-go="prev" title="Previous (←)">Back</button>
+        <button type="button" class="btn" data-go="next" title="Next (→, space)">Next</button>
+        <button type="button" class="btn" data-ask aria-pressed="true" title="On: the QR code opens the script page, to follow along and ask. Off: it opens the project site.">QR opens questions</button>
+        <button type="button" class="btn" data-qa aria-pressed="false" title="Show the top questions on the projected slide (Q)">Questions on slide</button>
+        <a class="btn" href="index.html?view=print&amp;autoprint" target="_blank" rel="noopener">Export PDF</a>
       </nav>
-      <div class="pv-lists">
-        <div class="pv-backups"><div class="lbl">Backup slides</div><ol></ol></div>
-        <div class="pv-questions" hidden><div class="lbl">Questions <span class="count"></span></div><ol></ol></div>
-      </div>
+      <div class="pv-backups" hidden><ol></ol></div>
+      <div class="pv-questions" hidden><ol></ol></div>
     </section>
   </main>
 
-  <script src="vendor/marked.js?v=20261105"></script>
-  <script src="js/mdeck.js?v=20261105"></script>
-  <script src="js/live.js?v=20261105"></script>
-  <script src="js/present.js?v=20261105"></script>
+  <script src="vendor/marked.js?v=20261110"></script>
+  <script src="js/mdeck.js?v=20261110"></script>
+  <script src="js/live.js?v=20261110"></script>
+  <script src="js/present.js?v=20261110"></script>
 </body>
 </html>

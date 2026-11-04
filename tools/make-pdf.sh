@@ -1,28 +1,12 @@
 #!/usr/bin/env bash
-# Exports a PDF backup of the deck: one 1920x1080 page per slide, builds shown.
-# (Image-based: reveal's own print view needs a visible window to lay out.)
-# Needs a local server on :8000 (node tools/serve.mjs) and Google Chrome.
-# THEME=light or THEME=dark picks the colours (default light).
+# Exports the slides as a PDF, one page per slide with every build showing.
+# Needs the local server (node tools/serve.mjs) and Google Chrome. You can also open
+# /slides/?view=print in a browser and print to PDF, or use Export PDF in the presenter view.
 set -euo pipefail
-curl -sf -o /dev/null "${BASE:-http://127.0.0.1:8000}/slides/index.html" || { echo "No server on ${BASE:-http://127.0.0.1:8000}; start one with: node tools/serve.mjs" >&2; exit 1; }
-cd "$(dirname "$0")/.."
-CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 BASE="${BASE:-http://127.0.0.1:8000}"
+OUT="${OUT:-slides.pdf}"
+curl -sf -o /dev/null "$BASE/slides/index.html" || { echo "No server on $BASE; start one with: node tools/serve.mjs" >&2; exit 1; }
+CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
-shot() {
-  "$CHROME" --headless=new --disable-gpu --hide-scrollbars --mute-audio \
-    --window-size=1920,1080 --force-device-scale-factor=1 \
-    --virtual-time-budget=6000 --user-data-dir="$TMP/profile" "$@" >/dev/null 2>&1
-}
-pages=""
-for id in $(grep -E '^id: ' slides/talk.md | sed -E 's/^id: *//'); do
-  shot --screenshot="$TMP/$id.png" "$BASE/slides/?poster&theme=${THEME:-light}#/$id"
-  pages="$pages<img src=\"$id.png\">"
-  echo "page: $id"
-done
-cat > "$TMP/print.html" <<HTML
-<!doctype html><style>@page{size:1920px 1080px;margin:0}html,body{margin:0;background:#fff}
-img{display:block;width:1920px;height:1080px;break-after:page}</style>$pages
-HTML
-shot --allow-file-access-from-files --no-pdf-header-footer --print-to-pdf="$PWD/heedvision-vis2026.pdf" "file://$TMP/print.html"
-echo "wrote heedvision-vis2026.pdf"
+"$CHROME" --headless=new --hide-scrollbars --mute-audio --no-pdf-header-footer --virtual-time-budget=15000 --user-data-dir="$TMP" --print-to-pdf="$OUT" "$BASE/slides/?view=print&theme=${THEME:-light}" >/dev/null 2>&1
+echo "wrote $OUT"

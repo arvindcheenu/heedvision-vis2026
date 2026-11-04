@@ -223,10 +223,7 @@
       this.agents.forEach((ag) => {
         const px = ox + ag.x * pitch + cell / 2, py = oy + ag.y * pitch + cell / 2;
         const [R, G, B] = ag.color;
-        const glow = ctx.createRadialGradient(px, py, 0, px, py, cell * 1.6);
-        glow.addColorStop(0, `rgba(${R},${G},${B},0.35)`);
-        glow.addColorStop(1, `rgba(${R},${G},${B},0)`);
-        ctx.fillStyle = glow;
+        ctx.fillStyle = `rgba(${R},${G},${B},0.2)`;
         ctx.beginPath(); ctx.arc(px, py, cell * 1.6, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = this.theme.ink;
         ctx.lineWidth = 3;

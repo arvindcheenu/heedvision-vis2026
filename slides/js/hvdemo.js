@@ -108,11 +108,7 @@ function skyTexture() {
   const c = document.createElement("canvas");
   c.width = 4; c.height = 256;
   const g = c.getContext("2d");
-  const grad = g.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, "#b9b7b6");
-  grad.addColorStop(0.62, "#dedddc");
-  grad.addColorStop(1, "#efefef");
-  g.fillStyle = grad; g.fillRect(0, 0, 4, 256);
+  g.fillStyle = "#dedddc"; g.fillRect(0, 0, 4, 256); // flat, like everything on the slides
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
