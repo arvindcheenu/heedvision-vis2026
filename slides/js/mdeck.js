@@ -305,7 +305,7 @@
     "figure-text": { columns: "7 5" },
     "text-figure": { columns: "5 7" },
     grid: { columns: "1 1 1", rows: "1 1" },
-    "figure-strip": { columns: "1", rows: "1 1" },
+    "figure-strip": { columns: "1", rows: "3 2" },
   };
 
   // Beamer's headline and footline. Every slide carries its own, so they print and stay put.
@@ -368,7 +368,7 @@
         const notes = items.filter((x) => x.startsWith('<p class="c-caveat'));
         const body = items.filter((x) => !notes.includes(x));
         inner = `<header class="frametitle"><h2>${mdi(headline)}</h2>${dek ? `<p>${mdi(dek)}</p>` : ""}</header>
-          <div class="s-body" style="grid-template-columns:${cols}${rows ? `;grid-template-rows:${rows}` : ""}">${body.join("")}</div>${notes.length ? `<footer class="s-foot">${notes.join("")}</footer>` : ""}`;
+          <div class="s-main"><div class="s-body" style="grid-template-columns:${cols}${rows ? `;grid-template-rows:${rows}` : ""}">${body.join("")}</div>${notes.length ? `<footer class="s-foot">${notes.join("")}</footer>` : ""}</div>`;
       }
       const kind = LAYOUTS[layout] ? "frame" : layout;
       return { id, title, chapter, layout, kind, backup, sm, time: parseFloat(sm.time) || 0, notes: renderNotes(notesMd), notesMd, inner };

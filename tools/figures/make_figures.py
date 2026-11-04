@@ -62,7 +62,11 @@ def panel(ax, title, stat, off, on, ylim, ticks, fmt, base=0):
             mean = vals
             ax.vlines(x, base, mean, color=color, linewidth=7, zorder=2)
             ax.scatter([x], [mean], s=440, color=color, zorder=3, clip_on=False)
-        ax.annotate(fmt(mean), (x + 0.33, mean), va="center", fontsize=34, fontweight="bold", color=INK if color == GREY else ACCENT)
+        label = dict(fontsize=34, fontweight="bold", color=INK if color == GREY else ACCENT)
+        if isinstance(vals, list):
+            ax.annotate(fmt(mean), (x + 0.33, mean), va="center", **label)
+        else:  # a stem has a neighbour to its right: the value goes on top
+            ax.annotate(fmt(mean), (x, mean), xytext=(0, 18), textcoords="offset points", ha="center", va="bottom", **label)
     ax.set_xlim(-0.5, 2.0)
     ax.set_ylim(*ylim)
     ax.set_xticks([0, 1], ["No-CAAV", "CAAV"])
