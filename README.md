@@ -1,154 +1,142 @@
-# HeedVision — project page and talk
+# Talk site
 
-Static project page and IEEE VIS 2026 talk for:
+A paper's project page, its slides, and a script page that follows the speaker. Static files, no build step, no dependencies. Fork it and it's yours.
 
-**HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments**
-Arvind Srinivasan and Niklas Elmqvist (Aarhus University)
-IEEE VIS 2026 — IEEE Transactions on Visualization and Computer Graphics (special issue)
+This one is for **HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments** (Arvind Srinivasan and Niklas Elmqvist, IEEE VIS 2026), live at <https://heedvision.arvindchee.nu>.
 
-Live at <https://heedvision.arvindchee.nu>
+## Make it yours
 
-## Structure
+1. **Fork**, then turn on GitHub Pages (Settings → Pages → Deploy from a branch → `main`, `/`). Delete `CNAME`, or put your own domain in it.
+2. **`site.config.js`**: title, authors, accent colour, fonts, logos.
+3. **`project.md`**: the project page, in markdown.
+4. **`slides/talk.md`**: the talk, in markdown. See [Slides](#slides).
+5. **`npm run dev`** to work with live reload, and to draw new layouts. See [Layouts](#layouts).
 
-    index.html            project page (no build step)
-    heedvision.pdf        author preprint (15 pp, appendices included)
-    assets/               teaser (WebP + PNG fallback), author photos
-    CNAME                 custom domain for GitHub Pages
+To drop what's specific to HeedVision: delete `slides/plugins/hv-*` and `plugins: hv-live` in `talk.md`, and replace `slides/assets/`, `assets/`, `heedvision.pdf`, and `tools/figures/`.
 
-    shared/               design system (hv.css), theme toggle, fonts, logos
-    slides/talk.md        the talk: settings, slides, script, components
-    slides/               the deck engine (reveal.js 6 + markdown components)
-    talk/                 transcript: the slide pinned on top, the script below
-    worker/               Cloudflare Worker for live follow-along and questions
-    tools/                local server (saves script edits) and PDF export
-
-All three pages share one design system; see [Design](#design).
-
-## Editing
-
-There is no build step. Edit and push; GitHub Pages redeploys. To work locally, run `node tools/serve.mjs` and open <http://localhost:8000>. If you change a `.js` or `.css` file, bump the `?v=` number on its `<script>`/`<link>` tags so returning visitors don't mix old and new code (editing `talk.md` doesn't need this).
-
-The arXiv button and its entry under *Materials* hide themselves automatically while their `href` is still the literal `ARXIV_URL`. Replace both occurrences to switch them on.
-
-## The talk
-
-Everything about the talk lives in **`slides/talk.md`**: settings, slides, script and custom components. The deck (`/slides/`), the transcript (`/talk/`) and the Talk section on this page all read that one file, so there is nothing else to keep in sync. Push it and GitHub Pages redeploys.
-
-### Settings (top of `talk.md`)
-
-```yaml
----
-title: HeedVision
-url: https://heedvision.arvindchee.nu/talk/   # QR code target while asking is on
-site: https://heedvision.arvindchee.nu/       # QR code target when asking is off
-photos: assets/people/arvind.jpg, assets/people/niklas.jpg   # title-slide portraits, in author order
-duration: 9.6                                 # minutes, for presenter-view pacing
-questions: on      # on | off | a link to the venue's own Q&A tool
-follow: on         # audience pages follow your slide
-live: https://heedvision-live.arvindcheenu.workers.dev
-room: vis2026
----
+```
+site.config.js      title, authors, accent, fonts, logos
+project.md          the project page
+slides/talk.md      slides and script
+slides/layouts.json layouts, drawn in the editor
+slides/plugins/     your own components, one file each
+slides/assets/      figures and photos
+tools/serve.mjs     local server; --dev turns on the editor
+tools/editor/       the layout editor
+tools/figures/      plots, drawn from CSVs
+worker/             optional live relay (follow the speaker, questions)
 ```
 
-If the venue runs its own Q&A, set `questions: off` or paste their link. The Ask buttons and question threads then go away or point to that link, and the QR codes on the title and end slides open the project site (`site:`) instead of the talk page. The presenter view's **Ask** button does the same on the spot, for the slides on this computer.
+## Slides
 
-### A slide
+`slides/talk.md` is the deck, the speaker notes and the script page at once.
 
 ```markdown
 ---
 id: scatter
-chapter: Study
-kicker: Result 1 · Scatterplot
-columns: 1 1
-time: 23
+layout: stage
+time: 64
 ---
 
-# Without landmarks, pairs duplicated 70% less and found more targets
+# Scatterplot
 
-::compare label="Duplicated search" a=11.3 b=3.3 a-label="Cues off" b-label="Cues on" change="−70%" tone=both
-::compare label="Targets found" a=62.4 b=78.5 change="+16 pts" tone=you step
+## Less redundancy, more targets
+
+::stage::
+::plot src=assets/fig/plot-scatter.svg alt="…"
+
+::foot::
+Dots: pairs. Bars: means.
 
 :::notes
-What you say. [click] marks where you advance.
+What you say. [click] marks a build.
 :::
 ```
 
-A slide with `backup: yes` is a spare answer for Q&A: it is listed in the script under *Backup*, and skipped when presenting (the talk stops at the end slide; open backups from the presenter view or with **B**).
-
-There are five layouts: `title`, `section`, `photo`, `content` (the default) and `end`. The headline is the slide's one message, written as a sentence. `section` and `photo` take `image:` (a section's photo is toned to the brand colours; a photo slide shows it full-bleed, with `credit:` as a source line and `cite:` for the paper behind its example). `align: center` keeps tiles at their natural height, centred on the slide.
-
-Keep `kicker:` (the running head over the headline) for wayfinding only, such as `RQ2 · Record`, `Result 1 · Scatterplot` or `Backup · …`; most slides don't need one.
-
-### Components
+`# Title` and `## Subtitle` fill the slots of those names. `::name::` starts the slot called `name`. A slot takes markdown, including tables, and any component:
 
 | Component | Use |
 |---|---|
-| `::stat value= label= sub=` | one big number |
-| `::compare a= b= a-label= b-label= unit= change=` | before/after on one scale, starting at zero |
-| `::dots n= of= label=` | n of m people |
-| `::image src= caption= fit=` / `::video src= poster= caption=` | media |
-| `:::card label= title= icon= cite= steps` | text tile; `icon` (eye layers palette pin person search gauge toggle fade) sits beside the heading, `cite` adds a small source line, `steps` reveals list items one by one |
-| `:::quote who=` | participant quote |
-| `:::steps reveal tones= icons=` | stages from a list; end an item with `{RQ1}` for a corner label, or `{RQ1 | the question}` to show its wording too |
-| `::clip src= poster= title= caption= ratio=` | looping video with its caption underneath |
-| `::live tag="…"` | the HeedVision demo, forked: two headsets side by side over one shared voxel store (drag a view, scroll, click the sphere to hide or show voxels) |
-| `::venn a= b= a-label= b-label=` | what a pair gain means, as overlapping finds |
-| `::art name=split` | line illustration in the text colour |
-| `:::row` / `:::stack` | put components beside or under each other |
-| `::demo modes= steps snapshot bare` | attention simulation; modes (`none count sum max diff who`) step in the order given; `snapshot` freezes one recorded session |
-| `::layers src="a, b, c" captions="A \| B \| C" steps` | images that build one over the other |
-| `::bvh steps` `::hunt steps` `::hv steps` | animated explainers: BVH voxelization, the treasure hunt, HeedVision's two headsets |
-| `::designspace highlight= badge= done= trigger=` | the 2×2 design space; highlight one or more corners |
-| `::glyph type=` `::caveat` `::qr` `::logos` | talk-specific pieces |
-| `:::questions` | live question board; shows its own content when questions are off |
+| `::figure src= alt= caption= fit=contain\|cover` | an image |
+| `::plot src= alt= caption=` | an SVG inlined into the slide, so it takes your fonts and accent |
+| `::video src= poster=` | plays while its slide is up |
+| `::stat value= label= sub=` | a number |
+| `:::quote who=` | a quote |
+| `:::row` `:::stack` | beside or under each other |
+| `::qr label=auto` `::authors` `::logos` `::page` | from your config |
 
-Any component takes `step` (appear on a click), `wide` (span all columns), `tall` (span two rows) and `tone=you|partner|both|brand`. Colour words in text can be highlighted with `<mark class="you">blue</mark>` (also `partner`, `both`). You can make your own in the file:
+Add `step` to any of them to show it on a click, and `step=2` to fix its click number. Slides with `backup: yes` are skipped when presenting; **B** opens them.
+
+Make your own, in the file:
 
 ```markdown
 :::define callout
-<div class="tile c-callout">
-
-{{content}}
-
-</div>
-:::
-
-:::callout
-Anything in **markdown**.
+<div class="my-callout">{{content}}</div>
 :::
 ```
 
-### Presenting
+Or as a plugin, for anything interactive: `slides/plugins/hv-live.js` is a short example. List plugins with `plugins: a, b` at the top of `talk.md`.
 
-1. Open the slides: `https://heedvision.arvindchee.nu/slides/?present=<key>`. The key is in `worker/.presenter-key` (git-ignored); to change it, run `npx wrangler secret put PRESENTER_KEY` in `worker/`.
-2. Press **P** for the presenter view (current and next build, timer paced against each slide's `time:`, script, backups, questions) or **S** for the speaker view (the script, large). Both open in a window of their own and drive the slides; keep that window on your laptop screen. Use either one's tab to switch.
-3. The audience scans the QR code. `/talk/` follows you, with the slide pinned above the script.
+## Layouts
 
-Keys on the slides: **→ / space** next, **←** back, **B** backups (and back), **T** light or dark, **R** live demo or recording, **Q** questions.
+A layout is a list of regions on a 1920×1080 page, stored in `slides/layouts.json`. You draw layouts, then write slides that use them in markdown.
 
-**Editing the script while rehearsing.** In the presenter or speaker view, press **E** (or *Edit*) and change the text; `[click]` marks a build. Saving:
+```bash
+npm run dev
+```
 
-- with `node tools/serve.mjs` running, writes it straight into `slides/talk.md`;
-- with the presenter key, sends it to the live relay, so `/talk/` shows it at once (until `talk.md` itself changes);
-- always keeps it in this browser. *Download talk.md* gives you the file with every edit applied, to commit.
+Open the link it prints in your terminal. Then:
 
-Run it locally with `node tools/serve.mjs`, then open <http://localhost:8000/slides/>. Press **R** on a slide with a recording to switch to a live demo, if `talk.md` sets `demo-<name>: <url>`.
+- **Drag** from the left onto the page: slots (filled from markdown), fixed text, images, shapes and lines, and components, which render for real as you place them.
+- **Move and resize** on the page. Regions snap to a grid, to each other and to the page centre; hold ⌥ to place freely.
+- **Set everything** on the right: position, font, size, weight, colour, alignment, fill, border, radius, padding, opacity, order, the click it appears on, and any CSS. Each layout can have its own CSS too.
+- **Save as block** keeps a styled region in your palette.
+- **Preview with** shows a layout with a real slide's content.
+- Press **Save**, and copy the markdown the editor gives you for that layout. From then on it's markdown: any slide can say `layout: your-layout`. The **Markdown** tab edits `talk.md` with a live preview, or use your own editor; the slides reload when a file changes.
 
-### Live relay
+Keys: arrows nudge, ⌘Z undo, ⌘D duplicate, ⌫ delete, ⌘S save.
 
-`worker/` is one Durable Object per room, with SQLite storage and hibernating WebSockets, on the Workers free plan. Deploy with `npx wrangler deploy` in `worker/`. Allowed origins are in `worker/wrangler.jsonc`. To test locally, run `npx wrangler dev --port 8787` and add `?live=http://127.0.0.1:8787` to the URLs.
+### Why the editor can't be opened by accident
 
-### Tools
+`npm start` is read-only. Only `npm run dev` turns on editing, and that lasts until you stop it.
 
-- `node tools/serve.mjs` serves the site on :8000 and lets the presenter view save script edits into `talk.md` (only from this machine).
-- `tools/make-pdf.sh` writes `heedvision-vis2026.pdf`, a backup with one page per slide (`THEME=light` for light). Needs the local server and Google Chrome.
+- The server listens on this machine only, and makes a new token each run. Only the link printed in your terminal unlocks the editor.
+- Saving also needs the session that link sets, a matching Host and Origin, and a custom header, so other sites open in your browser can't reach it.
+- Only `slides/talk.md` and `slides/layouts.json` can be written, and layouts are checked before they are.
+- Nothing in the slides links to the editor, and no key opens it. The published site is static, so it has nothing to save to: the editor page there only says it needs dev mode.
 
-## Design
+## Presenting
 
-`shared/hv.css` holds the tokens (VIS 2026 pink, orange, brown and peach, plus the study's blue/orange/pink), the type (Fraunces and Google Sans Flex) and the header, footer, cards and buttons used by every page. `shared/site.js` remembers the light or dark choice across pages and open tabs (`?theme=light|dark` forces one). The deck adds `slides/css/deck.css` on top, with its own light and dark tokens; card and quote text is fitted to each slide's tiles when the slide is shown.
+Open the slides, press **P** for the presenter view or **S** for the speaker view (the script, large). They open in their own window and drive the slides; put that one on your laptop. Once one is open, the projected slides show no controls.
 
-## Links
+Keys: arrows or space to move, **P**/**S** to switch view, **A** to choose what the QR code opens, **B** for backups. Click the time to reset it.
 
-- Data, analysis code, and system source: <https://osf.io/frsp8/>
+To have the audience's pages follow you, open `slides/?present=<key>`. See below.
 
-reveal.js (MIT), marked (MIT), qrcode-generator (MIT), Fraunces and Google Sans Flex (SIL OFL).
+## Live relay (optional)
+
+Audience pages can follow your slide, and take questions per slide. It's a Cloudflare Worker in `worker/`, free tier.
+
+1. `cd worker`, put your site in `wrangler.jsonc`'s allowed origins, then `npx wrangler deploy`.
+2. `npx wrangler secret put PRESENTER_KEY`, and keep the key private.
+3. At the top of `talk.md` set `live:` to the worker's URL and `room:` to a name.
+
+`questions: on | off | <a link to the venue's Q&A>` and `follow: on | off` control the rest. With `questions: off`, the QR code opens your project site instead of the script page. Delete those lines to run without any of it.
+
+## Look
+
+`accent` in `site.config.js` is the only colour in the interface. Everything else is greys, in `shared/site.css`. Figures keep their own colours. Fonts are the system stacks: `fonts: { heading: "serif", body: "sans" }`, or any CSS font stack. Slides are always light; the other pages follow the system.
+
+## Figures
+
+`npm run figures` redraws the result plots in `slides/assets/fig/` from `tools/figures/data/`. The plots are SVG with live text, so they follow your fonts and accent. It needs Python with matplotlib and scipy.
+
+The HeedVision data: `per_pair.csv` and `conditions.csv` come from the OSF package, and reproduce the means reported in the paper. `attention_fig9.csv` is read back from the paper's Fig. 9 image, as the script that made it isn't in the package. Everything is at <https://osf.io/frsp8/>.
+
+## Tools
+
+- `npm start`: serve the site, read-only, on :8000 (`--port=` to change).
+- `npm run dev`: the same, plus the editor, saving and live reload.
+- `npm run pdf`: a PDF of the slides, as a backup. Needs `npm start` and Google Chrome.
+
+reveal.js, marked, qrcode-generator, three.js and three-mesh-bvh are vendored in `slides/vendor/`, under their own MIT licenses.

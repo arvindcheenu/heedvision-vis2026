@@ -1,181 +1,19 @@
 <!doctype html>
-<!--
-  HeedVision project page. Static, no build step; shares its design with /talk/ and /slides/
-  through shared/hv.css.
-
-  Before publishing, fill in ARXIV_URL (appears twice). Until then the arXiv
-  button and its Materials entry hide themselves.
--->
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments — IEEE VIS 2026</title>
-<meta name="description" content="We introduce collaborative attention-aware visualizations (CAAVs) that track, record, and revisualize the collective attention of multiple users over time, implemented in HeedVision, a WebXR system for AR/VR headsets.">
-<meta name="author" content="Arvind Srinivasan, Niklas Elmqvist">
-
-<meta property="og:type" content="article">
-<meta property="og:title" content="HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments">
-<meta property="og:description" content="Collaborative attention-aware visualizations (CAAVs) that track, record, and revisualize the collective attention of multiple users over time. IEEE VIS 2026 / TVCG.">
-<meta property="og:image" content="assets/teaser.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="shared/logos/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="shared/hv.css?v=20261111">
-<script src="shared/site.js?v=20261111"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HeedVision</title>
+  <meta name="description" content="">
+  <script src="site.config.js"></script>
+  <script src="shared/site.js"></script>
+  <link rel="stylesheet" href="shared/site.css">
 </head>
 <body>
-
-<header class="site-head">
-  <a class="brand" href="./"><img src="shared/logos/mark.svg" alt=""><span>HeedVision</span></a>
-  <nav class="site-nav">
-    <a class="opt" href="./" aria-current="page">Paper</a>
-    <a href="talk/">Talk</a>
-    <a href="slides/" target="_blank" rel="noopener">Slides</a>
-  </nav>
-  <div class="head-end">
-    <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle dark mode">
-      <svg class="theme-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7.5 7.5 0 0 0 8.3 12.4A9 9 0 1 1 12 3z"/></svg>
-      <svg class="theme-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </button>
-  </div>
-</header>
-
-<main class="page">
-  <div class="kicker">IEEE VIS 2026 · TVCG special issue</div>
-  <h1 class="page-title">HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</h1>
-  <p class="page-sub">Tracking, recording, and revisualizing the collective attention of collaborators in shared immersive environments.</p>
-
-  <div class="authors">
-    <a class="author" href="https://orcid.org/0000-0002-3409-6077" target="_blank" rel="noopener">
-      <img src="assets/arvind-srinivasan.png" alt="" loading="lazy"><span><b>Arvind Srinivasan</b><small>Aarhus University</small></span>
-    </a>
-    <a class="author" href="https://orcid.org/0000-0001-5805-5301" target="_blank" rel="noopener">
-      <img src="assets/niklas-elmqvist.png" alt="" loading="lazy"><span><b>Niklas Elmqvist</b><small>Aarhus University</small></span>
-    </a>
-  </div>
-
-  <div class="actions">
-    <!-- ARXIV_URL: replace the href once the preprint is posted. -->
-    <a class="btn primary" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg> arXiv</a>
-    <a class="btn" id="pdf-btn" href="heedvision.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg> PDF</a>
-    <a class="btn" href="talk/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg> Talk</a>
-    <a class="btn" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg> OSF</a>
-  </div>
-
-  <figure class="figure card section">
-    <picture>
-      <source srcset="assets/teaser.webp" type="image/webp">
-      <img src="assets/teaser.png" alt="Three-panel overview. Panel A shows the collaborative attention-aware visualization design space as a two-by-two grid crossing world space against camera space with embedded against separated presentation, plus always-on, explicit, and implicit triggering options; the world-space embedded quadrant is marked as evaluated and the other three as implemented. Panel B shows two co-located users in a mixed reality environment viewing a terrain visualization overlaid with voxel attention cues, coloured blue for User A, orange for User B, and pink where both users attended. Panel C shows the treasure hunt evaluation across a terrain visualization and a 3D scatterplot, with and without attention cues." width="1584" height="415">
-    </picture>
-    <figcaption><strong>HeedVision overview.</strong>
-      (A) A Collaborative Attention-Aware Visualization design space covering attention capture, presentation, situatedness, and triggering.
-      (B) HeedVision implements this in a co-located mixed reality setting using voxel-based coverage maps for shared attention.
-      (C) We evaluate it through a treasure hunt task across terrain and scatterplot visualizations with and without attention cues, revealing context-dependent benefits in abstract environments lacking natural reference points.</figcaption>
-  </figure>
-
-  <section class="section">
-    <h2 class="section-title">Abstract</h2>
-    <div class="prose abstract"><p><em>Group awareness</em>, the ability to perceive the activities of collaborators in a shared space, is a vital mechanism to support effective coordination and joint data analysis in collaborative visualization.
-      We introduce <em>collaborative attention-aware visualizations</em> (CAAVs) that track, record, and revisualize the collective attention of multiple users over time.
-      We implement this concept in HeedVision, a standards-compliant WebXR system built with React Three Fiber that runs on modern AR/VR headsets, and complement it with proof-of-concept implementations covering the remaining three quadrants of our design space, varying presentation (embedded vs. separated) and situatedness (world space vs. camera space).
-      Through a mixed-methods exploratory study where pairs of co-located analysts performed visual search tasks in a shared immersive AR environment, we investigate how attention revisualization affects collaborative coordination in immersive analytics.
-      Our results show that CAAVs can improve spatial coordination, search efficiency, and task load distribution in collaborative visual search tasks among collaborators, though benefits vary by context, favoring abstract environments lacking natural landmarks.
-      This work extends attention awareness to multi-user settings and provides empirical evidence for its context-dependent benefits in collaborative visual search tasks within immersive analytics environments.</p></div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Keywords</h2>
-    <div class="chips">
-      <span class="chip">Attention tracking</span><span class="chip">Eyetracking</span><span class="chip">Immersive analytics</span><span class="chip">Ubiquitous analytics</span><span class="chip">Post-WIMP interaction</span>
-    </div>
-  </section>
-
-  <section class="section" id="talk">
-    <h2 class="section-title">Talk</h2>
-    <p class="prose">Nine minutes at IEEE VIS 2026 in Boston on letting collaborators see each other's attention, and on when that helps. Click the slide or use the arrows to step through it.</p>
-    <div class="deck-frame card"><iframe id="talk-iframe" src="slides/?embed" title="HeedVision talk slides" loading="lazy" allow="fullscreen; autoplay"></iframe></div>
-    <div class="deck-ctl">
-      <button class="btn" type="button" data-go="prev" aria-label="Previous" disabled>‹</button>
-      <button class="btn" type="button" data-go="next" aria-label="Next">›</button>
-      <span class="pos" id="talk-pos" aria-live="polite"></span>
-    </div>
-    <div class="links" style="margin-top:16px">
-      <a class="link-card card" href="talk/"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></svg></span><span><b>Slides &amp; script</b><span>Every slide next to what is said over it</span></span><span class="go" aria-hidden="true">›</span></a>
-      <a class="link-card card" href="slides/" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/></svg></span><span><b>Full-screen slides</b><span>The deck itself; press S for speaker notes</span></span><span class="go" aria-hidden="true">›</span></a>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Materials</h2>
-    <div class="links">
-      <a class="link-card card" id="arxiv-resource" href="ARXIV_URL" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg></span><span><b>arXiv preprint</b><span>Open-access author version, including appendices</span></span><span class="go" aria-hidden="true">›</span></a>
-      <a class="link-card card" href="heedvision.pdf" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg></span><span><b>Paper (PDF)</b><span>Full text with appendices: quotes and bootstrap analysis</span></span><span class="go" aria-hidden="true">›</span></a>
-      <a class="link-card card" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg></span><span><b>OSF repository</b><span>Data, analysis code, study materials, and source code (CC BY 4.0)</span></span><span class="go" aria-hidden="true">›</span></a>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Citation</h2>
-    <div class="bibtex card">
-<pre class="bibtex-code"><code id="bibtex-text">@article{srinivasan2026heedvision,
-  author  = {Srinivasan, Arvind and Elmqvist, Niklas},
-  title   = {{HeedVision}: Attention Awareness in Collaborative
-             Immersive Analytics Environments},
-  journal = {IEEE Transactions on Visualization and Computer Graphics},
-  year    = {2026},
-  note    = {To appear. Presented at IEEE VIS 2026.},
-}</code></pre>
-      <button class="btn" type="button" id="bibtex-copy">Copy BibTeX</button>
-    </div>
-  </section>
-</main>
-
-<footer class="site-foot">
-  <div class="logos">
-    <img src="shared/logos/vis2026.png" alt="IEEE VIS 2026">
-    <img class="mono" src="shared/logos/au.svg" alt="Aarhus University">
-    <img class="mono" src="shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics">
-  </div>
-  <p>© 2026 the authors. Paper © IEEE.<br>Supplemental materials released under CC BY 4.0.</p>
-</footer>
-
-<script>
-  // Hide the arXiv entries until a real URL is filled in; PDF then becomes the primary action.
-  (function () {
-    var pending = false;
-    ['arxiv-btn', 'arxiv-resource'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el && el.getAttribute('href') === 'ARXIV_URL') { el.hidden = true; pending = true; }
-    });
-    if (pending) document.getElementById('pdf-btn').classList.add('primary');
-  })();
-
-  // Copy BibTeX.
-  document.getElementById('bibtex-copy').addEventListener('click', function () {
-    var btn = this;
-    navigator.clipboard.writeText(document.getElementById('bibtex-text').textContent || '').then(function () {
-      btn.textContent = 'Copied!';
-      setTimeout(function () { btn.textContent = 'Copy BibTeX'; }, 2000);
-    });
-  });
-
-  // Talk: step the embedded deck and show where it is.
-  (function () {
-    var frame = document.getElementById('talk-iframe');
-    var pos = document.getElementById('talk-pos');
-    frame.addEventListener('load', function () { frame.parentNode.classList.add('ready'); });
-    document.querySelectorAll('.deck-ctl [data-go]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        frame.contentWindow.postMessage({ hv: 'go', dir: b.getAttribute('data-go') }, location.origin);
-      });
-    });
-    window.addEventListener('message', function (e) {
-      if (e.origin !== location.origin || e.source !== frame.contentWindow || !e.data || e.data.hv !== 'state') return;
-      pos.textContent = 'Slide ' + (e.data.index + 1) + ' of ' + e.data.total;
-      document.querySelector('.deck-ctl [data-go="prev"]').disabled = !e.data.prev;
-      document.querySelector('.deck-ctl [data-go="next"]').disabled = !e.data.next;
-    });
-  })();
-</script>
+  <!-- The page comes from site.config.js and project.md. -->
+  <main class="page" id="page"><noscript><p><a href="heedvision.pdf">Read the paper (PDF)</a>.</p></noscript></main>
+  <script src="slides/vendor/marked.js"></script>
+  <script src="slides/js/mdeck.js"></script>
+  <script src="shared/page.js"></script>
 </body>
 </html>

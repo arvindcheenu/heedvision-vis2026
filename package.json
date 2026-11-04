@@ -1,0 +1,12 @@
+{
+  "name": "talk-site",
+  "private": true,
+  "type": "module",
+  "description": "A paper's project page, its slides, and a script page. No build step.",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "dev": "node tools/serve.mjs --dev",
+    "figures": "python3 tools/figures/make_figures.py",
+    "pdf": "bash tools/make-pdf.sh"
+  }
+}

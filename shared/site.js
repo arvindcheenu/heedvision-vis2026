@@ -1,29 +1,15 @@
-// Shared page behaviour: light/dark theme, remembered across pages and kept in
-// sync between open tabs and embedded slides. Fires "hv-theme" when it changes.
+// Applies site.config.js before the page paints: accent, fonts, title, icon.
 (function () {
-  var KEY = "heedvision-theme";
-  function apply(dark) {
-    var was = document.documentElement.classList.contains("dark");
-    document.documentElement.classList.toggle("dark", dark);
-    if (was !== dark) window.dispatchEvent(new Event("hv-theme"));
-  }
-  function stored() {
-    var forced = /[?&]theme=(dark|light)/.exec(location.search); // ?theme= for stills and testing
-    if (forced) return forced[1] === "dark";
-    try { var t = localStorage.getItem(KEY); if (t) return t === "dark"; } catch (e) {}
-    return matchMedia("(prefers-color-scheme: dark)").matches;
-  }
-  apply(stored());
-  function toggle() {
-    var dark = !document.documentElement.classList.contains("dark");
-    apply(dark);
-    try { localStorage.setItem(KEY, dark ? "dark" : "light"); } catch (err) {}
-  }
-  window.HVTheme = { toggle: toggle, isDark: function () { return document.documentElement.classList.contains("dark"); } };
-  document.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest("[data-theme-toggle]");
-    if (b) toggle();
-  });
-  // another tab, or the page around an embedded slide, changed the theme
-  window.addEventListener("storage", function (e) { if (e.key === KEY) apply(stored()); });
+  var S = window.SITE || {};
+  var root = document.documentElement.style;
+  var font = function (f) { return f === "sans" ? "var(--font-sans)" : f === "serif" ? "var(--font-serif)" : f; };
+  if (S.accent) root.setProperty("--accent", S.accent);
+  var fonts = S.fonts || {};
+  if (fonts.heading) root.setProperty("--font-heading", font(fonts.heading));
+  if (fonts.body) root.setProperty("--font-body", font(fonts.body));
+  var icon = document.createElement("link");
+  icon.rel = "icon";
+  icon.type = "image/svg+xml";
+  icon.href = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="' + (S.accent || "#000") + '"/></svg>');
+  document.head.appendChild(icon);
 })();

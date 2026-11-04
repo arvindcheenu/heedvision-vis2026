@@ -20,7 +20,6 @@
     presenterKey: params.get("present") || "",
     slide: null,            // last slide broadcast by the presenter
     questions: new Map(),   // id -> question
-    notes: new Map(),       // slide id -> { md, base, ts }: script edits from the presenter view
     voted: new Set(store.get("hv.voted", [])),
     on(type, fn) { bus.addEventListener(type, (e) => fn(e.detail)); },
     emit(type, detail) { bus.dispatchEvent(new CustomEvent(type, { detail })); },
@@ -46,11 +45,6 @@
     },
     hide(id) { return send({ t: "hide", id }); },
     broadcast(slide) { if (this.presenterKey) send({ t: "slide", slide }); },
-    // presenter only: replace a slide's script for everyone; `base` is the hash of
-    // the talk.md text it replaces, so the edit is dropped once talk.md changes
-    saveNotes(id, md, base) { return this.presenterKey ? send({ t: "notes", id, md: String(md || "").slice(0, 12000), base }) : false; },
-    // the edit to show for a slide, if it still applies to this talk.md
-    noteFor(slide) { const n = this.notes.get(slide.id); return n && n.base === slide.notesHash ? n : null; },
 
     start(options) {
       cfg = { ...options };
@@ -90,8 +84,6 @@
       let m; try { m = JSON.parse(ev.data); } catch { return; }
       if (m.t === "init") {
         live.questions = new Map(m.questions.map((q) => [q.id, q]));
-        live.notes = new Map((m.notes || []).map((n) => [n.id, n]));
-        live.emit("notes");
         live.presenter = !!m.presenter;
         live.emit("questions");
         if (m.slide) { live.slide = m.slide; live.emit("slide", m.slide); }
@@ -104,9 +96,6 @@
         const q = live.questions.get(m.id); if (q) { q.votes = m.votes; live.emit("questions"); }
       } else if (m.t === "hidden") {
         const q = live.questions.get(m.id); if (q) { q.hidden = true; live.emit("questions"); }
-      } else if (m.t === "notes") {
-        if (m.md) live.notes.set(m.id, { id: m.id, md: m.md, base: m.base, ts: m.ts }); else live.notes.delete(m.id);
-        live.emit("notes", m.id);
       } else if (m.t === "error") {
         live.emit("error", m.msg);
       }

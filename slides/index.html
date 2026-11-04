@@ -1,62 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="always-light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HeedVision · IEEE VIS 2026 talk</title>
-  <meta name="description" content="Slides for the IEEE VIS 2026 talk on HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments.">
-  
-  <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <link rel="preload" href="../shared/fonts/Fraunces-roman-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="../shared/fonts/GoogleSansFlex-roman-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="../shared/site.js?v=20261111"></script>
-  <link rel="stylesheet" href="../shared/hv.css?v=20261111">
-  <link rel="stylesheet" href="vendor/reveal/reset.css?v=20261111">
-  <link rel="stylesheet" href="vendor/reveal/reveal.css?v=20261111">
-  <link rel="stylesheet" href="css/deck.css?v=20261111">
+  <title>Slides</title>
+  <script src="../site.config.js"></script>
+  <script src="../shared/site.js"></script>
+  <link rel="stylesheet" href="../shared/site.css">
+  <link rel="stylesheet" href="vendor/reveal/reset.css">
+  <link rel="stylesheet" href="vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="css/deck.css">
 </head>
 <body>
-<div class="stage" aria-hidden="true"></div>
-
-<!-- The slides come from talk.md. Edit that file, not this one. -->
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <radialGradient id="g-sphere" cx="38%" cy="32%" r="75%"><stop offset="0" style="stop-color:var(--sphere-hi)"/><stop offset="1" style="stop-color:var(--sphere-lo)"/></radialGradient>
-    <radialGradient id="g-blob"><stop offset="0" stop-color="#ec4f9c"/><stop offset=".45" stop-color="#ec4f9c" stop-opacity=".55"/><stop offset="1" stop-color="#ec4f9c" stop-opacity="0"/></radialGradient>
-    <symbol id="i-person" viewBox="0 0 80 90"><circle cx="40" cy="24" r="20" fill="currentColor"/><path d="M4 90c0-22 16-40 36-40s36 18 36 40z" fill="currentColor"/></symbol>
-    <symbol id="i-eye" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="20" cy="20" r="6" fill="currentColor"/></symbol>
-    <symbol id="i-loop" viewBox="0 0 48 48"><path d="M38 18a15 15 0 0 0-27-4M10 30a15 15 0 0 0 27 4" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M11 6v9h9M37 42v-9h-9" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-hand" viewBox="0 0 48 48"><path d="M14 6l22 15-10 2 6 12-5 2-6-12-7 7z" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></symbol>
-    <symbol id="i-bolt" viewBox="0 0 48 48"><path d="M27 4L10 27h12l-3 17 18-24H25z" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></symbol>
-
-    <!-- duotone icons: an ink line over a tinted fill (set --ic-ink and --ic-fill) -->
-    <symbol id="ic-eye" viewBox="0 0 48 48"><path d="M4 24c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S9 33 4 24z" style="fill:var(--ic-fill)"/><path d="M4 24c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S9 33 4 24z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="7" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="2.5" style="fill:var(--ic-ink)"/></symbol>
-    <symbol id="ic-layers" viewBox="0 0 48 48"><path d="M24 8l18 9-18 9-18-9z" style="fill:var(--ic-fill)"/><path d="M24 8l18 9-18 9-18-9z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25l18 9 18-9M6 33l18 9 18-9" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="ic-palette" viewBox="0 0 48 48"><path d="M24 6C13 6 5 14 5 24s8 18 18 18c3 0 4-2 4-4 0-3-3-4-1-7 1-2 4-2 7-2 5 0 10-3 10-9C43 12 34 6 24 6z" style="fill:var(--ic-fill)"/><path d="M24 6C13 6 5 14 5 24s8 18 18 18c3 0 4-2 4-4 0-3-3-4-1-7 1-2 4-2 7-2 5 0 10-3 10-9C43 12 34 6 24 6z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="22" r="3" fill="var(--you)" style="fill:var(--you)"/><circle cx="22" cy="14" r="3" style="fill:var(--both)"/><circle cx="32" cy="15" r="3" style="fill:var(--partner)"/></symbol>
-    <symbol id="ic-pin" viewBox="0 0 48 48"><path d="M24 44s14-13 14-24a14 14 0 0 0-28 0c0 11 14 24 14 24z" style="fill:var(--ic-fill)"/><path d="M24 44s14-13 14-24a14 14 0 0 0-28 0c0 11 14 24 14 24z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.5 17a4.5 4.5 0 1 1 6 4.2c-1 .5-1.5 1.3-1.5 2.3v1" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="29" r="1.8" style="fill:var(--ic-ink)"/></symbol>
-    <symbol id="ic-person" viewBox="0 0 48 48"><circle cx="24" cy="16" r="8" style="fill:var(--ic-fill)"/><path d="M8 42c0-9 7-15 16-15s16 6 16 15z" style="fill:var(--ic-fill)"/><circle cx="24" cy="16" r="8" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 42c0-9 7-15 16-15s16 6 16 15" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="ic-search" viewBox="0 0 48 48"><circle cx="21" cy="21" r="13" style="fill:var(--ic-fill)"/><circle cx="21" cy="21" r="13" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M31 31l11 11" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/><path d="M15 25l3-5 3 4 3-6 3 7" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/></symbol>
-    <symbol id="ic-gauge" viewBox="0 0 48 48"><path d="M6 34a18 18 0 0 1 36 0z" style="fill:var(--ic-fill)"/><path d="M6 34a18 18 0 0 1 36 0" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 34l9-11" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="34" r="3" style="fill:var(--ic-ink)"/><path d="M11 22l2 2M24 16v3M37 22l-2 2" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/></symbol>
-    <symbol id="ic-toggle" viewBox="0 0 48 48"><rect x="5" y="14" width="38" height="20" rx="10" style="fill:var(--ic-fill)"/><rect x="5" y="14" width="38" height="20" rx="10" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="33" cy="24" r="6" style="fill:var(--ic-ink)"/></symbol>
-    <symbol id="ic-fade" viewBox="0 0 48 48"><rect x="5" y="16" width="11" height="16" rx="3" style="fill:var(--ic-ink)"/><rect x="18.5" y="16" width="11" height="16" rx="3" style="fill:var(--ic-ink);opacity:.5"/><rect x="32" y="16" width="11" height="16" rx="3" style="fill:var(--ic-fill)"/><rect x="32" y="16" width="11" height="16" rx="3" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></symbol>
-    <symbol id="ic-split" viewBox="0 0 48 48"><path d="M7 24a17 17 0 0 1 34 0z" style="fill:var(--ic-fill)"/><circle cx="24" cy="24" r="17" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 24h42" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 4"/><circle cx="24" cy="15" r="2.5" style="fill:var(--ic-ink)"/><circle cx="24" cy="33" r="2.5" style="fill:var(--ic-ink)"/></symbol>
-    <symbol id="ic-flag" viewBox="0 0 48 48"><path d="M4 41l13-19 8 10 6-7 13 16z" style="fill:var(--ic-fill)"/><path d="M4 41l13-19 8 10 6-7 13 16z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 22V7l9 3.5-9 3.5" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="ic-scan" viewBox="0 0 48 48"><rect x="6" y="7" width="36" height="34" rx="5" style="fill:var(--ic-fill)"/><rect x="6" y="7" width="36" height="34" rx="5" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 15h22v9H13v9h18" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="34" cy="33" r="3" style="fill:var(--ic-ink)"/></symbol>
-    <symbol id="ic-chat" viewBox="0 0 48 48"><path d="M9 8h30a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4H23l-10 8v-8H9a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4z" style="fill:var(--ic-fill)"/><path d="M9 8h30a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4H23l-10 8v-8H9a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="21" r="2.5" style="fill:var(--ic-ink)"/><circle cx="24" cy="21" r="2.5" style="fill:var(--ic-ink)"/><circle cx="32" cy="21" r="2.5" style="fill:var(--ic-ink)"/></symbol>
-    <symbol id="ic-align" viewBox="0 0 48 48"><path d="M24 14l15 26H9z" style="fill:var(--ic-fill)"/><path d="M24 14l15 26H9z" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 3v8M24 30v15M14 30h20" fill="none" style="stroke:var(--ic-ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  </defs>
-</svg>
-
+<!-- The slides come from talk.md and layouts.json. -->
 <div class="reveal"><div class="slides"></div></div>
-
-<script src="vendor/marked.js?v=20261111"></script>
-<script src="vendor/reveal/reveal.js?v=20261111"></script>
-<script src="vendor/qrcode.js?v=20261111"></script>
-<script src="js/mdeck.js?v=20261111"></script>
-<script src="js/field.js?v=20261111"></script>
-<script src="js/explain.js?v=20261111"></script>
-<script src="js/live.js?v=20261111"></script>
-<script src="js/deck.js?v=20261111"></script>
+<script src="vendor/marked.js"></script>
+<script src="vendor/reveal/reveal.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="js/mdeck.js"></script>
+<script src="js/live.js"></script>
+<script src="js/deck.js"></script>
 </body>
 </html>
