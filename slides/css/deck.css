@@ -51,14 +51,19 @@
 /* ---------- section navigation: no bar. The current section is orange, ones you've left fade ---------- */
 .headline { position: absolute; left: 72px; right: 72px; top: 0; height: 52px; display: flex; align-items: center; gap: 40px; color: var(--fg-2); z-index: 3; }
 .sec { display: flex; align-items: center; gap: 12px; font-size: 21px; line-height: 1; transition: color 200ms, opacity 200ms; }
-.sec b { font-weight: 500; }
+.reveal .sec-name, .reveal .dots a, .reveal .f-what a { color: inherit; text-decoration: none; cursor: pointer; }
+.sec-name { font-weight: 500; }
+.reveal .sec-name:hover, .reveal .f-what a:hover { color: var(--title); }
 .sec.past { opacity: 0.38; }
+.sec.past:hover { opacity: 1; }
 .sec.now { color: var(--title); }
-.sec.now b { font-weight: 700; }
-.dots { display: flex; gap: 5px; }
-.dots button { all: unset; cursor: pointer; width: 11px; height: 11px; border-radius: 50%; box-sizing: border-box; border: 1.5px solid currentColor; }
-.dots button.done { background: currentColor; }
-.dots button.now { background: currentColor; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 28%, transparent); }
+.sec.now .sec-name { font-weight: 700; }
+.dots { display: flex; }
+.dots a { display: grid; place-items: center; width: 16px; height: 24px; }
+.dots a::before { content: ""; width: 11px; height: 11px; border-radius: 50%; box-sizing: border-box; border: 1.5px solid currentColor; }
+.dots a.done::before, .dots a:hover::before { background: currentColor; }
+.dots a.now::before { background: currentColor; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 28%, transparent); }
+.headline a:focus-visible, .f-what a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 4px; }
 
 /* ---------- footer: names, title, logos, no bar ---------- */
 .footline { position: absolute; left: 72px; right: 72px; bottom: 0; height: 56px; display: flex; align-items: center; gap: 28px; font-size: 21px; color: var(--fg-2); z-index: 3; }
@@ -316,3 +321,5 @@ body.is-embed .reveal .slides { cursor: pointer; }
 .reveal .slides .pdf-page > section { position: absolute !important; left: 0 !important; top: 0 !important; width: 1920px !important; height: 1080px !important; min-height: 1080px !important; overflow: hidden; }
 .reveal .slides .pdf-page { background: var(--bg); }
 html.print-pdf .fragment { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+/* print exactly these colours, even with "background graphics" off in the print dialog */
+html.print-pdf, html.print-pdf * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Exports the slides as a PDF, one page per slide with every build showing.
+# Exports the slides as a PDF, one page per slide with every build showing, and section
+# names and dots that link to their pages. The project page links to the file this writes,
+# so run it again whenever the slides change, and commit the result.
 # Needs the local server (node tools/serve.mjs) and Google Chrome. You can also open
 # /slides/?view=print in a browser and print to PDF, or use Export PDF in the presenter view.
 set -euo pipefail
 BASE="${BASE:-http://127.0.0.1:8000}"
-OUT="${OUT:-slides.pdf}"
+OUT="${OUT:-slides/heedvision-slides.pdf}"
 curl -sf -o /dev/null "$BASE/slides/index.html" || { echo "No server on $BASE; start one with: node tools/serve.mjs" >&2; exit 1; }
 CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT

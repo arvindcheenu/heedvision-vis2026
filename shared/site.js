@@ -4,6 +4,9 @@
   var root = document.documentElement, KEY = "heedvision-theme";
   var dark = matchMedia("(prefers-color-scheme: dark)");
   var forced = /[?&]theme=(dark|light)/.exec(location.search); // for stills and testing
+  // Chrome reports a light colour scheme while it prints, which would flip a dark "system" page
+  // halfway through. The print view is light unless ?theme=dark asks otherwise.
+  if (!forced && /[?&](view=print|print-pdf)/.test(location.search)) forced = [0, "light"];
   function mode() { try { return localStorage.getItem(KEY) || "system"; } catch (e) { return "system"; } }
   function apply() {
     var m = forced ? forced[1] : mode();

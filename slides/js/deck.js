@@ -126,8 +126,15 @@
   }
   addEventListener("storage", (e) => { if (e.key === askKey) renderQR(); });
 
-  // the dots in the section navigation go to their slide
-  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("[data-to]"); if (b) goTo({ id: b.dataset.to, f: -1 }); });
+  // section names, dots and the footer title go to their slide, as in Beamer
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("[data-to]");
+    const el = b && document.getElementById(b.dataset.to);
+    if (!el) return;
+    e.preventDefault();
+    const at = deck.getIndices(el);
+    deck.slide(at.h, at.v, -1);
+  });
 
   // ---------------------------------------------------------- bullets
   // :::items: the current bullet is highlighted, later ones wait (or stay visible with uncover=off)
@@ -144,7 +151,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261127"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261201"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -200,7 +207,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261127", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261201", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -545,7 +552,12 @@
       explainers.forEach((ex, cv) => { const box = cv.closest("[data-stepper]"); ex.resize(); ex.settle(box ? box.querySelectorAll(".step").length : 0); });
       lives.forEach((d) => d.settle && d.settle());
     }, 1200);
-    if (params.has("autoprint")) setTimeout(() => print(), 3000);
+    // in a PDF, links jump to an element's id
+    if (isPrint) document.querySelectorAll("a[data-to]").forEach((a) => a.setAttribute("href", `#${a.dataset.to}`));
+    if (params.has("autoprint")) setTimeout(async () => {
+      await Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]);
+      print();
+    }, 3000);
     live.on("status", (s) => { if (s === "open") broadcast(); });
     live.on("error", (m) => console.warn("[live]", m));
     renderBoard();

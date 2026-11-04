@@ -95,7 +95,9 @@ Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **
 
 ## PDF
 
-**Export PDF** in the presenter view opens `/slides/?view=print` and the print dialog, with one page per slide and every build showing. `tools/make-pdf.sh` does the same from the command line, with the local server running.
+**Slides as PDF** on the project page opens `slides/heedvision-slides.pdf`, with one page per slide and every build showing. Section names, dots and the footer title link to their pages, as in Beamer. It is a built file, so after changing the slides run `tools/make-pdf.sh` with the local server running, and commit the result.
+
+**Export PDF** in the presenter view opens `/slides/?view=print` and the print dialog, from the slides as they are now. Both are light; add `theme=dark` to the print URL for dark.
 
 ## Live relay
 

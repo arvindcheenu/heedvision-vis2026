@@ -122,10 +122,11 @@
   const askDeck = () => { try { frame.contentWindow.postMessage({ hv: "hello" }, location.origin); } catch {} };
   const helloTimer = setInterval(() => { if (ready) clearInterval(helloTimer); else askDeck(); }, 250);
   let stepping = false; // the reader moved the slide itself (buttons or a click on it)
-  frame.addEventListener("load", () => {
-    // a click inside the slide steps it too
-    try { frame.contentDocument.addEventListener("click", () => (stepping = true), true); } catch {}
-  });
+  // a click inside the slide steps it too. The frame may have loaded already, so listen now as well.
+  const markStepping = () => (stepping = true);
+  const watchFrame = () => { try { frame.contentDocument.addEventListener("click", markStepping, true); } catch {} };
+  frame.addEventListener("load", watchFrame);
+  watchFrame();
   addEventListener("message", (ev) => {
     if (ev.origin !== location.origin || ev.source !== frame.contentWindow || !ev.data || ev.data.hv !== "state") return;
     const s = ev.data;
@@ -143,7 +144,7 @@
   });
 
   // ---------------------------------------------------------- reading position → slide
-  let programmatic = false, programmaticTimer = 0;
+  let programmatic = false, programmaticTimer = 0, landing = null;
   function markerOf(id, f) {
     const e = byId(id);
     if (!e) return null;
@@ -175,7 +176,12 @@
     const y = scrollY + m.getBoundingClientRect().top - (readingLine() - 24);
     const calm = !smooth || matchMedia("(prefers-reduced-motion: reduce)").matches || document.hidden;
     scrollTo({ top: Math.max(0, y), behavior: calm ? "auto" : "smooth" });
-    programmaticTimer = setTimeout(() => (programmatic = false), calm ? 80 : 900);
+    // a long jump takes a while: don't let the slides it scrolls past take over until it lands
+    const land = () => { clearTimeout(programmaticTimer); programmaticTimer = setTimeout(() => (programmatic = false), 80); };
+    removeEventListener("scrollend", landing);
+    landing = land;
+    if (calm || Math.abs(scrollY - Math.max(0, y)) < 2 || !("onscrollend" in window)) programmaticTimer = setTimeout(() => (programmatic = false), calm ? 80 : 900);
+    else { programmaticTimer = setTimeout(() => (programmatic = false), 8000); addEventListener("scrollend", land, { once: true }); }
   }
   let raf = 0;
   function onScroll() {

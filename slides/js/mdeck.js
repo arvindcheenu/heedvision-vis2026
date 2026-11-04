@@ -317,10 +317,11 @@
     const chapters = [];
     main.forEach((s) => { let c = chapters.find((x) => x.name === s.chapter); if (!c) chapters.push((c = { name: s.chapter, slides: [] })); c.slides.push(s); });
     const at = main.indexOf(slide);
-    const dots = (c) => c.slides.map((s) => { const i = main.indexOf(s); return `<button type="button" class="${i < at ? "done" : i === at ? "now" : ""}" data-to="${esc(s.id)}" title="${esc(s.title)}" aria-label="${esc(s.title)}"></button>`; }).join("");
+    const link = (s, cls, text, label) => `<a class="${cls}" href="#/${esc(s.id)}" data-to="${esc(s.id)}" title="${esc(label)}" aria-label="${esc(label)}">${text}</a>`;
+    const dots = (c) => c.slides.map((s) => { const i = main.indexOf(s); return link(s, i < at ? "done" : i === at ? "now" : "", "", s.title); }).join("");
     const here = chapters.findIndex((c) => c.name === slide.chapter);
-    const head = `<nav class="headline" aria-label="Sections">${chapters.map((c, i) => `<div class="sec${i === here ? " now" : i < here ? " past" : ""}"><b>${esc(c.name)}</b><span class="dots">${dots(c)}</span></div>`).join("")}</nav>`;
-    const foot = `<div class="footline"><span class="f-who">${esc(m.authors || "")}</span><span class="f-what">${esc(m.title || "")}</span><span class="f-logos">${LOGOS("")}</span><span class="count">${slide.backup ? "Backup" : `${at + 1} / ${main.length}`}</span></div>`;
+    const head = `<nav class="headline" aria-label="Sections">${chapters.map((c, i) => `<div class="sec${i === here ? " now" : i < here ? " past" : ""}">${link(c.slides[0], "sec-name", esc(c.name), c.name)}<span class="dots">${dots(c)}</span></div>`).join("")}</nav>`;
+    const foot = `<div class="footline"><span class="f-who">${esc(m.authors || "")}</span><span class="f-what">${main[0] ? link(main[0], "", esc(m.title || ""), "Title page") : esc(m.title || "")}</span><span class="f-logos">${LOGOS("")}</span><span class="count">${slide.backup ? "Backup" : `${at + 1} / ${main.length}`}</span></div>`;
     return head + foot;
   }
 
