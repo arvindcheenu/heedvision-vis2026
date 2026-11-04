@@ -115,7 +115,11 @@
     if (!els.length) return;
     try {
       const mod = await import(new URL("vendor/magic-move.js", document.baseURI));
-      els.forEach((el) => magics.push({ el, m: mod.mount(el, JSON.parse(el.dataset.magic), { lang: el.dataset.lang }) }));
+      els.forEach((el) => {
+        const codes = JSON.parse(el.dataset.magic);
+        // with every build showing there's nothing to morph from: just the last step
+        magics.push({ el, m: mod.mount(el, flat ? codes.slice(-1) : codes, { lang: el.dataset.lang }) });
+      });
       syncMagic();
     } catch (err) { console.warn("[magic move]", err); }
   }
