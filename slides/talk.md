@@ -332,7 +332,7 @@ Count is how many people looked.
 id: design-space
 chapter: Idea
 kicker: RQ3 · Display
-time: 32
+time: 30
 ---
 
 # Where attention appears is a design choice: 4 placements × 3 triggers
@@ -340,7 +340,7 @@ time: 32
 ::designspace steps badge="HeedVision · tested" highlight=world-embedded trigger=explicit
 
 :::notes
-For display, we laid out a design space of where attention can appear.
+For display, we laid out a design space.
 
 [click] Attention can be embedded in the visualization or separated into its own view. In world space, both stay fixed in the space you share.
 
@@ -450,7 +450,7 @@ id: quadrants
 chapter: System
 columns: 1 1 1
 align: center
-time: 16
+time: 14
 ---
 
 # Each prototype is aimed at a different kind of teamwork
@@ -468,7 +468,7 @@ time: 16
 
 [click] There's attention projected onto the bounding box, which is aimed at guided tours.
 
-[click] And there's a 2D panel beside the data, aimed at handoffs. These run in VR only, and they weren't in the study.
+[click] And there's a 2D panel beside the data, aimed at handoffs. They weren't in the study.
 :::
 
 ---
@@ -576,7 +576,37 @@ We had sixteen graduate students in eight pairs, in the same room, in AR, free t
 
 [click] One was a scatterplot of a hundred random points, with no clusters to guide the split.
 
-[click] The other was a terrain of Mount Bruno, to ask whether cues still help when a space has landmarks of its own. Cues on versus off compares different pairs, four against four, so please read my numbers as directional, except one I'll point out.
+[click] The other was a terrain of Mount Bruno, to ask whether cues still help when a space has landmarks of its own. Cues on versus off compares different pairs, four against four, so read my numbers as directional, except one I'll point out.
+:::
+
+---
+id: measures
+chapter: Study
+columns: 1 1
+rows: 1 1
+time: 17
+---
+
+# We compared pairs with and without cues on four measures
+
+:::card icon=search title="Targets found" tone=you
+The share of the hidden targets the pair found in a hunt.
+:::
+
+:::card icon=layers title="Duplicated search" tone=both
+How much partners looked at the same places: normalized redundancy from Shannon entropy, 1 − H / Hmax.
+:::
+
+:::card icon=person title="Pair gain" tone=partner
+Targets the pair found, divided by what its stronger member found. 1.46× means 46% more.
+:::
+
+:::card icon=gauge title="Workload"
+NASA TLX composite on a 1–7 scale, after each hunt.
+:::
+
+:::notes
+Before the numbers, here's what we measured. Targets found is the share of hidden targets a pair found. Duplicated search is how much partners looked at the same places. Pair gain divides what the pair found by what its stronger member found. And workload is the NASA TLX.
 :::
 
 ---
@@ -584,7 +614,7 @@ id: scatter
 chapter: Study
 kicker: Result 1 · Scatterplot
 columns: 1 1
-time: 13
+time: 9
 ---
 
 # On random points, pairs with cues tended to duplicate less and find more
@@ -596,7 +626,7 @@ time: 13
 ::caveat text="Exploratory: 4 vs 4 pairs. A direction, not a reliable difference (targets p = .11, duplicated search p = .26)."
 
 :::notes
-We measured duplicated search, which is how much partners looked at the same places. On the scatterplot, pairs with cues had 3.3 percent, against 11.3 without.
+On the scatterplot, pairs with cues had 3.3 percent duplicated search, against 11.3 without.
 
 [click] Pairs with cues also found more targets: 78.5 percent against 62.4.
 :::
@@ -640,12 +670,14 @@ time: 21
 
 ::compare label="Targets found by the pair, vs. its stronger member" a=1.19 b=1.46 unit="×" a-label="Cues off" b-label="Cues on" change="+0.28" tone=you
 
-::stat value="p = .029" label="exact permutation test, 4 vs 4 pairs" sub="Δ +0.28, 95% CI [0.11, 0.45]. The one result where the interval and the exact test agree. Uncorrected, so a lead to replicate." tone=you step
+::venn a=1.19 b=1.46 a-label="Cues off" b-label="Cues on" label="What that means: less overlap in what partners found" note="If both partners found as many, the pink share is what each found that the other also found." step
+
+::caveat text="Exact p = .029, Δ +0.28, 95% CI [0.11, 0.45], uncorrected. Exploratory: 4 vs 4 pairs."
 
 :::notes
-But terrain also gave us our one result with statistical support. With cues, a pair found 1.46 times the targets its stronger member found, against 1.19 without.
+But terrain also gave us our one result with statistical support, at an exact p of .029. With cues, a pair found 1.46 times the targets its stronger member found, against 1.19 without.
 
-[click] That difference has an interval clear of zero and an exact p of .029. It's uncorrected, so a lead to replicate, but partners seem to have complemented each other more.
+[click] If both partners found equally many, their finds overlapped by about half with cues, instead of four fifths. So the cues helped here too.
 :::
 
 ---
@@ -653,7 +685,7 @@ id: strategies-cues
 chapter: Study
 kicker: Result 3 · Strategies
 columns: 1 1 1
-time: 31
+time: 28
 ---
 
 # With cues, people split the space, swept it in order and read the colours
@@ -681,7 +713,7 @@ From questionnaires and interviews we also found six strategies, and three stood
 
 [click] The second is systematic search, where you sweep your own region in order.
 
-[click] The third is reading the colours to stay out of each other's way. On the scatterplot, one participant told us they didn't talk at all, which could mean less effort or less discussion.
+[click] The third is reading the colours to stay out of each other's way. On the scatterplot, one participant told us they didn't talk at all.
 :::
 
 ---
@@ -689,7 +721,7 @@ id: strategies-without
 chapter: Study
 kicker: Result 3 · Strategies
 columns: 1 1 1
-time: 23
+time: 19
 ---
 
 # Without cues, some pairs fell back on talk, landmarks and lining up in the room
@@ -713,7 +745,7 @@ Line both copies up in the room, so pointing means the same thing. One pair, wit
 :::
 
 :::notes
-Without cues, some pairs fell back on the other three. They talked positions through, which was common on the scatterplot without cues and absent with them.
+Without cues, some pairs fell back on the other three. They talked positions through.
 
 [click] They used landmarks: on the terrain with or without cues, and on the scatterplot only with the cues off.
 
