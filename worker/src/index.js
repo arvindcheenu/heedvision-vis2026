@@ -17,7 +17,7 @@ const MAX_ANSWER = 1200;
 const LIKE_TARGETS = ["paper", "slides"];
 const HOUR = 3_600_000;
 const STARS_REPO = "arvindcheenu/caav";
-const STARS_EVERY = 120_000; // GitHub allows 60 anonymous requests an hour, and the relay shares its address
+const STARS_EVERY = 120_000;
 
 export default {
   async fetch(req, env) {
@@ -195,21 +195,17 @@ export class Room extends DurableObject {
     };
   }
 
-  // The relay asks GitHub, not each visitor, and shares the answer. A failed check keeps the last count.
+  // The relay asks, not each visitor, and shares the answer. GitHub often refuses anonymous requests from
+  // Cloudflare's shared addresses, so a public cached copy is the fallback. A failed check keeps the last count.
   async refreshStars() {
     const row = this.sql.exec("SELECT v FROM meta WHERE k = 'stars'").toArray()[0];
     const had = row ? JSON.parse(row.v) : null;
-    if ((had && Date.now() - had.ts < STARS_EVERY) || this.starsBusy) return;
-    this.starsBusy = true;
-    try {
-      const r = await fetch(`https://api.github.com/repos/${STARS_REPO}`, { headers: { "User-Agent": "heedvision-live", Accept: "application/vnd.github+json" } });
-      if (r.ok) {
-        const n = (await r.json()).stargazers_count;
-        if (Number.isInteger(n)) this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('stars', ?)", JSON.stringify({ n, ts: Date.now() }));
-      } else if (had) {
-        this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('stars', ?)", JSON.stringify({ n: had.n, ts: Date.now() }));
-      }
-    } catch {} finally { this.starsBusy = false; }
+    const now = Date.now();
+    if ((had && now - had.ts < STARS_EVERY) || now - (this.starsTried || 0) < STARS_EVERY) return;
+    this.starsTried = now;
+    const n = (await starsFromGitHub(this.env.GITHUB_TOKEN)) ?? (await starsFromShields());
+    console.log("stars", n);
+    if (n !== null) this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('stars', ?)", JSON.stringify({ n, ts: now }));
   }
 
   slide() {
@@ -258,6 +254,26 @@ export class Room extends DurableObject {
     this.buckets.set(bucket, hits);
     return true;
   }
+}
+
+async function starsFromGitHub(token) {
+  try {
+    const headers = { "User-Agent": "heedvision-live", Accept: "application/vnd.github+json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const r = await fetch(`https://api.github.com/repos/${STARS_REPO}`, { headers });
+    if (!r.ok) { console.log("github", r.status); return null; }
+    const n = (await r.json()).stargazers_count;
+    return Number.isInteger(n) ? n : null;
+  } catch (e) { console.log("github", String(e)); return null; }
+}
+
+async function starsFromShields() {
+  try {
+    const r = await fetch(`https://img.shields.io/github/stars/${STARS_REPO}.json`, { headers: { "User-Agent": "heedvision-live" } });
+    if (!r.ok) { console.log("shields", r.status); return null; }
+    const m = /^(\d+(?:\.\d+)?)(k?)$/.exec(String((await r.json()).message).trim());
+    return m ? Math.round(parseFloat(m[1]) * (m[2] ? 1000 : 1)) : null;
+  } catch (e) { console.log("shields", String(e)); return null; }
 }
 
 function send(ws, msg) { try { ws.send(JSON.stringify(msg)); } catch {} }
