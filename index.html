@@ -20,14 +20,16 @@
 <meta property="og:image" content="assets/teaser.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="shared/logos/mark.svg" type="image/svg+xml">
-<link rel="preload" href="shared/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="shared/theme.css?v=20261205">
-<link rel="stylesheet" href="shared/hv.css?v=20261205">
-<script src="shared/site.js?v=20261205"></script>
+<link rel="preload" href="shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="shared/theme.css?v=20261208">
+<link rel="stylesheet" href="shared/hv.css?v=20261208">
+<script src="shared/site.js?v=20261208"></script>
+<script src="shared/tactile.js?v=20261208" defer></script>
 </head>
 <body>
 
 <a class="btn skip" href="#main">Skip to the page</a>
+<div class="page-tools"><span data-sound-toggle></span></div>
 <div class="page-bar" aria-hidden="true"><i></i></div>
 <nav class="page-toc" aria-label="Contents"><ol role="list"></ol></nav>
 <main class="page" id="main">
@@ -43,13 +45,15 @@
     </a>
   </div>
 
+  <p class="venue"><em>IEEE Transactions on Visualization and Computer Graphics</em>, 2026. To appear. Presented at IEEE VIS 2026, Boston.</p>
+
   <div class="actions">
     <!-- ARXIV_URL: replace the href once the preprint is posted. -->
     <a class="btn" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg> arXiv</a>
     <a class="btn" id="pdf-btn" href="heedvision.pdf" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg> PDF</a>
     <a class="btn" href="talk/"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg> Talk</a>
     <a class="btn" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg> OSF</a>
-    <a class="btn" href="slides/heedvision-slides.pdf?v=20261205" target="_blank" rel="noopener">Slides as PDF</a>
+    <a class="btn" href="slides/heedvision-slides.pdf?v=20261208" target="_blank" rel="noopener">Slides as PDF</a>
   </div>
 
   <figure class="figure card section">
@@ -75,9 +79,7 @@
 
   <section class="section">
     <h2 class="section-title">Keywords</h2>
-    <div class="chips">
-      <span class="chip">Attention tracking</span><span class="chip">Eyetracking</span><span class="chip">Immersive analytics</span><span class="chip">Ubiquitous analytics</span><span class="chip">Post-WIMP interaction</span>
-    </div>
+    <p class="keywords">Attention tracking, eyetracking, immersive analytics, ubiquitous analytics, post-WIMP interaction.</p>
   </section>
 
   <section class="section" id="talk">
@@ -100,6 +102,7 @@
 
   <section class="section">
     <h2 class="section-title">Citation</h2>
+    <p class="cite-line">A. Srinivasan and N. Elmqvist, “HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments,” <em>IEEE Transactions on Visualization and Computer Graphics</em>, 2026. To appear.</p>
     <div class="bibtex card">
 <pre class="bibtex-code"><code id="bibtex-text">@article{srinivasan2026heedvision,
   author  = {Srinivasan, Arvind and Elmqvist, Niklas},
@@ -124,7 +127,7 @@
   <p>© 2026 the authors. Paper © IEEE.<br>Supplemental materials released under CC BY 4.0.</p>
 </footer>
 
-<script src="shared/progress.js?v=20261205"></script>
+<script src="shared/progress.js?v=20261208"></script>
 <script>
   // Contents, built from the page's sections, with its scroll progress.
   (function () {

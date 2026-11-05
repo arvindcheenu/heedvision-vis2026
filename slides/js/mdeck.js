@@ -355,7 +355,8 @@
 
       if (layout === "title") {
         const photos = (m.photos || "").split(",").map((v) => v.trim());
-        const authors = (m.authors || "").split(",").map((v, i) => `<span class="author">${photos[i] ? `<img src="${esc(photos[i])}" alt="">` : ""}<b>${esc(v.trim())}</b></span>`).join("");
+        const places = (m.affiliations || "").split(",").map((v) => v.trim());
+        const authors = (m.authors || "").split(",").map((v, i) => `<span class="author">${photos[i] ? `<img src="${esc(photos[i])}" alt="">` : ""}<span><b>${esc(v.trim())}</b>${places[i] ? `<small>${esc(places[i])}</small>` : ""}</span></span>`).join("");
         inner = `<div class="t-block"><h1>${mdi(m.title)}</h1></div>
           <div class="t-grid"><p class="t-sub">${mdi(m.subtitle || "")}</p><div class="t-people">${authors}</div>
           <p class="t-venue">${(m.venue || "").split("·").map((v) => esc(v.trim())).join("<br>")}</p>

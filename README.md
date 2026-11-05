@@ -65,9 +65,11 @@ The project page and the script page have no rules or native scrollbars. On the 
 
 ### Styles
 
-Font, corners and palette live in one file, `shared/theme.css`. Change them there, or live on the **Theme** page in dev mode (the button at the top of the editor, or `/tools/edit/theme.html`), which previews the real pages, reads out contrast and saves the file. Commit and push to publish. The palette is the IEEE VIS 2026 template's, and the font is Nunito, which ships in `shared/fonts/` under the SIL Open Font License so it looks the same in every browser, in the PDF and offline. SF Pro Rounded can't be shipped with a website; choosing it only takes effect in Safari on Apple devices.
+Font, corners and palette live in one file, `shared/theme.css`. Change them there, or live on the **Theme** page in dev mode (the button at the top of the editor, or `/tools/edit/theme.html`), which previews the real pages, reads out contrast and saves the file. Commit and push to publish. The palette is the IEEE VIS 2026 template's, and the font is SN Pro, a variable font from 200 to 900 that ships in `shared/fonts/` under the SIL Open Font License, so it looks the same in every browser, in the PDF and offline. Its weights are named in `theme.css` (`--w-text`, `--w-strong`, `--w-head`, `--w-display`), a little lighter in dark mode. SN Pro has no Greek or arrows, so Δ and ρ fall back to the system font; maths stays in KaTeX and BibTeX in monospace.
 
-Shared components are in `shared/hv.css`, one block each. The slides' own sizes, and what each colour means, are in `slides/css/deck.css`. Everything is flat colour. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.
+Shared components are in `shared/hv.css`, one block each. The slides' own sizes, and what each colour means, are in `slides/css/deck.css`. Everything is flat colour, apart from the light that follows the cursor. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.
+
+`shared/tactile.js` adds that light and the sounds, which it synthesizes, so there are no audio files. The speaker button on the paper and script pages turns sounds off, and the choice is remembered. They start on with a mouse and off on a phone. The slides and the presenter view have `data-silent` on `<html>`, so they never make a sound.
 
 ## Editing
 
@@ -103,7 +105,7 @@ Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **
 
 ## Live relay
 
-`worker/` is one Durable Object per room, on the Workers free plan. Deploy with `npx wrangler deploy` in `worker/`; allowed origins are in `worker/wrangler.jsonc`. Set the key with `npx wrangler secret put PRESENTER_KEY`.
+`worker/` is one Durable Object per room, on the Workers free plan. Deploy with `npx wrangler deploy` in `worker/`; allowed origins are in `worker/wrangler.jsonc`. Set the key with `npx wrangler secret put PRESENTER_KEY`. Your copy of the key is in `worker/.presenter-key`, which git ignores. The key you type in a page's address has to match the secret on Cloudflare.
 
 ### Questions and live updates
 

@@ -3,6 +3,7 @@ title: HeedVision
 subtitle: Attention Awareness in Collaborative Immersive Analytics Environments
 authors: Arvind Srinivasan, Niklas Elmqvist
 photos: assets/people/arvind.jpg, assets/people/niklas.jpg
+affiliations: Aarhus University, Aarhus University
 venue: IEEE VIS 2026 · Boston · November 9–13
 contacts: **Arvind Srinivasan** · arvind@cs.au.dk; Niklas Elmqvist · elm@cs.au.dk
 open-to-work: Open to work · Postdoc · Industry
@@ -144,19 +145,19 @@ time: 42
 
 # Collaborative attention-aware visualization
 
-:::card icon=eye title="Capture" class=col
+:::card title="Capture" class=col
 Distinguish between users while tracking attention simultaneously.
 
 <span class="rq-tag">RQ1</span><span class="rq">How should the attention of multiple viewers on a visualization be captured in real time?</span>
 :::
 
-:::card icon=layers title="Record" class=col step=1
+:::card title="Record" class=col step=1
 Identity-aware accumulators, with sum, maximum, difference and count.
 
 <span class="rq-tag">RQ2</span><span class="rq">How should the attention of multiple viewers on a visualization be recorded over time?</span>
 :::
 
-:::card icon=palette title="Revisualize" class=col step=2
+:::card title="Revisualize" class=col step=2
 Encode both attention intensity and user identity.
 
 <span class="rq-tag">RQ3</span><span class="rq">How should the attention of multiple viewers on a visualization be displayed?</span>
@@ -416,7 +417,7 @@ time: 42
 
 ::plot src=assets/fig/plot-scatter.svg alt="Four panels, No-CAAV against CAAV on the scatterplot. Target discovery 62.4 versus 78.5 percent, with each pair shown as a dot. Coverage 67.1 versus 76.5 percent. Normalized redundancy 11.3 versus 3.3 percent. Target gain 1.19 versus 1.33, with each pair shown as a dot."
 
-::caveat text="Dots: pairs. Bars: means. Targets BCa 95% CI [−0.012, +0.293]. Redundancy Δ = −0.058, exact p = 0.257: directional. Redrawn from Figs. 7, 8, 12."
+::caveat text="Dots: pairs. Bars: means. Targets BCa 95% CI [−0.012, +0.293]. Redundancy Δ = −0.058, exact *p* = 0.257: directional. Redrawn from Figs. 7, 8, 12."
 
 :::notes
 First the scatterplot, where there's nothing to navigate by. Each dot here is a pair, and the bar is the mean.
@@ -438,7 +439,7 @@ time: 54
 ::plot src=assets/fig/plot-terrain.svg alt="Two panels, No-CAAV against CAAV on the terrain. Target gain 1.19 versus 1.46, with each pair shown as a dot and all four CAAV pairs above the No-CAAV mean. Normalized redundancy 4.0 versus 14.9 percent."
 ::plot src=assets/fig/plot-terrain-maps.svg step alt="Figure 9 of the paper, redrawn. Left, the terrain's gradient, darker where it is steeper. Right, aggregated attention over all terrain conditions, brightest along the same ridge, with the steepest quarter of the terrain outlined."
 
-::caveat text="Target gain BCa 95% CI [0.112, 0.450], p = 0.029. Gradient and attention: Pearson r = 0.490, Spearman ρ = 0.561, both p < 0.0001. Redrawn from Figs. 8, 9, 12."
+::caveat text="Target gain BCa 95% CI [0.112, 0.450], *p* = 0.029. Gradient and attention: Pearson *r* = 0.490, Spearman *ρ* = 0.561, both *p* < 0.0001. Redrawn from Figs. 8, 9, 12."
 
 :::notes
 Terrain looks different. CAAV pairs found 26 percent of targets versus 19.6, and that interval spans zero as well. But target gain gives us our strongest result: 1.46 with CAAV against 1.19 without. That's a difference of 0.277, with a confidence interval from 0.112 to 0.450, a g of 1.67, and a permutation p of 0.029. All four CAAV pairs outperformed the no-CAAV mean.
@@ -457,24 +458,25 @@ time: 26
 
 # Six strategies
 
-:::card icon=split title="Spatial division" tone=both cite="P3"
+:::card title="Spatial division" tone=both cite="P3"
 > We cut the space into top and bottom, and one search for top another search for the bottom.
 :::
-:::card icon=scan title="Systematic search" tone=both cite="P12"
+:::card title="Systematic search" tone=both cite="P12"
 > I took one half and systematically searched through it.
 :::
-:::card icon=palette title="Visual feedback" tone=both cite="P14"
+:::card title="Visual feedback" tone=both cite="P14"
 > Used the voxel system to avoid redundant searches.
 :::
-:::card icon=chat title="Verbal coordination" cite="P13"
+:::card title="Verbal coordination" cite="P13"
 > We tried to coordinate verbally by describing positions relative to the Scatter structure.
 :::
-:::card icon=flag title="Landmark navigation" cite="P10"
+:::card title="Landmark navigation" cite="P10"
 > We used landmarks and described roughly in which area we found the targets.
 :::
-:::card icon=align title="Physical synchronization" cite="P6"
+:::card title="Physical synchronization" cite="P6"
 > We placed the Scatter in the same location in the room using the yellow triangle.
 :::
+::caveat text="Top row, in pink: the strategies CAAV enabled."
 
 :::notes
 Our thematic analysis found six collaborative strategies. On the top row, in pink, are the ones CAAV enabled: spatial division, where each person takes a region, systematic search, and visual feedback, where you use the colours to stay out of each other's way. On the bottom are what pairs fell back on: talking positions through, using landmarks, and lining up their copies in the room.
@@ -500,15 +502,16 @@ time: 32
 | Visual feedback | 0 | 2 | 0 | 5 |
 | Physical synchronization | 2 | 0 | 0 | 0 |
 :::
+::caveat text="Participant counts per strategy, by pair. Participants may appear under more than one strategy."
 
 :::quote who="P8"
 we have no verbal communication during the condition where we have [CAAV]
 :::
 
 :::row wide
-::stat value="93.8%" label="preferred CAAV conditions" tone=both
-::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69" tone=both
-::stat value="74.38" label="mean SUS" sub="benchmark 68" tone=both
+::stat value="93.8%" label="preferred CAAV conditions"
+::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69"
+::stat value="74.38" label="mean SUS" sub="benchmark 68"
 :::
 
 :::notes
