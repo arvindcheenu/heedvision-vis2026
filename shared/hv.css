@@ -46,6 +46,8 @@
 
 /* ---------- base ---------- */
 * { box-sizing: border-box; }
+/* no bounce at the ends of a page, or of anything inside one */
+html, body { overscroll-behavior: none; }
 html { scroll-behavior: smooth; scroll-padding-top: 76px; accent-color: var(--accent); caret-color: var(--accent); -webkit-tap-highlight-color: color-mix(in srgb, var(--accent) 20%, transparent); }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-text); font-size: 17px; font-weight: var(--w-text); line-height: 1.6; font-synthesis: none; font-kerning: normal; font-feature-settings: "calt", "liga", "kern"; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 h1, h2, h3 { font-family: var(--f-display); font-weight: var(--w-head); letter-spacing: -0.012em; line-height: 1.12; margin: 0; text-wrap: balance; }
@@ -277,7 +279,7 @@ mark.both { background: color-mix(in srgb, var(--both) 30%, transparent); }
 mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-radius: var(--radius); }
 
 /* ---------- scrolling: every list scrolls smoothly and text dissolves at its edges ---------- */
-.toc-inner, .page-toc, .pq-list, .pv-notes, .pv-left, .hv-sheet .q-list { scroll-behavior: smooth; overscroll-behavior: contain; }
+.toc-inner, .page-toc, .pq-list, .pv-notes, .pv-left, .hv-sheet .q-list { scroll-behavior: smooth; overscroll-behavior: none; }
 /* shared/tactile.js sets how much to fade, and only where there's more to see */
 .soft-edges { --fade-t: 0px; --fade-b: 0px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%); }
 /* text softens as it leaves the page, under one blur and a fade. A single fixed layer stays steady while
@@ -296,6 +298,65 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
   .edge-blur { display: none; }
 }
 @media print { .edge-blur, .page-tools { display: none !important; } }
+
+/* ---------- likes, visits and how fast they're coming in ---------- */
+.like-btn .n { font-variant-numeric: tabular-nums; }
+.like-btn .n:empty { display: none; }
+.like-row { margin: 14px 0 0; }
+.reach { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin: 18px 0 0; font-size: 14.5px; color: var(--fg-2); }
+.reach p { margin: 0; }
+.reach b { color: var(--fg); font-variant-numeric: tabular-nums; }
+.reach span { margin-left: 6px; }
+.vel { position: relative; width: 220px; }
+.vel svg { display: block; width: 100%; height: 44px; overflow: visible; touch-action: none; }
+.vel-line { fill: none; stroke: var(--title); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.vel-area { fill: color-mix(in srgb, var(--title) 12%, transparent); }
+.vel-cross { stroke: var(--fg-3); stroke-width: 1; }
+.vel-dot { fill: var(--title); stroke: var(--bg); stroke-width: 2; }
+.vz-tip { position: absolute; bottom: calc(100% + 6px); z-index: 5; padding: 3px 8px; border-radius: 6px; background: var(--fg); color: var(--bg); font-size: 12.5px; line-height: 1.35; white-space: nowrap; pointer-events: none; }
+.gl-chart .vz-tip { bottom: auto; }
+
+/* ---------- the paper at a glance ---------- */
+.gl-step { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 4px 16px; margin-top: 20px; }
+.gl-step:first-of-type { margin-top: 6px; }
+.gl-step h3 { font-size: 16px; line-height: 1.6; color: var(--sec-text); }
+.gl-step p { margin: 0; font-size: 16.5px; line-height: 1.55; max-width: 62ch; }
+.gl-three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.gl-three p { font-size: 15px; line-height: 1.45; }
+.gl-three svg { display: block; width: 26px; height: 26px; margin-bottom: 6px; color: var(--sec-text); }
+.gl-three b { display: block; font-size: 16px; }
+.gl-built { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: center; }
+.gl-space { border-collapse: separate; border-spacing: 3px; font-size: 13.5px; line-height: 1.25; }
+.gl-space th { font-weight: var(--w-text); color: var(--fg-2); text-align: left; padding: 2px 6px 2px 0; white-space: nowrap; }
+.gl-space td { padding: 7px 10px; border-radius: calc(var(--radius) * 0.6); background: var(--surface-2); color: var(--fg-2); text-align: center; }
+.gl-space td:empty { background: none; }
+.gl-space td.on { background: var(--accent); color: var(--on-accent); font-weight: var(--w-strong); }
+.gl-chart { position: relative; margin-top: 10px; --gl-off-c: #c2a184; }
+.dark .gl-chart { --gl-off-c: #7f6a58; }
+.gl-row { margin: 14px 0 2px; font-size: 15px; font-weight: var(--w-strong); }
+.gl-panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.gl-panel { margin: 0; min-width: 0; }
+.gl-panel figcaption { font-size: 13.5px; color: var(--fg-2); }
+.gl-panel svg { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--f-text); }
+.gl-tick, .gl-x { fill: var(--fg-2); font-size: 11.5px; }
+.gl-val { fill: var(--fg); font-size: 12.5px; font-weight: var(--w-strong); font-variant-numeric: tabular-nums; }
+.gl-off { fill: var(--gl-off-c); stroke: var(--gl-off-c); }
+.gl-on { fill: var(--accent); stroke: var(--accent); }
+.gl-pair { stroke: var(--bg); stroke-width: 2; }
+.gl-mean { stroke: var(--bg); stroke-width: 1; }
+.gl-stem { stroke-width: 2.5; stroke-linecap: round; }
+.gl-note { margin-top: 10px !important; font-size: 13.5px !important; color: var(--fg-2); }
+.gl-numbers { margin-top: 8px; font-size: 14.5px; }
+.gl-numbers summary { cursor: pointer; font-weight: var(--w-strong); border-radius: 4px; }
+.gl-table { margin-top: 6px; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.gl-table th, .gl-table td { padding: 3px 18px 3px 0; text-align: left; font-weight: var(--w-text); }
+.gl-table thead th { font-weight: var(--w-strong); }
+@media (max-width: 640px) {
+  .gl-step { grid-template-columns: minmax(0, 1fr); }
+  .gl-three, .gl-built, .gl-panels { grid-template-columns: minmax(0, 1fr); }
+  .gl-panel svg { max-width: 300px; }
+  .stage-bar .like-btn span { display: none; }
+}
 
 /* ---------- hold ⌘: a key on every control ---------- */
 .key-layer { position: fixed; inset: 0; z-index: 90; pointer-events: none; }

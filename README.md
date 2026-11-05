@@ -123,6 +123,10 @@ The timer stops when the presenter view closes, and picks up again with **Resume
 
 To try all of this without touching the real room, run `npx wrangler dev --port 8787 --var PRESENTER_KEY:test` in `worker/` and add `live=http://127.0.0.1:8787` to each page's address.
 
+## Likes and visits
+
+`shared/stats.js` shows like buttons on the paper and script pages, and on the paper page a visit count with a velocity graph of visits every six hours over the last week. They live on the relay: `GET /rooms/vis2026/stats`, `POST /hit` and `POST /like`. A visit is a number added to an hour, and nothing about the visitor is stored. A like stores a random id kept in that browser, so it can be taken back. Local work, automated browsers and anyone asking not to be tracked aren't counted. If the relay can't answer, none of this shows.
+
 ## Tools
 
 - `node tools/serve.mjs`: serves the site on :8000, read-only. `--dev` adds editing, the Theme page and live reload.

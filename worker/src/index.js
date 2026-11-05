@@ -4,6 +4,9 @@
 //
 //   GET /rooms/:room/ws      WebSocket (add ?key=PRESENTER_KEY to present)
 //   GET /rooms/:room/state   current slide, visible questions and script edits as JSON
+//   GET /rooms/:room/stats   visits to the paper page by hour, and likes
+//   POST /rooms/:room/hit    counts one visit. Stores a number per hour, nothing about the visitor
+//   POST /rooms/:room/like   {target: "paper" | "slides", cid, on}
 import { DurableObject } from "cloudflare:workers";
 
 const MAX_TEXT = 600;
@@ -11,6 +14,8 @@ const MAX_NAME = 60;
 const MAX_QUESTIONS = 2000;
 const MAX_NOTES = 12000;
 const MAX_ANSWER = 1200;
+const LIKE_TARGETS = ["paper", "slides"];
+const HOUR = 3_600_000;
 
 export default {
   async fetch(req, env) {
@@ -21,7 +26,7 @@ export default {
 
     if (req.method === "OPTIONS") return withCors(new Response(null, { status: 204 }), origin, originOk);
 
-    const m = url.pathname.match(/^\/rooms\/([a-z0-9-]{1,40})\/(ws|state)$/i);
+    const m = url.pathname.match(/^\/rooms\/([a-z0-9-]{1,40})\/(ws|state|stats|hit|like)$/i);
     if (!m) return new Response("HeedVision live relay\n", { status: 404 });
     if (!originOk) return new Response("Origin not allowed\n", { status: 403 });
 
@@ -46,6 +51,8 @@ export class Room extends DurableObject {
     this.sql.exec(`CREATE TABLE IF NOT EXISTS votes (qid TEXT, voter TEXT, PRIMARY KEY (qid, voter))`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, md TEXT, base TEXT, ts INTEGER)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS visits (hour INTEGER PRIMARY KEY, n INTEGER NOT NULL)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS likes (target TEXT, cid TEXT, PRIMARY KEY (target, cid))`);
     this.buckets = new Map(); // in-memory rate limits; reset when the object sleeps
   }
 
@@ -53,6 +60,23 @@ export class Room extends DurableObject {
     const url = new URL(req.url);
     if (url.pathname.endsWith("/state")) {
       return Response.json({ slide: this.slide(), questions: this.questions(false), notes: this.notes() });
+    }
+    if (url.pathname.endsWith("/stats")) return Response.json(this.stats());
+    if (url.pathname.endsWith("/hit") || url.pathname.endsWith("/like")) {
+      if (req.method !== "POST") return new Response("Use POST\n", { status: 405 });
+      const who = req.headers.get("CF-Connecting-IP") || "local";
+      if (url.pathname.endsWith("/hit")) {
+        if (this.allow(`hit:${who}`, 30, 60_000)) this.sql.exec("INSERT INTO visits (hour, n) VALUES (?, 1) ON CONFLICT (hour) DO UPDATE SET n = n + 1", Math.floor(Date.now() / HOUR));
+        return Response.json({ ok: true });
+      }
+      if (!this.allow(`like:${who}`, 20, 60_000)) return Response.json({ error: "Too many likes for now." }, { status: 429 });
+      let m;
+      try { m = JSON.parse(await req.text()); } catch { return new Response("Bad JSON\n", { status: 400 }); }
+      const cid = cleanId(m.cid);
+      if (!LIKE_TARGETS.includes(m.target) || !cid) return new Response("Bad like\n", { status: 400 });
+      if (m.on) this.sql.exec("INSERT OR IGNORE INTO likes (target, cid) VALUES (?, ?)", m.target, cid);
+      else this.sql.exec("DELETE FROM likes WHERE target = ? AND cid = ?", m.target, cid);
+      return Response.json({ likes: this.stats().likes });
     }
     const key = url.searchParams.get("key") || "";
     const presenter = await isPresenterKey(key, this.env.PRESENTER_KEY);
@@ -151,6 +175,16 @@ export class Room extends DurableObject {
 
   async webSocketClose() {}
   async webSocketError() {}
+
+  stats() {
+    const since = Math.floor(Date.now() / HOUR) - 24 * 7;
+    const likes = Object.fromEntries(LIKE_TARGETS.map((t) => [t, this.sql.exec("SELECT COUNT(*) AS n FROM likes WHERE target = ?", t).one().n]));
+    return {
+      visits: this.sql.exec("SELECT COALESCE(SUM(n), 0) AS n FROM visits").one().n,
+      hours: this.sql.exec("SELECT hour, n FROM visits WHERE hour >= ? ORDER BY hour", since).toArray(),
+      likes,
+    };
+  }
 
   slide() {
     const row = this.sql.exec("SELECT v FROM meta WHERE k = 'slide'").toArray()[0];

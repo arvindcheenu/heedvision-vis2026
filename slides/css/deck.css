@@ -26,6 +26,7 @@
   --plot-ink: var(--fg); --plot-muted: rgba(246, 239, 233, 0.7); --plot-grey: #a89f97; --plot-line: #4a4038;
 }
 
+html, body { overscroll-behavior: none; }
 .reveal-viewport { background: var(--bg); }
 /* One radius everywhere: this is the same on screen as --radius on the pages, because slides are
    drawn at 1920 wide and scaled down. It matches the rounded maps in the plots. */

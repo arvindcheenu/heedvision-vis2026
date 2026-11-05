@@ -1,5 +1,5 @@
 /* The presenter view: the slide, its controls and the questions on the left; the next build and the script on the right. */
-html, body { height: 100%; }
+html, body { height: 100%; overscroll-behavior: none; }
 body { overflow: hidden; display: flex; flex-direction: column; }
 
 /* timer */
