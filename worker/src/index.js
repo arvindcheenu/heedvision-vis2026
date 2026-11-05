@@ -2,7 +2,7 @@
 // One Durable Object per room keeps the presenter's current slide and the
 // audience's questions, and fans updates out over hibernatable WebSockets.
 //
-//   GET /rooms/:room/ws      WebSocket (add ?key=PRESENTER_KEY to present)
+//   GET /rooms/:room/ws      WebSocket. The host signs in with {t: "auth", key} once connected
 //   GET /rooms/:room/state   current slide, visible questions and script edits as JSON
 //   GET /rooms/:room/stats   visits to the paper page by hour, likes, and the toolkit's GitHub stars
 //   POST /rooms/:room/hit    counts one visit. Stores a number per hour, nothing about the visitor
@@ -16,6 +16,7 @@ const MAX_NOTES = 12000;
 const MAX_ANSWER = 1200;
 const LIKE_TARGETS = ["paper", "slides"];
 const HOUR = 3_600_000;
+const MIN_KEY = 16;
 const STARS_REPO = "arvindcheenu/caav";
 const STARS_EVERY = 120_000;
 
@@ -85,13 +86,13 @@ export class Room extends DurableObject {
       else this.sql.exec("DELETE FROM likes WHERE target = ? AND cid = ?", m.target, cid);
       return Response.json({ likes: this.stats().likes });
     }
-    const key = url.searchParams.get("key") || "";
-    const presenter = await isPresenterKey(key, this.env.PRESENTER_KEY);
+    const key = url.searchParams.get("key") || ""; // pages from before sign-in existed
     const ip = req.headers.get("CF-Connecting-IP") || "local";
+    const presenter = !!key && !this.tooManyMisses(ip) && (await this.checkHost(key, ip));
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({ presenter, ip });
-    server.send(JSON.stringify({ t: "init", presenter, replies: true, moderation: true, moderate: this.moderate(), slide: this.slide(), questions: this.questions(presenter), notes: this.notes() }));
+    server.send(JSON.stringify(this.init(presenter)));
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -101,7 +102,30 @@ export class Room extends DurableObject {
     try { m = JSON.parse(raw); } catch { return; }
     const { presenter, ip } = ws.deserializeAttachment() || {};
 
-    if (m.t === "slide") {
+    if (m.t === "auth") {
+      if (this.tooManyMisses(ip)) return send(ws, { t: "auth", ok: false, reason: "wait" });
+      const ok = await this.checkHost(String(m.key || ""), ip);
+      if (!ok) return send(ws, { t: "auth", ok: false, reason: "wrong" });
+      ws.serializeAttachment({ presenter: true, ip });
+      send(ws, this.init(true));
+      send(ws, { t: "auth", ok: true });
+    } else if (m.t === "signout") {
+      ws.serializeAttachment({ presenter: false, ip });
+      send(ws, this.init(false));
+    } else if (m.t === "set-key") {
+      // the host chooses a new passphrase: the old one stops working, and so does every other signed-in browser
+      if (!presenter) return;
+      const key = String(m.key || "");
+      if (key.length < MIN_KEY || key.length > 200) return send(ws, { t: "key-set", ok: false });
+      await this.saveHost(key);
+      for (const other of this.ctx.getWebSockets()) {
+        if (other === ws || !other.deserializeAttachment()?.presenter) continue;
+        other.serializeAttachment({ ...other.deserializeAttachment(), presenter: false });
+        send(other, this.init(false));
+        send(other, { t: "auth", ok: false, reason: "changed" });
+      }
+      send(ws, { t: "key-set", ok: true });
+    } else if (m.t === "slide") {
       if (!presenter) return;
       const s = cleanSlide(m.slide);
       if (!s) return;
@@ -182,6 +206,46 @@ export class Room extends DurableObject {
 
   async webSocketClose() {}
   async webSocketError() {}
+
+  init(presenter) {
+    return { t: "init", presenter, host: true, replies: true, moderation: true, moderate: this.moderate(), slide: this.slide(), questions: this.questions(presenter), notes: this.notes() };
+  }
+
+  // The host is whoever holds the passphrase. The relay keeps only a salted hash of it. Until a passphrase has
+  // been set here, the PRESENTER_KEY secret is the passphrase. After that the same secret stops working, unless
+  // it is changed with `wrangler secret put`: a new secret signs in and clears the stored one, which is how to
+  // recover a lost passphrase.
+  async isHost(key) {
+    const env = this.env.PRESENTER_KEY || "";
+    if (!key) return false;
+    const row = this.sql.exec("SELECT v FROM meta WHERE k = 'host'").toArray()[0];
+    if (!row) return sameText(key, env);
+    const host = JSON.parse(row.v);
+    if (sameBytes(await slowHash(key, host.salt), host.hash)) return true;
+    if (env && sameText(key, env) && (await quickHash(env)) !== host.env) {
+      this.sql.exec("DELETE FROM meta WHERE k = 'host'");
+      return true;
+    }
+    return false;
+  }
+
+  // only wrong guesses count against an address, so reloading your own page never locks you out
+  tooManyMisses(ip) {
+    const now = Date.now();
+    return (this.buckets.get(`miss:${ip}`) || []).filter((t) => now - t < 60_000).length >= 10;
+  }
+
+  async checkHost(key, ip) {
+    const ok = await this.isHost(key);
+    if (!ok) this.allow(`miss:${ip}`, 1000, 60_000);
+    return ok;
+  }
+
+  async saveHost(key) {
+    const salt = toHex(crypto.getRandomValues(new Uint8Array(16)));
+    const host = { salt, hash: await slowHash(key, salt), env: await quickHash(this.env.PRESENTER_KEY || "") };
+    this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('host', ?)", JSON.stringify(host));
+  }
 
   stats() {
     const since = Math.floor(Date.now() / HOUR) - 24 * 7;
@@ -295,11 +359,27 @@ function cleanSlide(s) {
   return { id, h: int(s.h), v: int(s.v), f: int(s.f), ts: Date.now() };
 }
 
-async function isPresenterKey(given, expected) {
-  if (!given || !expected) return false;
+const toHex = (bytes) => [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, "0")).join("");
+
+async function quickHash(text) {
+  return toHex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)));
+}
+
+async function slowHash(text, salt) {
   const enc = new TextEncoder();
-  const [a, b] = await Promise.all([given, expected].map((s) => crypto.subtle.digest("SHA-256", enc.encode(s))));
-  return crypto.subtle.timingSafeEqual(a, b);
+  const base = await crypto.subtle.importKey("raw", enc.encode(text), "PBKDF2", false, ["deriveBits"]);
+  return toHex(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: enc.encode(salt), iterations: 100_000 }, base, 256));
+}
+
+function sameBytes(a, b) {
+  const enc = new TextEncoder(), x = enc.encode(a), y = enc.encode(b);
+  return x.length === y.length && crypto.subtle.timingSafeEqual(x, y);
+}
+
+function sameText(a, b) {
+  if (!a || !b) return false;
+  const enc = new TextEncoder(), x = enc.encode(a.padEnd(256)), y = enc.encode(b.padEnd(256));
+  return a.length === b.length && x.length === y.length && crypto.subtle.timingSafeEqual(x, y);
 }
 
 function withCors(res, origin, ok) {

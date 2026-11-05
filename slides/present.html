@@ -2,21 +2,35 @@
 <html lang="en" data-sound-scope="presenter">
 <head>
   <meta charset="utf-8">
+  <!-- Decide before anything draws: only the host sees the presenter view. -->
+  <script>try { if (!localStorage.getItem("hv.host") && !/[?&]present=/.test(location.search)) document.documentElement.className = "gated"; } catch (e) { document.documentElement.className = "gated"; }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>HeedVision · Presenter</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <script src="../shared/site.js?v=20261237"></script>
-  <script src="../shared/tactile.js?v=20261237" defer></script>
-  <script src="../shared/icons.js?v=20261237"></script>
-  <script src="../shared/keys.js?v=20261237"></script>
+  <script src="../shared/site.js?v=20261239"></script>
+  <script src="../shared/tactile.js?v=20261239" defer></script>
+  <script src="../shared/icons.js?v=20261239"></script>
+  <script src="../shared/keys.js?v=20261239"></script>
   <link rel="preload" href="../shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../shared/theme.css?v=20261237">
-  <link rel="stylesheet" href="../shared/hv.css?v=20261237">
-  <link rel="stylesheet" href="css/present.css?v=20261237">
+  <link rel="stylesheet" href="../shared/theme.css?v=20261239">
+  <link rel="stylesheet" href="../shared/hv.css?v=20261239">
+  <link rel="stylesheet" href="css/present.css?v=20261239">
 </head>
 <!-- Press P on the slides for this view. It drives them. -->
 <body>
+  <main class="pv-gate">
+    <h1 id="gate-title">This view is for the speaker</h1>
+    <p>To follow along or ask a question, <a href="../talk/">open the talk</a>.</p>
+    <form class="pv-gate-form" autocomplete="on">
+      <label for="gate-key">Host passphrase</label>
+      <input class="field" id="gate-key" name="password" type="password" autocomplete="current-password" required>
+      <input type="text" name="username" value="HeedVision host" autocomplete="username" hidden>
+      <button type="submit" class="btn">Sign in</button>
+      <p class="pv-gate-note" role="alert"></p>
+    </form>
+  </main>
+
   <header class="pv-head">
     <div class="pv-timer" role="group" aria-label="Timer">
       <b class="elapsed" role="timer" aria-label="Time so far">0:00</b>
@@ -26,9 +40,24 @@
       <button type="button" class="btn auto" aria-pressed="true" title="Start and resume the timer when the slides move">Auto-resume</button>
     </div>
     <span class="pv-link" role="status"></span>
+    <button type="button" class="btn pv-host" data-host="new" hidden title="Make a new passphrase. The old one stops working.">New passphrase</button>
+    <button type="button" class="btn pv-host" data-host="out" hidden title="Sign out in this browser">Sign out</button>
     <span data-sound-toggle></span>
     <span data-theme-picker></span>
   </header>
+
+  <section class="pv-newkey" role="dialog" aria-labelledby="newkey-title" hidden>
+    <h2 id="newkey-title">A new passphrase</h2>
+    <p class="pv-newkey-value" tabindex="0"></p>
+    <p>Save this now: it won't be shown again. Once you use it, your old passphrase stops working and any other signed-in browser is signed out.</p>
+    <div class="pv-newkey-row">
+      <button type="button" class="btn" data-newkey="copy">Copy</button>
+      <button type="button" class="btn" data-newkey="again">Another</button>
+      <button type="button" class="btn" data-newkey="use">Use this one</button>
+      <button type="button" class="btn" data-newkey="cancel">Cancel</button>
+    </div>
+    <p class="pv-newkey-note" role="status"></p>
+  </section>
 
   <main class="pv-main">
     <div class="pv-left">
@@ -65,9 +94,9 @@
     </div>
   </main>
 
-  <script src="vendor/marked.js?v=20261237"></script>
-  <script src="js/mdeck.js?v=20261237"></script>
-  <script src="js/live.js?v=20261237"></script>
-  <script src="js/present.js?v=20261237"></script>
+  <script src="vendor/marked.js?v=20261239"></script>
+  <script src="js/mdeck.js?v=20261239"></script>
+  <script src="js/live.js?v=20261239"></script>
+  <script src="js/present.js?v=20261239"></script>
 </body>
 </html>

@@ -15,6 +15,9 @@
   if (window.parent !== window) return;
   if (params.has("present") || params.has("receiver") || params.has("embed") || params.has("poster") || /print/.test(params.get("view") || "")) return;
 
+  // the host's browser holds the passphrase, and the host's own visits aren't worth counting
+  try { if (localStorage.getItem("hv.host")) return; } catch (e) {}
+
   function choice() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function remember(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
 

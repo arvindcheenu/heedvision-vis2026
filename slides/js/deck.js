@@ -8,14 +8,22 @@
   const isPrint = params.get("view") === "print" || params.has("print-pdf");
   const isPoster = params.has("poster") || isPrint;
   const isReceiver = params.has("receiver");
+  // An old ?present= link still signs in, but the passphrase doesn't stay in the address.
+  const hostStore = { get() { try { return JSON.parse(localStorage.getItem("hv.host")); } catch { return null; } }, set(k) { try { localStorage.setItem("hv.host", JSON.stringify(k)); } catch {} } };
   const hasKey = !!live.presenterKey;
+  if (hasKey) {
+    hostStore.set(live.presenterKey);
+    const u = new URL(location.href); u.searchParams.delete("present");
+    history.replaceState(null, "", u);
+  }
   // once this browser has presented, it never shows audience controls (?audience undoes it)
   const PRESENTER = "hv.presenter";
   const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
   if (params.has("audience")) lsSet(PRESENTER, null);
   if (hasKey) lsSet(PRESENTER, "1");
-  const isPresenting = hasKey || lsGet(PRESENTER) === "1";
+  // only the host's browser counts as presenting; an earlier press of P doesn't
+  const isPresenting = hasKey || (lsGet(PRESENTER) === "1" && !!hostStore.get());
   function markPresenter() { lsSet(PRESENTER, "1"); document.body.classList.add("presenting"); if (fab) fab.remove(); if (sheet) sheet.remove(); fab = sheet = null; }
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   // ?embed shows the deck inside another page; ?embed=<id> shows just that slide
@@ -172,7 +180,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261237"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261239"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -228,7 +236,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261237", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261239", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -374,7 +382,9 @@
   if (channel) {
     channel.onmessage = (e) => {
       const m = e.data || {};
-      if (m.t === "hello") { markPresenter(); postConsole(); if (hasKey) channel.postMessage({ t: "key", key: live.presenterKey }); }
+      // the presenter view is open and signed in: it hands this window its passphrase, so the slides can lead
+      if (m.t === "hello") { markPresenter(); postConsole(); if (m.key && m.key !== live.presenterKey) live.signIn(m.key).then((a) => { if (a.ok) broadcast(); }); }
+      if (m.t === "signout") live.signOut();
       else if (m.t === "go") {
         if (m.dir === "next") advance();
         else if (m.dir === "prev") deck.prev();
@@ -385,9 +395,9 @@
     };
   }
   function openConsole() {
-    markPresenter();
-    const u = `present.html${hasKey ? `?present=${encodeURIComponent(live.presenterKey)}` : ""}`;
-    window.open(u, "hv-presenter", "popup,width=1440,height=900");
+    // for anyone but the host, this opens the sign-in and changes nothing here
+    if (hostStore.get()) markPresenter();
+    window.open("present.html", "hv-presenter", "popup,width=1440,height=900");
   }
 
   // ---------------------------------------------------------- live: follow + ask
@@ -513,11 +523,11 @@
   }
   // presenter: double-click a question on the board to hide it
   document.addEventListener("dblclick", (e) => {
-    const it = hasKey && e.target.closest(".qa-item");
+    const it = live.presenter && e.target.closest(".qa-item");
     if (it) live.hide(it.dataset.id);
   });
 
-  function broadcast() { if (hasKey && set.follow) live.broadcast(currentState()); }
+  function broadcast() { if (live.presenter && set.follow) live.broadcast(currentState()); }
 
   // ---------------------------------------------------------- embed bridge
   // The host page steps through builds with {hv:"go", dir} or jumps with {hv:"go", id, f},
@@ -589,7 +599,7 @@
       await Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]);
       print();
     }, 3000);
-    live.on("status", (s) => { if (s === "open") broadcast(); });
+    live.on("auth", (a) => { if (a.ok) broadcast(); });
     live.on("error", (m) => console.warn("[live]", m));
     renderBoard();
     // the canvases drew their labels before the font had arrived

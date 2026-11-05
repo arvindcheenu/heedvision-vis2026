@@ -288,7 +288,7 @@
   }
   liveBtn.addEventListener("click", () => setFollow(true));
   // this browser is presenting: it never needs to rejoin itself
-  try { if (localStorage.getItem("hv.presenter") === "1") document.body.classList.add("presenting"); } catch {}
+  try { if (localStorage.getItem("hv.presenter") === "1" && localStorage.getItem("hv.host")) document.body.classList.add("presenting"); } catch {}
   // reading on your own pauses following
   ["wheel", "touchmove"].forEach((t) => addEventListener(t, () => { if (following && !programmatic) setFollow(false); }, { passive: true }));
   addEventListener("keydown", (ev) => {

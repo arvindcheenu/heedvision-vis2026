@@ -21,7 +21,7 @@
     enabled: false,
     status: "off",          // off | connecting | open | closed
     presenterKey: params.get("present") || "",
-    presenter: false,       // the relay accepted the presenter key
+    presenter: false,       // the relay accepted this browser as the host
     replies: false,
     moderation: false,      // this relay can hold questions for approval
     moderate: false,        // ...and is doing so
@@ -88,6 +88,22 @@
     // the edit to show for a slide, if it still applies to this talk.md
     noteFor(slide) { const n = this.notes.get(slide.id); return n && n.base === slide.notesHash ? n : null; },
 
+    // the host: sign in, change the passphrase, sign out. Each answers once the relay has.
+    signIn(key) {
+      this.presenterKey = key;
+      if (ws && ws.readyState === 1) sendAuth();
+      return new Promise((done) => waiters.auth.push(done));
+    },
+    changeKey(key) {
+      send({ t: "set-key", key });
+      return new Promise((done) => waiters.key.push((ok) => { if (ok) this.presenterKey = key; done(ok); }));
+    },
+    signOut() {
+      this.presenterKey = "";
+      this.presenter = false;
+      send({ t: "signout" });
+    },
+
     start(options) {
       cfg = { ...options };
       // For local testing: ?live=http://127.0.0.1:8787 points at `npx wrangler dev`.
@@ -100,27 +116,34 @@
     },
   };
 
-  let ws = null, retry = 0;
+  let ws = null, retry = 0, signingIn = false;
   const queue = [];
+  const waiters = { auth: [], key: [] };
   function send(msg) {
     if (!live.enabled) return false;
-    if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+    // nothing overtakes a sign-in: the relay would refuse it
+    if (ws && ws.readyState === 1 && !signingIn) ws.send(JSON.stringify(msg));
     else queue.push(msg);
     return true;
+  }
+  function flush() { if (ws && ws.readyState === 1 && !signingIn) queue.splice(0).forEach((m) => ws.send(JSON.stringify(m))); }
+  function sendAuth() {
+    signingIn = true;
+    ws.send(JSON.stringify({ t: "auth", key: live.presenterKey }));
   }
 
   function setStatus(s) { live.status = s; live.emit("status", s); }
 
   function connect() {
     const base = cfg.endpoint.replace(/\/$/, "").replace(/^http/, "ws");
-    const url = `${base}/rooms/${encodeURIComponent(cfg.room || "default")}/ws` +
-      (live.presenterKey ? `?key=${encodeURIComponent(live.presenterKey)}` : "");
+    const url = `${base}/rooms/${encodeURIComponent(cfg.room || "default")}/ws`;
     setStatus("connecting");
     try { ws = new WebSocket(url); } catch { return schedule(); }
     ws.onopen = () => {
       retry = 0;
       setStatus("open");
-      queue.splice(0).forEach((m) => ws.send(JSON.stringify(m)));
+      if (live.presenterKey) sendAuth();
+      flush();
     };
     ws.onmessage = (ev) => {
       let m; try { m = JSON.parse(ev.data); } catch { return; }
@@ -134,7 +157,20 @@
         live.emit("notes");
         live.emit("questions");
         if (m.slide) { live.slide = m.slide; live.emit("slide", m.slide); }
-        if (live.presenterKey && !m.presenter) live.emit("error", "Presenter key was not accepted");
+      } else if (m.t === "auth") {
+        signingIn = false;
+        // too many wrong guesses from this network: a remembered passphrase isn't wrong, so it waits and tries again
+        if (!m.ok && m.reason === "wait" && live.presenterKey && !waiters.auth.length) {
+          setTimeout(() => { if (ws && ws.readyState === 1 && live.presenterKey) sendAuth(); }, 20000);
+          flush();
+          return;
+        }
+        if (!m.ok) { live.presenterKey = ""; live.presenter = false; live.emit("questions"); }
+        live.emit("auth", { ok: !!m.ok, reason: m.reason });
+        waiters.auth.splice(0).forEach((done) => done({ ok: !!m.ok, reason: m.reason }));
+        flush();
+      } else if (m.t === "key-set") {
+        waiters.key.splice(0).forEach((done) => done(!!m.ok));
       } else if (m.t === "slide") {
         live.slide = m.slide; live.emit("slide", m.slide);
       } else if (m.t === "question") {
@@ -154,7 +190,7 @@
         live.emit("error", m.msg);
       }
     };
-    ws.onclose = () => { setStatus("closed"); schedule(); };
+    ws.onclose = () => { signingIn = false; setStatus("closed"); schedule(); };
     ws.onerror = () => { try { ws.close(); } catch {} };
   }
   function schedule() {

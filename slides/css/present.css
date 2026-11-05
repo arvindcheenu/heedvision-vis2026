@@ -2,6 +2,26 @@
 html, body { height: 100%; overscroll-behavior: none; }
 body { overflow: hidden; display: flex; flex-direction: column; }
 
+/* only the host sees the view; everyone else, the sign-in */
+.gated .pv-head, .gated .pv-main { display: none; }
+html:not(.gated) .pv-gate { display: none; }
+.gated body { overflow: auto; align-items: center; justify-content: center; padding: 24px; }
+.pv-gate { width: min(420px, 100%); }
+.pv-gate h1 { font-size: 26px; }
+.pv-gate p { margin: 8px 0 18px; }
+.pv-gate-form { display: grid; gap: 10px; }
+.pv-gate-form label { font-weight: var(--w-strong); }
+.pv-gate-form .btn { justify-self: start; }
+.pv-gate-note { margin: 0 !important; min-height: 1.5em; color: var(--accent); }
+.pv-newkey { position: fixed; z-index: 60; top: 64px; right: 16px; width: min(460px, calc(100vw - 32px)); padding: 18px; border-radius: var(--radius); background: var(--bg); box-shadow: var(--raised-more); }
+.pv-newkey h2 { font-size: 18px; }
+.pv-newkey p { margin: 10px 0; font-size: 15px; line-height: 1.45; }
+.pv-newkey .pv-newkey-value { padding: 10px 12px; border-radius: calc(var(--radius) * 0.7); background: var(--surface-2); font-size: 18px; font-weight: var(--w-strong); overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.pv-newkey-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.pv-newkey-row .btn { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.pv-newkey .pv-newkey-note { min-height: 1.4em; margin-bottom: 0; color: var(--fg-2); }
+.pv-host { min-height: 34px; padding: 0 12px; font-size: 14px; }
+
 /* timer */
 .pv-head { flex: none; display: flex; align-items: center; gap: 6px; padding: 10px 16px 0; }
 .pv-timer { display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }

@@ -9,7 +9,6 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
-  store.set("hv.presenter", 1);
 
   const src = await fetch("talk.md", { cache: "no-cache" }).then((r) => r.text());
   const talk = MDeck.render(src);
@@ -17,10 +16,56 @@
   const slides = new Map(talk.slides.map((s) => [s.id, s]));
   const main = () => talk.slides.filter((s) => !s.backup);
 
+  // ---------------------------------------------------------- only the host gets past here
+  // The passphrase stays in this browser, so a reload or lost Wi-Fi doesn't lock you out of your own notes.
+  // The relay still checks it, and if it no longer holds, this returns to the sign-in.
+  const HOST = "hv.host";
+  const gateNote = (t) => { $(".pv-gate-note").textContent = t; };
+  const WHY = { wrong: "That passphrase isn't right.", wait: "Too many tries. Please wait a minute.", changed: "The passphrase has changed. Please sign in with the new one." };
+  const remembered = store.get(HOST, null);
+  const fromLink = params.get("present");
+  if (fromLink) {
+    const u = new URL(location.href); u.searchParams.delete("present");
+    history.replaceState(null, "", u);
+  }
+  live.presenterKey = fromLink || remembered || "";
+  live.on("auth", (a) => {
+    if (a.ok) return store.set(HOST, live.presenterKey || store.get(HOST, null));
+    if (!document.documentElement.classList.contains("gated")) {
+      localStorage.removeItem(HOST);
+      try { sessionStorage.setItem("hv.gate.why", a.reason || "wrong"); } catch {}
+      location.reload();
+    }
+  });
+  live.start({ endpoint: set.live, room: set.room });
+  if (!live.presenterKey) {
+    let why = null;
+    try { why = sessionStorage.getItem("hv.gate.why"); sessionStorage.removeItem("hv.gate.why"); } catch {}
+    if (why) gateNote(WHY[why] || WHY.wrong);
+    const box = $("#gate-key");
+    box.focus();
+    await new Promise((signedIn) => {
+      $(".pv-gate-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const key = box.value.trim();
+        if (!key) return;
+        gateNote("Checking…");
+        const slow = setTimeout(() => gateNote("Can't reach the relay yet. Still trying…"), 6000);
+        const a = await live.signIn(key);
+        clearTimeout(slow);
+        if (!a.ok) { gateNote(WHY[a.reason] || WHY.wrong); box.select(); return; }
+        store.set(HOST, key);
+        box.value = "";
+        signedIn();
+      });
+    });
+    document.documentElement.classList.remove("gated");
+  }
+  store.set("hv.presenter", 1);
+
   // ---------------------------------------------------------- link to the slides
   const channel = new BroadcastChannel(`hv-present-${set.room}`);
-  let state = null, deckSeen = 0, liveStarted = false;
-  function startLive() { if (!liveStarted) { liveStarted = true; live.start({ endpoint: set.live, room: set.room }); } }
+  let state = null, deckSeen = 0;
   channel.onmessage = (e) => {
     const m = e.data || {};
     if (m.t === "state") {
@@ -28,14 +73,13 @@
       // answers to the "are you there?" below change nothing, and shouldn't move the script
       if (!state || m.id !== state.id || m.f !== state.f || m.ask !== state.ask || m.qa !== state.qa) onState(m);
     }
-    else if (m.t === "key" && m.key && !live.presenterKey) live.presenterKey = m.key;
   };
-  channel.postMessage({ t: "hello" });
-  setTimeout(startLive, 700); // gives the slides a moment to hand over the presenter key
+  const hello = () => channel.postMessage({ t: "hello", key: live.presenterKey });
+  hello();
   setInterval(() => {
     const ok = Date.now() - deckSeen < 6000 || (deckSeen && document.hidden);
     $(".pv-link").textContent = ok ? "" : "Open the slides in this browser";
-    channel.postMessage({ t: "hello" });
+    hello();
   }, 2000);
   const go = (msg) => channel.postMessage({ t: "go", ...msg });
   live.on("slide", (s) => { if (Date.now() - deckSeen > 4000) onState({ ...s, builds: slides.get(s.id)?.clicks || 0, backup: !!slides.get(s.id)?.backup }); });
@@ -230,10 +274,10 @@
     $(".pq-count").textContent = qs.length || "";
     const held = qs.filter((q) => q.pending).length;
     $(".pv-scope").textContent = live.presenter ? "You're presenting live: anyone following along moves with you."
-      : live.presenterKey && live.status !== "open" ? ""
-      : "You control only your own copy of the slides, in this browser. The hosted talk and other viewers aren't affected.";
+      : "Not connected to the relay right now. Your slides, script and timer still work here; it reconnects by itself.";
+    document.querySelector('[data-host="new"]').hidden = !live.presenter; // needs the relay; signing out doesn't
+    document.querySelector('[data-host="out"]').hidden = false;
     $(".pq-hint").innerHTML = live.status !== "open" ? "Connecting to the questions…"
-      : !live.presenter ? "To reply, open the slides with your key: add <code>?present=your-key</code> to their address, then press P."
       : !live.replies || !live.moderation ? "Some actions need the updated relay. Run <code>npx wrangler deploy</code> in <code>worker/</code>."
       : held ? `${held} waiting for your approval.`
       : live.moderate ? "New questions wait here for your approval." : "";
@@ -302,6 +346,50 @@
     else if (k === "q" || k === "Q") channel.postMessage({ t: "qa", on: !qa });
     else if (k === "t" || k === "T") HVTheme.cycle();
   });
+
+  // ---------------------------------------------------------- the host's passphrase
+  const newkey = $(".pv-newkey"), newValue = $(".pv-newkey-value"), newNote = $(".pv-newkey-note");
+  let words = null, candidate = "";
+  async function makePassphrase() {
+    words = words || (await fetch("words.txt").then((r) => r.text())).trim().split("\n");
+    const picks = crypto.getRandomValues(new Uint32Array(6));
+    // 2048 words, six times over: about 66 bits, and unbiased because 2048 divides 2^32
+    candidate = [...picks].map((n) => words[n % words.length]).join("-");
+    newValue.textContent = candidate;
+    newNote.textContent = "";
+  }
+  document.querySelector('[data-host="new"]').addEventListener("click", async () => {
+    await makePassphrase();
+    newkey.hidden = false;
+    newValue.focus();
+  });
+  document.querySelector('[data-host="out"]').addEventListener("click", () => {
+    live.signOut();
+    channel.postMessage({ t: "signout" });
+    localStorage.removeItem(HOST);
+    store.set("hv.presenter", null);
+    localStorage.removeItem("hv.presenter");
+    location.reload();
+  });
+  newkey.addEventListener("click", async (e) => {
+    const act = e.target.closest("[data-newkey]")?.dataset.newkey;
+    if (!act) return;
+    if (act === "cancel") { newkey.hidden = true; candidate = ""; newValue.textContent = ""; document.querySelector('[data-host="new"]').focus(); }
+    else if (act === "again") await makePassphrase();
+    else if (act === "copy") {
+      try { await navigator.clipboard.writeText(candidate); newNote.textContent = "Copied."; }
+      catch { newNote.textContent = "Couldn't copy. Select the passphrase above instead."; }
+    } else if (act === "use") {
+      newNote.textContent = "Saving…";
+      const ok = await live.changeKey(candidate);
+      if (!ok) { newNote.textContent = "That didn't work. Your old passphrase still holds."; return; }
+      store.set(HOST, candidate);
+      newNote.textContent = "Done. This is your passphrase now.";
+      hello();
+      setTimeout(() => { newkey.hidden = true; candidate = ""; newValue.textContent = ""; }, 1800);
+    }
+  });
+  newkey.addEventListener("keydown", (e) => { if (e.key === "Escape") newkey.querySelector('[data-newkey="cancel"]').click(); });
 
   document.title = `${set.title} · Presenter`;
   renderNotes(true);

@@ -89,7 +89,7 @@ The plain `node tools/serve.mjs` is read-only. In dev mode, only this machine, h
 
 ## Presenting
 
-1. Open `https://heedvision.arvindchee.nu/slides/?present=<key>`. The key is in `worker/.presenter-key` (git-ignored).
+1. Open `https://heedvision.arvindchee.nu/slides/` and press **P**, then sign in with the host passphrase. This browser remembers you, so next time **P** goes straight there.
 2. Press **P** for the presenter view. It opens in its own window and drives the slides. The browser you present from never shows audience controls; add `?audience` to a slides link to undo that.
 3. The audience scans the QR code. `/talk/` follows you, with the slide pinned above the script, and takes questions per slide.
 
@@ -109,11 +109,11 @@ Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **
 
 ## Live relay
 
-`worker/` is one Durable Object per room, on the Workers free plan. Deploy with `npx wrangler deploy` in `worker/`; allowed origins are in `worker/wrangler.jsonc`. Set the key with `npx wrangler secret put PRESENTER_KEY`. Your copy of the key is in `worker/.presenter-key`, which git ignores. The key you type in a page's address has to match the secret on Cloudflare.
+`worker/` is one Durable Object per room, on the Workers free plan. Deploy with `npx wrangler deploy` in `worker/`; allowed origins are in `worker/wrangler.jsonc`. **The host** is whoever holds the passphrase. **New passphrase** in the presenter view makes one in the browser and shows it once; the relay keeps only a salted hash, so nobody can read it back. The old passphrase stops working and other signed-in browsers are signed out. **Lost it?** Run `npx wrangler secret put PRESENTER_KEY` in `worker/` with a new value at least 16 characters long, and sign in with that. Until the first **New passphrase**, the `PRESENTER_KEY` secret is the passphrase, and `worker/.presenter-key` is your copy of it; after that, that file is out of date.
 
 ### Questions and live updates
 
-Pressing **P** without the key controls only your own copy of the slides, in that browser: the hosted talk and other viewers aren't affected, and the presenter view says so. With the key, anyone following along moves with you. Open the slides as `/slides/?present=your-key` and press **P**. The presenter view lists every question as it arrives: waiting for approval first, then not yet answered, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Delete** erases it and its votes for everyone (press twice; it can't be undone).
+Only the host gets the presenter view. Everyone else who presses **P** sees a sign-in, and the relay refuses their replies, approvals, deletions and script edits regardless. Once signed in, anyone following along moves with you. The presenter view lists every question as it arrives: waiting for approval first, then not yet answered, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Delete** erases it and its votes for everyone (press twice; it can't be undone).
 
 **Approve first** holds new questions until you **Approve** them: only you can see them until then, and they can't be voted on or projected. It's off by default, and the setting stays on the relay. Turning it off doesn't release questions already held. **Questions on slide** (Q) projects the top unanswered ones.
 
