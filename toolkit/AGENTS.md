@@ -61,5 +61,6 @@ Rules:
 - A viewer's colour must reach the screen exactly, so colours are sRGB throughout and presentations skip tone mapping.
 - When you change the API, update `site/content/docs.md`. The sample tests will fail if its code no longer compiles, but they cannot catch wrong prose.
 - If you change what the playground does, update `site/playground/code.ts` to match, so the code it shows stays true.
+- The site must not shift as it loads. `playgroundShell` in `site/vite.config.ts` writes the playground's first layout into the page, so if you change that layout or the starting settings, keep the shell the same height. Page text stays hidden behind a skeleton until SN Pro has loaded (`waitForFonts`), because text wraps differently in the fallback font.
 
 Writing style for the docs: plain and direct, no em dashes, and only claim what was actually tested.

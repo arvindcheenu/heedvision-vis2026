@@ -8,9 +8,22 @@
     <meta name="description" content="Documentation for caav: attach attention to three.js objects, record it per person, and show it in every mode of the HeedVision design space." />
     <link rel="icon" href="../../shared/logos/mark.svg" type="image/svg+xml">
     <link rel="preload" href="../shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="../shared/fonts/sn-pro-latin-italic.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../shared/theme.css">
     <link rel="stylesheet" href="../shared/hv.css">
     <link rel="stylesheet" href="../style.css">
+    <script>
+      (function () {
+        var root = document.documentElement;
+        if (!document.fonts || !document.fonts.load) return;
+        root.classList.add("fonts-pending");
+        function ready() { root.classList.remove("fonts-pending"); }
+        Promise.race([
+          Promise.all([document.fonts.load('420 17px "SN Pro"'), document.fonts.load('italic 420 17px "SN Pro"')]),
+          new Promise(function (done) { setTimeout(done, 4000); }),
+        ]).then(ready, ready);
+      })();
+    </script>
     <script src="../shared/site.js"></script>
     <script src="../shared/tactile.js" defer></script>
     <script src="../../shared/icons.js"></script>
@@ -22,12 +35,13 @@
     <a class="btn skip" href="#main">Skip to the page</a>
     <div class="page-tools"><span data-sound-toggle></span></div>
     <div class="page-bar" aria-hidden="true"><i></i></div>
+    <div class="page-skel" aria-hidden="true"><span class="skel skel-page-title"></span><span class="skel skel-line"></span><span class="skel skel-line"></span><span class="skel skel-page-actions"></span><span class="skel skel-head"></span><span class="skel skel-line"></span><span class="skel skel-line"></span><span class="skel skel-line"></span><span class="skel skel-line"></span></div>
     <nav class="page-toc" aria-label="Contents" data-headings=".prose h2"><ol role="list"></ol></nav>
 
     <main class="page" id="main">
       <div class="actions">
         <a class="btn" href="../"><svg data-fa="arrow-left" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg> caav home</a>
-        <a class="btn" href="https://github.com/arvindcheenu/caav"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/><path d="M14 4l-4 16"/></svg> Source</a>
+        <a class="btn star-btn" href="https://github.com/arvindcheenu/caav" target="_blank" rel="noopener"><svg data-fa="star" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg> Star caav on GitHub</a>
         <a class="btn" href="../llms-full.txt">Plain text</a>
         <a class="btn" href="../AGENTS.md">AGENTS.md</a>
       </div>
@@ -101,7 +115,7 @@ requestAnimationFrame(frame);</code></pre>
 });</code></pre>
 <p>Attention is stored in the object&#39;s local space, so it stays on the object when the object moves, rotates or scales.</p>
 <h3 id="voxel-resolution">Voxel resolution</h3>
-<p>Smaller voxels show finer detail, but each view does more work and each voxel takes longer to fill, since a gaze spends less time in any one of them. Change the size at any time:</p>
+<p>Smaller voxels show finer detail, but each view does more work and each voxel takes longer to fill, since a gaze spends less time in any one of them. Sparse objects need bigger voxels: a head ray mostly passes between the points of a scatterplot, and a voxel only exists where it touches geometry. The playground uses 0.08 for its surfaces and 0.1 for its scatterplot of 100 points, spheres of radius 0.05 in a box 2 wide. Change the size at any time:</p>
 <pre tabindex="0"><code>attached.setVoxelSize(<span class="c-number">0.1</span>);</code></pre>
 <p>Views rebuild themselves on their next update. Recorded attention for that object starts again from zero, because the old values belong to voxels that no longer exist. A miniature that someone moved stays where they put it.</p>
 <h3 id="several-objects">Several objects</h3>
@@ -606,11 +620,12 @@ session.on(<span class="c-string">"dwell"</span>, (event) =&gt; {
     <footer class="site-foot">
       <div class="foot-end"><span data-theme-picker></span></div>
       <div class="logos" role="group" aria-label="IEEE VIS 2026, Aarhus University and the Center for Anytime Anywhere Analytics">
-        <img src="../../shared/logos/vis2026.png" alt="IEEE VIS 2026" onerror="this.remove()">
-        <img class="mono" src="../../shared/logos/au.svg" alt="Aarhus University" onerror="this.remove()">
-        <img class="mono" src="../../shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics" onerror="this.remove()">
+        <img src="../../shared/logos/vis2026.png" width="2000" height="458" alt="IEEE VIS 2026" onerror="this.remove()">
+        <img class="mono" src="../../shared/logos/au.svg" width="201" height="41" alt="Aarhus University" onerror="this.remove()">
+        <img class="mono" src="../../shared/logos/ca3.svg" width="108" height="84" alt="Center for Anytime Anywhere Analytics" onerror="this.remove()">
       </div>
       <p>Code under the <a href="../LICENSE.txt">MIT License</a>. <a href="https://github.com/arvindcheenu/caav">Source on GitHub</a>.<br>SN Pro under the <a href="../shared/fonts/OFL.txt">SIL Open Font License</a>.<br>Hold ⌘ (Ctrl on Windows) to see a key for every control.</p>
+      <p class="made">Made with <svg data-fa="heart" role="img" aria-label="love" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> by <a href="https://arvindchee.nu" target="_blank" rel="noopener">Arvindcheenu</a></p>
     </footer>
   </body>
 </html>
