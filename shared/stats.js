@@ -1,5 +1,5 @@
 // Likes, the visit count and its velocity graph, from the live relay. If the relay can't answer, none of
-// this shows and the pages work as usual. A visit is one number added to an hour: nothing about the visitor
+// this shows and the pages work as usual. Their space is reserved from the start, so nothing moves. A visit is one number added to an hour: nothing about the visitor
 // is stored. Local work and automated browsers aren't counted, and neither is anyone asking not to be tracked.
 (function () {
   var params = new URLSearchParams(location.search);
@@ -19,15 +19,15 @@
   function drawLikes() {
     document.querySelectorAll("[data-like]").forEach(function (b) {
       var t = b.getAttribute("data-like"), n = counts[t] || 0, on = !!get("hv.liked." + t);
-      b.hidden = false;
+      b.removeAttribute("aria-busy");
       b.setAttribute("aria-pressed", String(on));
       b.setAttribute("aria-label", (t === "paper" ? "Like this paper" : "Like the slides") + ", " + n + (n === 1 ? " like" : " likes"));
-      b.querySelector(".n").textContent = n ? n.toLocaleString() : "";
+      b.querySelector(".n").textContent = n.toLocaleString();
     });
   }
   document.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest("[data-like]");
-    if (!b) return;
+    if (!b || b.hasAttribute("aria-busy")) return;
     var t = b.getAttribute("data-like"), on = !get("hv.liked." + t), was = counts[t] || 0;
     put("hv.liked." + t, on ? "1" : null);
     counts[t] = Math.max(0, was + (on ? 1 : -1));
@@ -76,7 +76,7 @@
       tip.style.left = Math.max(0, Math.min(r.width - tip.offsetWidth, x(i) * r.width / W - tip.offsetWidth / 2)) + "px";
     };
     svg.onpointerleave = reset;
-    box.hidden = false;
+    box.removeAttribute("aria-busy");
   }
 
   // ------------------------------------------------------------ start
@@ -93,7 +93,12 @@
       counts = d.likes;
       drawLikes();
       if (box && d.visits > 0) velocity(box, d.hours, d.visits);
-    }).catch(function () {});
+      else if (box) box.classList.add("off");
+    }).catch(function () {
+      // no relay: everything keeps its place, empty, so the page doesn't move
+      if (box) box.classList.add("off");
+      document.querySelectorAll("[data-like]").forEach(function (b) { b.classList.add("off"); });
+    });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();

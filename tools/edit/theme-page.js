@@ -5,7 +5,7 @@
   const STUDY = [["--you", "You"], ["--partner", "Your partner"], ["--both", "Both"]];
   const SYSTEM = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   const FONTS = [
-    ["SN Pro, ships with the site", `"SN Pro", ${SYSTEM}`],
+    ["SN Pro, ships with the site", `"SN Pro", "SN Pro Fallback", ${SYSTEM}`],
     ["System sans", SYSTEM],
   ];
   const VIS = {

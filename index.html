@@ -21,13 +21,14 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="shared/logos/mark.svg" type="image/svg+xml">
 <link rel="preload" href="shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="shared/theme.css?v=20261221">
-<link rel="stylesheet" href="shared/hv.css?v=20261221">
-<script src="shared/site.js?v=20261221"></script>
-<script src="shared/tactile.js?v=20261221" defer></script>
-<script src="shared/icons.js?v=20261221"></script>
-<script src="shared/keys.js?v=20261221"></script>
-<script src="shared/stats.js?v=20261221" defer></script>
+<link rel="stylesheet" href="shared/theme.css?v=20261224">
+<link rel="stylesheet" href="shared/hv.css?v=20261224">
+<script src="shared/site.js?v=20261224"></script>
+<script src="shared/consent.js?v=20261224" defer></script>
+<script src="shared/tactile.js?v=20261224" defer></script>
+<script src="shared/icons.js?v=20261224"></script>
+<script src="shared/keys.js?v=20261224"></script>
+<script src="shared/stats.js?v=20261224" defer></script>
 </head>
 <body>
 
@@ -57,11 +58,11 @@
     <a class="btn" href="talk/"><svg data-fa="presentation-screen" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg> Talk</a>
     <a class="btn" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><svg data-fa="database" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg> OSF</a>
     <a class="btn" href="toolkit/"><svg data-fa="cube" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg> Toolkit</a>
-    <a class="btn" href="slides/heedvision-slides.pdf?v=20261221" target="_blank" rel="noopener"><svg data-fa="file-pdf" aria-hidden="true" viewBox="0 0 24 24"></svg> Slides as PDF</a>
-    <button class="btn like-btn" type="button" data-like="paper" aria-pressed="false" hidden><svg data-fa="heart" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> <span>Like this paper</span> <b class="n"></b></button>
+    <a class="btn" href="slides/heedvision-slides.pdf?v=20261224" target="_blank" rel="noopener"><svg data-fa="file-pdf" aria-hidden="true" viewBox="0 0 24 24"></svg> Slides as PDF</a>
   </div>
 
-  <div class="reach" data-reach hidden>
+  <div class="reach" data-reach aria-busy="true">
+    <button class="btn like-btn" type="button" data-like="paper" aria-pressed="false" aria-busy="true"><svg data-fa="heart" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> <span>Like this paper</span> <b class="n">0</b></button>
     <p><b data-visits></b> <span data-recent></span></p>
     <div class="vel"><svg viewBox="0 0 220 44" role="img"></svg><div class="vz-tip" hidden></div></div>
   </div>
@@ -99,7 +100,7 @@
       <a class="link-card card" href="talk/"><span class="ico"><svg data-fa="memo" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></svg></span><span><b>Slides &amp; script</b><span>Every slide next to what is said over it</span></span><span class="go" aria-hidden="true">›</span></a>
       <a class="link-card card" href="slides/" target="_blank" rel="noopener"><span class="ico"><svg data-fa="expand" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/></svg></span><span><b>Full-screen slides</b><span>The deck itself. Press P for a presenter view of your own copy</span></span><span class="go" aria-hidden="true">›</span></a>
     </div>
-    <p class="like-row"><button class="btn like-btn" type="button" data-like="slides" aria-pressed="false" hidden><svg data-fa="heart" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> <span>Like the slides</span> <b class="n"></b></button></p>
+    <p class="like-row"><button class="btn like-btn" type="button" data-like="slides" aria-pressed="false" aria-busy="true"><svg data-fa="heart" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> <span>Like the slides</span> <b class="n">0</b></button></p>
   </section>
 
   <section class="section">
@@ -139,10 +140,10 @@
     <img class="mono" src="shared/logos/au.svg" alt="Aarhus University">
     <img class="mono" src="shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics">
   </div>
-  <p>© 2026 the authors. Paper © IEEE.<br>Supplemental materials released under CC BY 4.0.<br>Hold ⌘ (Ctrl on Windows) to see a key for every control.</p>
+  <p>© 2026 the authors. Paper © IEEE.<br>Supplemental materials released under CC BY 4.0.<br>Hold ⌘ (Ctrl on Windows) to see a key for every control.<br><button type="button" data-cookie-settings>Cookie settings</button></p>
 </footer>
 
-<script src="shared/progress.js?v=20261221"></script>
+<script src="shared/progress.js?v=20261224"></script>
 <script>
   // Contents, built from the page's sections, with its scroll progress.
   (function () {

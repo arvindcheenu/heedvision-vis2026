@@ -4,8 +4,10 @@
 //   <use href="#ic-eye">                           the slide icons, named in shared/icons.tsv
 (function () {
   var url = document.currentScript.src.replace("icons.js", "icons.svg");
+  // until they load, an icon holds its place; if they can't, it gives the place back
+  function none() { document.documentElement.classList.add("no-fa"); }
   fetch(url).then(function (r) { return r.ok ? r.text() : null; }).then(function (text) {
-    if (!text) return;
+    if (!text) return none();
     var doc = new DOMParser().parseFromString(text, "image/svg+xml");
     var symbols = {};
     doc.querySelectorAll("symbol").forEach(function (s) { symbols[s.id] = s; });
@@ -41,5 +43,5 @@
       }).observe(document.body, { childList: true, subtree: true });
     }
     if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
-  }).catch(function () {});
+  }).catch(none);
 })();

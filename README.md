@@ -123,9 +123,13 @@ The timer stops when the presenter view closes, and picks up again with **Resume
 
 To try all of this without touching the real room, run `npx wrangler dev --port 8787 --var PRESENTER_KEY:test` in `worker/` and add `live=http://127.0.0.1:8787` to each page's address.
 
+## Analytics
+
+`shared/consent.js` asks once whether Google Analytics may run, and loads nothing from Google until someone says yes. "Cookie settings" in the footer changes the answer, and saying no removes the cookies. The slides never ask, and only run it if the visitor has already agreed elsewhere. The presenter view doesn't include it, and neither does any address with a presenter key. Query strings are stripped before anything reaches Google, because they can hold that key. It only sends from `heedvision.arvindchee.nu`, so local work isn't counted. This is separate from the relay's visit counter, which sets no cookies.
+
 ## Toolkit
 
-`toolkit/` is the built site for the caav attention library, published at `/toolkit/`. Its source is in `/Users/au758519/Ideas/caav`. Don't edit it here: build it there, then copy `site-dist/` over this folder.
+`toolkit/` is the built site for the caav attention library, published at `/toolkit/`. Its source is in `/Users/au758519/Ideas/caav`. Don't edit it here: build it there, then run `tools/copy-toolkit.sh`, which also adds the analytics to its pages.
 
 ## Likes and visits
 

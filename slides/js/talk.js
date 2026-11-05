@@ -26,6 +26,8 @@
   const set = talk.settings;
   const useQuestions = set.questions === "on" && !!set.live;
   const useFollow = set.follow && !!set.live;
+  tocList.textContent = ""; // the skeleton
+  tocList.removeAttribute("aria-hidden");
   document.querySelectorAll("[data-meta]").forEach((el) => { const v = talk.meta[el.dataset.meta]; if (v) el.innerHTML = marked.parseInline(v); });
   document.querySelector("[data-live-intro]").textContent = useFollow && useQuestions ? "During the talk it follows the speaker by itself, and every slide has its own question thread."
     : useFollow ? "During the talk it follows the speaker by itself."
@@ -110,7 +112,10 @@
   // ---------------------------------------------------------- the pinned slide
   let ready = false, shown = null, want = null;
   const stageH = () => stage.getBoundingClientRect().bottom;
-  new ResizeObserver(() => document.documentElement.style.setProperty("--stage-h", `${stage.offsetHeight}px`)).observe(stage);
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty("--stage-h", `${stage.offsetHeight}px`);
+    document.documentElement.classList.add("stage-known");
+  }).observe(stage);
   let retries = 0;
   function show(id, f) {
     if (!want || want.id !== id || want.f !== f) retries = 0;

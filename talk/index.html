@@ -6,14 +6,15 @@
   <title>HeedVision · Talk</title>
   <meta name="description" content="The IEEE VIS 2026 talk on HeedVision: the slides, pinned, next to everything that is said over them, with questions per slide.">
   <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <script src="../shared/site.js?v=20261221"></script>
-  <script src="../shared/tactile.js?v=20261221" defer></script>
-  <script src="../shared/icons.js?v=20261221"></script>
-  <script src="../shared/keys.js?v=20261221"></script>
-  <script src="../shared/stats.js?v=20261221" defer></script>
+  <script src="../shared/site.js?v=20261224"></script>
+  <script src="../shared/consent.js?v=20261224" defer></script>
+  <script src="../shared/tactile.js?v=20261224" defer></script>
+  <script src="../shared/icons.js?v=20261224"></script>
+  <script src="../shared/keys.js?v=20261224"></script>
+  <script src="../shared/stats.js?v=20261224" defer></script>
   <link rel="preload" href="../shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../shared/theme.css?v=20261221">
-  <link rel="stylesheet" href="../shared/hv.css?v=20261221">
+  <link rel="stylesheet" href="../shared/theme.css?v=20261224">
+  <link rel="stylesheet" href="../shared/hv.css?v=20261224">
 </head>
 <body class="talk-page">
   <a class="btn skip" href="#transcript">Skip to the script</a>
@@ -21,14 +22,14 @@
   <!-- The slide stays pinned at the top and follows what you're reading (or the speaker, when live). -->
   <section class="talk-stage" aria-label="The current slide">
     <div class="talk-stage-inner">
-      <div class="deck-frame"><iframe id="stage-deck" src="../slides/?embed" title="Slides" allow="fullscreen; autoplay"></iframe></div>
+      <div class="deck-frame"><iframe id="stage-deck" src="../slides/?embed" title="Slides" allow="fullscreen; autoplay" onload="this.parentElement.classList.add('ready')"></iframe></div>
       <div class="slide-progress" aria-hidden="true"></div>
       <div class="stage-bar">
         <button class="btn" type="button" data-go="prev" aria-label="Previous build" disabled>‹</button>
         <button class="btn" type="button" data-go="next" aria-label="Next build" disabled>›</button>
         <span class="pos" aria-live="polite"></span>
         <button class="btn live-btn" type="button" hidden>Rejoin live</button>
-        <button class="btn like-btn" type="button" data-like="slides" aria-pressed="false" hidden><svg data-fa="heart" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> <span>Like the slides</span> <b class="n"></b></button>
+        <button class="btn like-btn" type="button" data-like="slides" aria-pressed="false" aria-busy="true"><svg data-fa="heart" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.4-9 9-9 9z"/></svg> <span>Like the slides</span> <b class="n">0</b></button>
         <span data-sound-toggle></span>
         <a class="btn" href="../slides/" target="_blank" rel="noopener">Present</a>
       </div>
@@ -39,12 +40,12 @@
     <main class="talk-main">
       <section class="talk-hero">
         <h1 class="page-title" data-meta="title">HeedVision</h1>
-        <p class="page-sub" data-meta="subtitle"></p>
-        <p class="talk-intro">Everything said in the talk, with the slide pinned above. Scroll and the slide follows; tap a line to see its slide. <span data-live-intro></span></p>
+        <p class="page-sub" data-meta="subtitle">Attention Awareness in Collaborative Immersive Analytics Environments</p>
+        <p class="talk-intro">Everything said in the talk, with the slide pinned above. Scroll and the slide follows; tap a line to see its slide. <span data-live-intro>During the talk it follows the speaker by itself, and every slide has its own question thread.</span></p>
       </section>
-      <div id="transcript" tabindex="-1"><p class="loading">Loading the talk…</p></div>
+      <div id="transcript" tabindex="-1"><p class="sr">Loading the talk…</p><div class="skel-script" aria-hidden="true"><span class="skel skel-head"></span><span class="skel skel-line"></span><span class="skel skel-line"></span><span class="skel skel-line" style="width:72%"></span><span class="skel skel-head"></span><span class="skel skel-line"></span><span class="skel skel-line"></span><span class="skel skel-line" style="width:58%"></span></div></div>
     </main>
-    <nav class="toc" aria-label="Contents"><div class="toc-inner"><ol role="list"></ol></div></nav>
+    <nav class="toc" aria-label="Contents"><div class="toc-inner"><ol role="list" data-loading aria-hidden="true"><li class="skel skel-line" style="width:48%"></li><li class="skel skel-line" style="width:80%"></li><li class="skel skel-line" style="width:68%"></li><li class="skel skel-line" style="width:74%"></li><li class="skel skel-line" style="width:40%"></li><li class="skel skel-line" style="width:84%"></li><li class="skel skel-line" style="width:62%"></li><li class="skel skel-line" style="width:72%"></li></ol></div></nav>
   </div>
 
   <div class="edge-blur top" aria-hidden="true"></div>
@@ -59,10 +60,10 @@
     <div class="foot-end"><a class="btn" href="../">Paper</a><span data-theme-picker></span></div>
   </footer>
 
-  <script src="../slides/vendor/marked.js?v=20261221"></script>
-  <script src="../slides/js/mdeck.js?v=20261221"></script>
-  <script src="../slides/js/live.js?v=20261221"></script>
-  <script src="../shared/progress.js?v=20261221"></script>
-  <script src="../slides/js/talk.js?v=20261221"></script>
+  <script src="../slides/vendor/marked.js?v=20261224"></script>
+  <script src="../slides/js/mdeck.js?v=20261224"></script>
+  <script src="../slides/js/live.js?v=20261224"></script>
+  <script src="../shared/progress.js?v=20261224"></script>
+  <script src="../slides/js/talk.js?v=20261224"></script>
 </body>
 </html>
