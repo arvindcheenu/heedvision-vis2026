@@ -5,7 +5,7 @@
 // embedded slide or when the address holds a presenter key. Query strings never reach Google, because they
 // can hold that key.
 (function () {
-  var ID = "G-LJ8YB1JDH1";
+  var ID = "G-3M37FZFD3L";
   var KEY = "heedvision-analytics";
   var HOST = "heedvision.arvindchee.nu"; // local work and previews never send anything
   var script = document.currentScript;
