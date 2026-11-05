@@ -14,6 +14,9 @@ import sys
 path, v = sys.argv[1:]
 s = open(path).read()
 s = s.replace("<head>", f'<head>\n    <script src="/shared/consent.js?v={v}" defer></script>', 1)
+# the star button's live count, from the relay
+s = s.replace("Star caav on GitHub</a>", '<span>Star caav on GitHub</span> <b class="n" data-stars></b></a>')
+s = s.replace("</head>", f'  <script src="/shared/stats.js?v={v}" defer></script>\n  </head>', 1)
 open(path, "w").write(s)
 PY
 done
