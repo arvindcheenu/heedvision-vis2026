@@ -3,13 +3,15 @@
 //
 // Sounds have an off switch: put <span data-sound-toggle></span> where you want it. The choice is
 // remembered per browser. They start on with a mouse and off on a phone, because a roomful of phones
-// clicking during a talk would be awful. Pages with data-silent on <html> (the slides and the presenter
-// view, whose laptop is usually wired to the room's speakers) never make a sound and show no switch.
+// clicking during a talk would be awful. The presenter view (data-sound-scope) has its own switch, off
+// until you turn it on, because that laptop is usually wired to the room's speakers. The slides
+// (data-silent) never make a sound.
 (function () {
   var CLICKABLE = ".btn, .theme-picker button, .sound-toggle, .link-card";
   var QUIET_CLICKABLE = CLICKABLE + ", .page-toc a, .toc a, .script .click, .qs summary, .entry-go, .authors .author";
   var root = document.documentElement;
   var silent = root.hasAttribute("data-silent");
+  var scope = root.getAttribute("data-sound-scope");
 
   // ------------------------------------------------------------ light
   var fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -44,12 +46,12 @@
   }
 
   // ------------------------------------------------------------ sound
-  var KEY = "heedvision-sound", ctx = null, out = null, noise = null;
+  var KEY = "heedvision-sound" + (scope ? "-" + scope : ""), ctx = null, out = null, noise = null;
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function isOn() {
     if (silent) return false;
     var s = stored();
-    return s ? s === "on" : fine;
+    return s ? s === "on" : !scope && fine;
   }
   function tick(c, dest, t, freq, q, gain, length) {
     var src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
@@ -79,12 +81,12 @@
     return noise;
   }
   var VOICES = {
-    hover: function (c, d, t) { tick(c, d, t, 5200, 2, 0.012, 0.006); },
-    press: function (c, d, t) { tick(c, d, t, 2300, 1.1, 0.11, 0.016); tone(c, d, t, 170, 0.07, 0.03, 90); },
-    release: function (c, d, t) { tick(c, d, t, 3600, 1.3, 0.05, 0.01); },
-    on: function (c, d, t) { tone(c, d, t, 620, 0.03, 0.05); tone(c, d, t + 0.05, 930, 0.03, 0.07); },
-    off: function (c, d, t) { tone(c, d, t, 930, 0.025, 0.05); tone(c, d, t + 0.05, 620, 0.025, 0.07); },
-    sent: function (c, d, t) { tone(c, d, t, 587, 0.03, 0.09); tone(c, d, t + 0.08, 880, 0.03, 0.14); },
+    hover: function (c, d, t) { tick(c, d, t, 5200, 2, 0.03, 0.007); },
+    press: function (c, d, t) { tick(c, d, t, 2300, 1.1, 0.34, 0.02); tone(c, d, t, 170, 0.16, 0.035, 90); },
+    release: function (c, d, t) { tick(c, d, t, 3600, 1.3, 0.16, 0.012); },
+    on: function (c, d, t) { tone(c, d, t, 620, 0.07, 0.06); tone(c, d, t + 0.05, 930, 0.07, 0.08); },
+    off: function (c, d, t) { tone(c, d, t, 930, 0.06, 0.06); tone(c, d, t + 0.05, 620, 0.06, 0.08); },
+    sent: function (c, d, t) { tone(c, d, t, 587, 0.07, 0.1); tone(c, d, t + 0.08, 880, 0.07, 0.15); },
   };
   // browsers allow sound only after a press or a key, so nothing starts before then
   function wake() {
@@ -129,14 +131,14 @@
 
   // ------------------------------------------------------------ the switch
   var ICON = {
-    on: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>',
-    off: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
+    on: ["volume-high", '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>'],
+    off: ["volume-xmark", '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>'],
   };
   function draw(el) {
-    var on = isOn();
+    var on = isOn(), i = ICON[on ? "on" : "off"];
     el.setAttribute("aria-pressed", String(on));
     el.setAttribute("title", on ? "Sounds on" : "Sounds off");
-    el.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICON[on ? "on" : "off"] + "</svg>";
+    el.innerHTML = (on ? '<svg data-fa="volume-high"' : '<svg data-fa="volume-xmark"') + ' aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + i[1] + "</svg>";
   }
   function mount() {
     document.querySelectorAll("[data-sound-toggle]").forEach(function (slot) {
@@ -157,5 +159,58 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount); else mount();
   addEventListener("storage", function (e) { if (e.key === KEY) document.querySelectorAll(".sound-toggle").forEach(draw); });
 
-  var api = window.HVTactile = { isOn: isOn, play: play, voices: VOICES, last: null };
+  // ------------------------------------------------------------ scrolling
+  // Lists dissolve at the edge where there's more to see, and a bar shows how far through you are.
+  var SOFT = ".toc-inner, .page-toc, .pq-list, .pv-notes, .hv-sheet .q-list";
+  function watch(el) {
+    if (el.hvSoft) return;
+    el.hvSoft = true;
+    el.classList.add("soft-edges");
+    var bar = el.hasAttribute("data-scroll-bar") ? document.querySelector(el.getAttribute("data-scroll-bar")) : null;
+    var queued = false;
+    function update() {
+      queued = false;
+      var max = el.scrollHeight - el.clientHeight, top = el.scrollTop, can = max > 4;
+      el.style.setProperty("--fade-t", (can ? Math.min(top, 28) : 0) + "px");
+      el.style.setProperty("--fade-b", (can ? Math.min(max - top, 28) : 0) + "px");
+      el.classList.toggle("scrolled", top > 2);
+      el.classList.toggle("more", can && max - top > 2);
+      if (bar) {
+        bar.hidden = !can;
+        bar.firstElementChild.style.transform = "scaleX(" + (can ? top / max : 0) + ")";
+      }
+    }
+    function later() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    el.addEventListener("scroll", later, { passive: true });
+    new ResizeObserver(later).observe(el);
+    new MutationObserver(later).observe(el, { childList: true, subtree: true, characterData: true });
+    later();
+  }
+  function soften() { document.querySelectorAll(SOFT).forEach(watch); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", soften); else soften();
+  addEventListener("load", function () {
+    soften();
+    new MutationObserver(soften).observe(document.body, { childList: true });
+  });
+
+  // The controls in the corner stay put. Reading down, they step back; scrolling up, they come forward.
+  var tools = null, lastY = 0;
+  // the blur at the window's edges only starts once there's something passing under it
+  function edges() {
+    root.classList.toggle("page-scrolled", scrollY > 4);
+    root.classList.toggle("page-end", scrollY + innerHeight >= root.scrollHeight - 4);
+  }
+  addEventListener("load", edges);
+  addEventListener("resize", edges, { passive: true });
+  addEventListener("scroll", function () {
+    edges();
+    tools = tools || document.querySelector(".page-tools");
+    if (!tools) return;
+    var y = scrollY;
+    if (Math.abs(y - lastY) < 6) return;
+    tools.classList.toggle("receded", y > lastY && y > 80);
+    lastY = y;
+  }, { passive: true });
+
+  var api = window.HVTactile = { isOn: isOn, play: play, voices: VOICES, last: null, state: function () { return ctx ? ctx.state : "not started"; } };
 })();

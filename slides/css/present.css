@@ -22,12 +22,17 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 .pv-meta .pos { font-weight: var(--w-head); font-variant-numeric: tabular-nums; }
 .pv-meta .title { color: var(--fg-2); }
 .pv-ctl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pv-scope { margin: 8px 0 0; font-size: 14px; line-height: 1.4; color: var(--fg-3); }
+.pv-scope:empty { display: none; }
 .next-title { margin-top: 6px; font-size: 14px; color: var(--fg-2); }
 .pv-backups { flex: none; }
 .pv-backups ol { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* a heading with what belongs beside it */
-.pv-bar { display: flex; align-items: center; gap: 10px; min-height: 36px; margin-bottom: 6px; }
+.pv-bar { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; margin-bottom: 6px; padding-bottom: 5px; }
+/* how far through you are, and that there's more to see. It shows only when there is */
+.pv-scroll { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; overflow: hidden; border-radius: 3px; background: color-mix(in srgb, var(--title) 16%, transparent); }
+.pv-scroll i { display: block; height: 100%; background: var(--title); border-radius: 3px; transform: scaleX(0); transform-origin: left; transition: transform 120ms linear; }
 .pv-bar h2 { font-size: 18px; font-weight: var(--w-head); letter-spacing: -0.01em; }
 
 /* questions */
@@ -39,7 +44,7 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 .pq-hint { margin: 0 0 8px; font-size: 14px; line-height: 1.4; color: var(--fg-3); }
 .pq-hint:empty { display: none; }
 .pq-hint code { font-size: 13px; }
-.pq-list { flex: 1; min-height: 0; overflow-y: auto; display: grid; align-content: start; gap: 16px; padding: 4px 8px 8px 4px; scrollbar-width: thin; }
+.pq-list { flex: 1; min-height: 0; overflow-y: auto; display: grid; align-content: start; gap: 16px; padding: 4px 8px 8px 4px; scrollbar-width: none; }
 .pq { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; }
 .pq.done { opacity: 0.62; }
 .pq.done:focus-within, .pq.done:hover { opacity: 1; }
@@ -54,8 +59,17 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 .pq-empty { margin: 0; font-size: 15px; color: var(--fg-3); }
 
 /* script */
-.pv-notes { flex: 1; min-height: 0; overflow-y: auto; isolation: isolate; display: flex; flex-direction: column; border-radius: var(--radius); scrollbar-width: thin; }
-.pv-notes .pv-bar { flex: none; position: sticky; top: 0; z-index: 1; background: var(--bg); }
+.pv-notes { flex: 1; min-height: 0; overflow-y: auto; isolation: isolate; display: flex; flex-direction: column; border-radius: var(--radius); scrollbar-width: none; }
+.pv-notes.soft-edges { -webkit-mask-image: none; mask-image: none; } /* a mask on this list would stop the header's glass blurring */
+.pv-notes::after { content: ""; flex: none; position: sticky; bottom: 0; height: 32px; margin-top: -32px; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--bg)); opacity: 0; transition: opacity 160ms; }
+.pv-notes.more::after { opacity: 1; }
+.pv-notes .pv-bar { flex: none; position: sticky; top: 0; z-index: 1; }
+.pv-notes .pv-bar::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--bg) 80%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); }
+.pv-notes .pv-bar .edge-blur { z-index: -1; }
+/* big script text smears under a strong blur: a gentler band here */
+.pv-notes .edge-blur i:nth-child(1) { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.pv-notes .edge-blur i:nth-child(2) { -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.pv-notes .edge-blur i:nth-child(3) { -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px); }
 .pn-state { font-size: 13.5px; color: var(--fg-3); }
 .pn-edit { margin-left: auto; min-height: 34px; padding: 0 12px; font-size: 14px; }
 .notes { font-size: 24px; line-height: 1.45; }

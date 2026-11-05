@@ -180,7 +180,7 @@
     clearTimeout(programmaticTimer);
     const y = scrollY + m.getBoundingClientRect().top - (readingLine() - 24);
     const calm = !smooth || matchMedia("(prefers-reduced-motion: reduce)").matches || document.hidden;
-    scrollTo({ top: Math.max(0, y), behavior: calm ? "auto" : "smooth" });
+    scrollTo({ top: Math.max(0, y), behavior: calm ? "instant" : "smooth" });
     // a long jump takes a while: don't let the slides it scrolls past take over until it lands
     const land = () => { clearTimeout(programmaticTimer); programmaticTimer = setTimeout(() => (programmatic = false), 80); };
     removeEventListener("scrollend", landing);

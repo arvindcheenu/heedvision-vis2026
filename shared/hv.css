@@ -19,8 +19,8 @@
   --sunk: inset 0 1px 3px color-mix(in srgb, var(--fg) 26%, transparent), inset 0 0 0 0.5px color-mix(in srgb, var(--fg) 12%, transparent);
   --well: inset 0 1px 2px color-mix(in srgb, var(--fg) 13%, transparent), inset 0 0 0 0.5px color-mix(in srgb, var(--fg) 8%, transparent);
   /* the light that follows the cursor, on the surface and along the edge */
-  --shine: rgb(255 255 255 / 0.9);
-  --shine-edge: color-mix(in srgb, var(--accent) 60%, transparent);
+  --shine: rgb(255 255 255 / 0.42);
+  --shine-edge: color-mix(in srgb, var(--accent) 26%, transparent);
   /* each section can have its own colour: give --c2 to --c6 their own values */
   --c1: var(--title); --c2: var(--c1); --c3: var(--c1); --c4: var(--c1); --c5: var(--c1); --c6: var(--c1);
   --sec-ink: #000;
@@ -32,13 +32,13 @@
   --raised-more: inset 0 1px 0 rgb(255 255 255 / 0.13), 0 0 0 0.5px rgb(0 0 0 / 0.55), 0 2px 3px rgb(0 0 0 / 0.4), 0 6px 14px -4px rgb(0 0 0 / 0.65);
   --sunk: inset 0 1px 3px rgb(0 0 0 / 0.6), inset 0 0 0 0.5px rgb(0 0 0 / 0.4);
   --well: inset 0 1px 2px rgb(0 0 0 / 0.4), inset 0 0 0 0.5px rgb(255 255 255 / 0.05);
-  --shine: rgb(255 255 255 / 0.15);
-  --shine-edge: rgb(255 255 255 / 0.5);
+  --shine: rgb(255 255 255 / 0.055);
+  --shine-edge: rgb(255 255 255 / 0.2);
 }
 
 /* ---------- base ---------- */
 * { box-sizing: border-box; }
-html { scroll-padding-top: 76px; accent-color: var(--accent); caret-color: var(--accent); -webkit-tap-highlight-color: color-mix(in srgb, var(--accent) 20%, transparent); }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; accent-color: var(--accent); caret-color: var(--accent); -webkit-tap-highlight-color: color-mix(in srgb, var(--accent) 20%, transparent); }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-text); font-size: 17px; font-weight: var(--w-text); line-height: 1.6; font-synthesis: none; font-kerning: normal; font-feature-settings: "calt", "liga", "kern"; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 h1, h2, h3 { font-family: var(--f-display); font-weight: var(--w-head); letter-spacing: -0.012em; line-height: 1.12; margin: 0; text-wrap: balance; }
 b, strong { font-weight: var(--w-strong); }
@@ -91,8 +91,12 @@ ul[role="list"], ol[role="list"] { list-style: none; margin: 0; padding: 0; }
 }
 .btn:hover, .theme-picker button:hover, .sound-toggle:hover { background: var(--hover); color: var(--fg); box-shadow: var(--raised-more); transform: translateY(-1px); }
 .btn:active, .theme-picker button:active, .sound-toggle:active { box-shadow: var(--sunk); transform: translateY(1px) scale(0.985); transition-duration: 40ms; }
-.btn[aria-pressed="true"], .theme-picker button[aria-pressed="true"], .sound-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); box-shadow: var(--sunk); transform: none; --shine: rgb(255 255 255 / 0.26); --shine-edge: rgb(255 255 255 / 0.55); }
+.btn[aria-pressed="true"], .theme-picker button[aria-pressed="true"], .sound-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); box-shadow: var(--sunk); transform: none; --shine: rgb(255 255 255 / 0.1); --shine-edge: rgb(255 255 255 / 0.25); }
 .btn svg { width: 16px; height: 16px; }
+.btn svg[data-fa], .link-card svg[data-fa] { width: 19px; height: 19px; flex: none; }
+svg[data-fa]:empty { display: none; }
+/* a press always lands on the control, even if it redraws its icon */
+.btn svg, .sound-toggle svg, .theme-picker svg, .link-card svg { pointer-events: none; }
 .btn[disabled] { opacity: 0.4; pointer-events: none; box-shadow: none; }
 .theme-picker { display: inline-flex; gap: 4px; }
 .theme-picker button, .sound-toggle { width: 40px; padding: 0; }
@@ -103,14 +107,17 @@ ul[role="list"], ol[role="list"] { list-style: none; margin: 0; padding: 0; }
 .sound-toggle[aria-pressed]:active { box-shadow: var(--sunk); transform: translateY(1px); }
 .sound-toggle[aria-pressed="false"] { color: var(--fg-3); }
 
-.page-tools { position: absolute; top: 14px; right: 16px; z-index: 30; }
+/* the sound switch on a page with no header: always there, stepping back while you read down */
+.page-tools { position: fixed; top: 12px; right: 14px; z-index: 45; display: flex; border-radius: var(--radius); background: color-mix(in srgb, var(--bg) 66%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); transition: opacity 240ms var(--ease), transform 240ms var(--ease); }
+.page-tools.receded { opacity: 0.7; transform: scale(0.94); }
+.page-tools:hover, .page-tools:focus-within { opacity: 1; transform: none; }
 
 /* the light that follows the cursor (shared/tactile.js sets --mx, --my and .lit) */
 .lit-able::before, .lit-able::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 220ms var(--ease); }
-.lit-able::after { z-index: -1; background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 50%), var(--shine), transparent 75%); }
-.lit-able::before { padding: 1px; background: radial-gradient(70px circle at var(--mx, 50%) var(--my, 50%), var(--shine-edge), transparent 80%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.lit-able::after { z-index: -1; background: radial-gradient(72px circle at var(--mx, 50%) var(--my, 50%), var(--shine), transparent 75%); }
+.lit-able::before { padding: 1px; background: radial-gradient(56px circle at var(--mx, 50%) var(--my, 50%), var(--shine-edge), transparent 80%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 .lit-able.lit::after, .lit-able.lit::before { opacity: 1; transition-duration: 80ms; }
-.lit-able.near::before { opacity: 0.8; transition-duration: 80ms; }
+.lit-able.near::before { opacity: 0.45; transition-duration: 80ms; }
 
 /* ---------- one field, everywhere ---------- */
 .field { display: block; width: 100%; min-height: 44px; padding: 10px 14px; border: 0; border-radius: var(--radius); background: var(--surface-2); box-shadow: var(--well); color: var(--fg); font: var(--w-text) 16px/1.4 var(--f-text); }
@@ -196,7 +203,9 @@ html::-webkit-scrollbar, .toc-inner::-webkit-scrollbar, .page-toc::-webkit-scrol
 
 /* ---------- script page ---------- */
 /* the slide stays pinned; the script scrolls beneath it */
-.talk-stage { position: sticky; top: 0; z-index: 25; isolation: isolate; padding: 12px 16px 10px; background: var(--bg); }
+.talk-stage { position: sticky; top: 0; z-index: 25; isolation: isolate; padding: 12px 16px 10px; }
+/* the script passes under glass, not behind a wall. The glass is its own layer, so the band below can blur too */
+.talk-stage::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--bg) 74%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.25); backdrop-filter: blur(20px) saturate(1.25); }
 .talk-stage-inner { width: min(100%, calc(min(48vh, 560px) * 16 / 9)); margin: 0 auto; }
 .deck-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius); background: var(--surface-2); }
 .deck-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
@@ -260,3 +269,26 @@ mark.you { background: color-mix(in srgb, var(--you) 30%, transparent); }
 mark.partner { background: color-mix(in srgb, var(--partner) 34%, transparent); }
 mark.both { background: color-mix(in srgb, var(--both) 30%, transparent); }
 mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-radius: var(--radius); }
+
+/* ---------- scrolling: every list scrolls smoothly and text dissolves at its edges ---------- */
+.toc-inner, .page-toc, .pq-list, .pv-notes, .pv-left, .hv-sheet .q-list { scroll-behavior: smooth; overscroll-behavior: contain; }
+/* shared/tactile.js sets how much to fade, and only where there's more to see */
+.soft-edges { --fade-t: 0px; --fade-b: 0px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%); }
+/* progressive blur: text sharpens gradually as it leaves the edge. Each layer blurs less, over a wider band */
+.edge-blur { position: absolute; left: 0; right: 0; top: 100%; height: var(--edge, 64px); z-index: 1; pointer-events: none; transition: opacity 200ms var(--ease); }
+/* it starts only once something is passing under it, and leaves the page's last lines alone */
+html:not(.page-scrolled) .talk-stage > .edge-blur, html.page-end .edge-blur.foot, .pv-notes:not(.scrolled) .edge-blur { opacity: 0; }
+.edge-blur::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 70%, transparent), transparent); }
+.edge-blur i { position: absolute; inset: 0; display: block; }
+.edge-blur i:nth-child(1) { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); -webkit-mask-image: linear-gradient(to bottom, #000, transparent 32%); mask-image: linear-gradient(to bottom, #000, transparent 32%); }
+.edge-blur i:nth-child(2) { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-mask-image: linear-gradient(to bottom, #000 12%, transparent 58%); mask-image: linear-gradient(to bottom, #000 12%, transparent 58%); }
+.edge-blur i:nth-child(3) { -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px); -webkit-mask-image: linear-gradient(to bottom, #000 32%, transparent 82%); mask-image: linear-gradient(to bottom, #000 32%, transparent 82%); }
+.edge-blur i:nth-child(4) { -webkit-backdrop-filter: blur(0.5px); backdrop-filter: blur(0.5px); -webkit-mask-image: linear-gradient(to bottom, #000 56%, transparent); mask-image: linear-gradient(to bottom, #000 56%, transparent); }
+/* the same at the foot of the window, mirrored */
+.edge-blur.foot { position: fixed; top: auto; bottom: 0; z-index: 20; transform: scaleY(-1); }
+@media (prefers-reduced-transparency: reduce) {
+  .talk-stage::before { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .page-tools { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .edge-blur { display: none; }
+}
+@media print { .edge-blur, .page-tools { display: none !important; } }

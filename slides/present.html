@@ -1,17 +1,18 @@
 <!doctype html>
-<html lang="en" data-silent>
+<html lang="en" data-sound-scope="presenter">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>HeedVision · Presenter</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <script src="../shared/site.js?v=20261208"></script>
-  <script src="../shared/tactile.js?v=20261208" defer></script>
+  <script src="../shared/site.js?v=20261214"></script>
+  <script src="../shared/tactile.js?v=20261214" defer></script>
+  <script src="../shared/icons.js?v=20261214"></script>
   <link rel="preload" href="../shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../shared/theme.css?v=20261208">
-  <link rel="stylesheet" href="../shared/hv.css?v=20261208">
-  <link rel="stylesheet" href="css/present.css?v=20261208">
+  <link rel="stylesheet" href="../shared/theme.css?v=20261214">
+  <link rel="stylesheet" href="../shared/hv.css?v=20261214">
+  <link rel="stylesheet" href="css/present.css?v=20261214">
 </head>
 <!-- Press P on the slides for this view. It drives them. -->
 <body>
@@ -24,6 +25,7 @@
       <button type="button" class="btn auto" aria-pressed="true" title="Start and resume the timer when the slides move">Auto-resume</button>
     </div>
     <span class="pv-link" role="status"></span>
+    <span data-sound-toggle></span>
     <span data-theme-picker></span>
   </header>
 
@@ -33,18 +35,19 @@
         <div class="pv-frame"><iframe title="Current slide" data-role="current" tabindex="-1"></iframe></div>
         <div class="pv-meta" aria-live="polite"><span class="pos"></span><span class="title"></span></div>
         <div class="pv-ctl" role="group" aria-label="Slide controls">
-          <button type="button" class="btn" data-go="prev" title="Previous (←)">Back</button>
-          <button type="button" class="btn" data-go="next" title="Next (→, space)">Next</button>
-          <button type="button" class="btn" data-ask aria-pressed="true" title="On: the QR code opens the script page, to follow along and ask. Off: it opens the project site.">QR opens questions</button>
-          <button type="button" class="btn" data-qa aria-pressed="false" title="Show the top questions on the projected slide (Q)">Questions on slide</button>
-          <a class="btn" href="index.html?view=print&amp;autoprint" target="_blank" rel="noopener">Export PDF</a>
+          <button type="button" class="btn" data-go="prev" title="Previous (←)"><svg data-fa="arrow-left" aria-hidden="true" viewBox="0 0 24 24" width="17" height="17"></svg> Back</button>
+          <button type="button" class="btn" data-go="next" title="Next (→, space)">Next <svg data-fa="arrow-right" aria-hidden="true" viewBox="0 0 24 24" width="17" height="17"></svg></button>
+          <button type="button" class="btn" data-ask aria-pressed="true" title="On: the QR code opens the script page, to follow along and ask. Off: it opens the project site."><svg data-fa="qrcode" aria-hidden="true" viewBox="0 0 24 24" width="17" height="17"></svg> QR opens questions</button>
+          <button type="button" class="btn" data-qa aria-pressed="false" title="Show the top questions on the projected slide (Q)"><svg data-fa="comment-question" aria-hidden="true" viewBox="0 0 24 24" width="17" height="17"></svg> Questions on slide</button>
+          <a class="btn" href="index.html?view=print&amp;autoprint" target="_blank" rel="noopener"><svg data-fa="file-pdf" aria-hidden="true" viewBox="0 0 24 24" width="17" height="17"></svg> Export PDF</a>
         </div>
+        <p class="pv-scope" role="status"></p>
       </section>
       <nav class="pv-backups" aria-label="Backup slides" hidden><ol role="list"></ol></nav>
       <section class="pv-questions" aria-labelledby="pq-title" hidden>
-        <header class="pv-bar"><h2 id="pq-title" tabindex="-1">Questions</h2><span class="pq-count"></span><button type="button" class="btn pq-mod" aria-pressed="false" hidden title="On: new questions wait for your approval before anyone else sees them. Off: they appear for everyone straight away.">Approve first</button></header>
+        <header class="pv-bar"><span class="pv-scroll" id="pq-scroll" aria-hidden="true" hidden><i></i></span><h2 id="pq-title" tabindex="-1">Questions</h2><span class="pq-count"></span><button type="button" class="btn pq-mod" aria-pressed="false" hidden title="On: new questions wait for your approval before anyone else sees them. Off: they appear for everyone straight away.">Approve first</button></header>
         <p class="pq-hint"></p>
-        <ol class="pq-list" role="list" aria-live="polite"></ol>
+        <ol class="pq-list" role="list" aria-live="polite" data-scroll-bar="#pq-scroll"></ol>
       </section>
     </div>
     <div class="pv-right">
@@ -52,8 +55,8 @@
         <div class="pv-frame"><iframe title="Next build" data-role="next" tabindex="-1"></iframe><div class="end" hidden>End of the talk</div></div>
         <div class="next-title"></div>
       </section>
-      <section class="pv-notes" aria-labelledby="pn-title" tabindex="0">
-        <header class="pv-bar"><h2 id="pn-title">Script</h2><span class="pn-state" role="status"></span><button type="button" class="btn pn-edit" hidden title="Changes reach the script page and this view as you type">Edit live</button></header>
+      <section class="pv-notes" aria-labelledby="pn-title" tabindex="0" data-scroll-bar="#pn-scroll">
+        <header class="pv-bar"><span class="pv-scroll" id="pn-scroll" aria-hidden="true" hidden><i></i></span><div class="edge-blur" aria-hidden="true" style="--edge: 24px"><i></i><i></i><i></i><i></i></div><h2 id="pn-title">Script</h2><span class="pn-state" role="status"></span><button type="button" class="btn pn-edit" hidden title="Changes reach the script page and this view as you type"><svg data-fa="pen-to-square" aria-hidden="true" viewBox="0 0 24 24" width="17" height="17"></svg> Edit live</button></header>
         <div class="notes"></div>
         <label class="sr" for="pn-area">The script for this slide</label>
         <textarea class="field notes-edit" id="pn-area" hidden></textarea>
@@ -61,9 +64,9 @@
     </div>
   </main>
 
-  <script src="vendor/marked.js?v=20261208"></script>
-  <script src="js/mdeck.js?v=20261208"></script>
-  <script src="js/live.js?v=20261208"></script>
-  <script src="js/present.js?v=20261208"></script>
+  <script src="vendor/marked.js?v=20261214"></script>
+  <script src="js/mdeck.js?v=20261214"></script>
+  <script src="js/live.js?v=20261214"></script>
+  <script src="js/present.js?v=20261214"></script>
 </body>
 </html>

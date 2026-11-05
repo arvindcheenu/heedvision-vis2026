@@ -160,7 +160,7 @@
     area.value = scriptOf(sl);
     notesEl.hidden = true;
     area.hidden = false;
-    editBtn.textContent = "Done";
+    editBtn.lastChild.textContent = ` ${"Done"}`;
     editBtn.setAttribute("aria-pressed", "true");
     editState.textContent = "Reaches everyone as you type";
     area.focus();
@@ -170,7 +170,7 @@
     editing = null;
     area.hidden = true;
     notesEl.hidden = false;
-    editBtn.textContent = "Edit live";
+    editBtn.lastChild.textContent = ` ${"Edit live"}`;
     editBtn.setAttribute("aria-pressed", "false");
     renderNotes(false);
   }
@@ -203,16 +203,16 @@
         <small>${q.pending ? "<b>Only you can see this.</b> " : ""}${esc(q.name || "Anonymous")} · ${where}</small>
         ${q.answer ? `<p class="q-answer"><b>You:</b> ${esc(q.answer)}</p>` : ""}
         ${q.pending ? `<div class="pq-acts">
-          ${can ? `<button type="button" class="btn" data-act="approve">Approve</button><button type="button" class="btn" data-act="remove">Delete</button>` : ""}
+          ${can ? `<button type="button" class="btn" data-act="approve"><svg data-fa="check" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"></svg> Approve</button><button type="button" class="btn" data-act="remove"><svg data-fa="trash-can" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"></svg> Delete</button>` : ""}
         </div>` : replying === q.id ? `<form>
           <label class="sr" for="pq-reply">Your reply to: ${esc(q.text)}</label>
           <textarea class="field" id="pq-reply" maxlength="1200" placeholder="Everyone sees this under the question" required></textarea>
           <div class="row"><button type="submit" class="btn">Send reply</button><button type="button" class="btn" data-act="cancel">Cancel</button></div>
         </form>` : `<div class="pq-acts">
-          ${slide && slide.id !== state?.id ? `<button type="button" class="btn" data-act="show">Go to slide</button>` : ""}
-          ${canReply ? `<button type="button" class="btn" data-act="reply">${q.answer ? "Change reply" : "Reply"}</button>` : ""}
-          ${canReply && !q.answer ? `<button type="button" class="btn" data-act="said">Answered aloud</button>` : ""}
-          ${can ? `<button type="button" class="btn" data-act="remove">Delete</button>` : ""}
+          ${slide && slide.id !== state?.id ? `<button type="button" class="btn" data-act="show"><svg data-fa="arrow-right" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"></svg> Go to slide</button>` : ""}
+          ${canReply ? `<button type="button" class="btn" data-act="reply"><svg data-fa="reply" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"></svg> ${q.answer ? "Change reply" : "Reply"}</button>` : ""}
+          ${canReply && !q.answer ? `<button type="button" class="btn" data-act="said"><svg data-fa="circle-check" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"></svg> Answered aloud</button>` : ""}
+          ${can ? `<button type="button" class="btn" data-act="remove"><svg data-fa="trash-can" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"></svg> Delete</button>` : ""}
         </div>`}
       </div>
     </li>`;
@@ -229,6 +229,9 @@
     const qs = live.all();
     $(".pq-count").textContent = qs.length || "";
     const held = qs.filter((q) => q.pending).length;
+    $(".pv-scope").textContent = live.presenter ? "You're presenting live: anyone following along moves with you."
+      : live.presenterKey && live.status !== "open" ? ""
+      : "You control only your own copy of the slides, in this browser. The hosted talk and other viewers aren't affected.";
     $(".pq-hint").innerHTML = live.status !== "open" ? "Connecting to the questions…"
       : !live.presenter ? "To reply, open the slides with your key: add <code>?present=your-key</code> to their address, then press P."
       : !live.replies || !live.moderation ? "Some actions need the updated relay. Run <code>npx wrangler deploy</code> in <code>worker/</code>."
@@ -293,8 +296,8 @@
     if (e.target.closest("textarea, input, select")) return;
     const k = e.key;
     if ((k === " " || k === "Enter") && e.target.closest("button, a, summary")) return;
-    if ([" ", "ArrowRight", "ArrowDown", "PageDown", "Enter", "n", "N"].includes(k)) { e.preventDefault(); go({ dir: "next" }); }
-    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(k)) { e.preventDefault(); go({ dir: "prev" }); }
+    if ([" ", "ArrowRight", "ArrowDown", "PageDown", "Enter", "n", "N"].includes(k)) { e.preventDefault(); window.HVTactile?.play("press"); go({ dir: "next" }); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(k)) { e.preventDefault(); window.HVTactile?.play("press"); go({ dir: "prev" }); }
     else if (k === "b" || k === "B") channel.postMessage({ t: "backups" });
     else if (k === "q" || k === "Q") channel.postMessage({ t: "qa", on: !qa });
     else if (k === "t" || k === "T") HVTheme.cycle();

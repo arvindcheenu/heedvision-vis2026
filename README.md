@@ -69,7 +69,9 @@ Font, corners and palette live in one file, `shared/theme.css`. Change them ther
 
 Shared components are in `shared/hv.css`, one block each. The slides' own sizes, and what each colour means, are in `slides/css/deck.css`. Everything is flat colour, apart from the light that follows the cursor. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.
 
-`shared/tactile.js` adds that light and the sounds, which it synthesizes, so there are no audio files. The speaker button on the paper and script pages turns sounds off, and the choice is remembered. They start on with a mouse and off on a phone. The slides and the presenter view have `data-silent` on `<html>`, so they never make a sound.
+`shared/tactile.js` adds that light and the sounds, which it synthesizes, so there are no audio files. The speaker button turns sounds on or off, and the choice is remembered. On the paper and script pages they start on with a mouse and off on a phone. The presenter view has its own switch, off until you turn it on, because that laptop usually feeds the room's speakers. The slides have `data-silent` on `<html>` and never make a sound.
+
+**Icons.** The site's own simple icons are committed. Font Awesome Pro replaces them wherever `shared/icons.svg` exists, using `shared/icons.js`. `python3 tools/build-icons.py` makes that file from the private `arvindcheenu/chimistry-vendor` repository. It is git-ignored and must never be committed, because this repository is public and the licence doesn't allow redistribution. Choose icons with `data-fa="name"` on an `<svg>`, or in `shared/icons.tsv` for slides.
 
 ## Editing
 
@@ -109,7 +111,7 @@ Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **
 
 ### Questions and live updates
 
-Open the slides as `/slides/?present=your-key` and press **P**. The presenter view lists every question as it arrives: waiting for approval first, then not yet answered, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Delete** erases it and its votes for everyone (press twice; it can't be undone).
+Pressing **P** without the key controls only your own copy of the slides, in that browser: the hosted talk and other viewers aren't affected, and the presenter view says so. With the key, anyone following along moves with you. Open the slides as `/slides/?present=your-key` and press **P**. The presenter view lists every question as it arrives: waiting for approval first, then not yet answered, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Delete** erases it and its votes for everyone (press twice; it can't be undone).
 
 **Approve first** holds new questions until you **Approve** them: only you can see them until then, and they can't be voted on or projected. It's off by default, and the setting stays on the relay. Turning it off doesn't release questions already held. **Questions on slide** (Q) projects the top unanswered ones.
 

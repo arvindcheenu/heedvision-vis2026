@@ -1,0 +1,10 @@
+# Which Font Awesome Pro icon each slide icon uses: the name in talk.md (icon=eye), then the Font Awesome name.
+# Buttons and cards name theirs directly, with data-fa="…" on their <svg>.
+eye	eye
+layers	layer-group
+palette	palette
+split	grid-2
+scan	binoculars
+chat	comments
+flag	map-location-dot
+align	arrows-to-dot

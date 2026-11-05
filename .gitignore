@@ -16,3 +16,5 @@ heedvision-vis2026.pdf
 
 .DS_Store
 .claude/
+# Font Awesome Pro: licensed, and this repository is public (tools/build-icons.py)
+shared/icons.svg

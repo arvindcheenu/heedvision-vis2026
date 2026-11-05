@@ -145,19 +145,19 @@ time: 42
 
 # Collaborative attention-aware visualization
 
-:::card title="Capture" class=col
+:::card icon=eye title="Capture" class=col
 Distinguish between users while tracking attention simultaneously.
 
 <span class="rq-tag">RQ1</span><span class="rq">How should the attention of multiple viewers on a visualization be captured in real time?</span>
 :::
 
-:::card title="Record" class=col step=1
+:::card icon=layers title="Record" class=col step=1
 Identity-aware accumulators, with sum, maximum, difference and count.
 
 <span class="rq-tag">RQ2</span><span class="rq">How should the attention of multiple viewers on a visualization be recorded over time?</span>
 :::
 
-:::card title="Revisualize" class=col step=2
+:::card icon=palette title="Revisualize" class=col step=2
 Encode both attention intensity and user identity.
 
 <span class="rq-tag">RQ3</span><span class="rq">How should the attention of multiple viewers on a visualization be displayed?</span>
@@ -458,22 +458,22 @@ time: 26
 
 # Six strategies
 
-:::card title="Spatial division" tone=both cite="P3"
+:::card icon=split title="Spatial division" tone=both cite="P3"
 > We cut the space into top and bottom, and one search for top another search for the bottom.
 :::
-:::card title="Systematic search" tone=both cite="P12"
+:::card icon=scan title="Systematic search" tone=both cite="P12"
 > I took one half and systematically searched through it.
 :::
-:::card title="Visual feedback" tone=both cite="P14"
+:::card icon=palette title="Visual feedback" tone=both cite="P14"
 > Used the voxel system to avoid redundant searches.
 :::
-:::card title="Verbal coordination" cite="P13"
+:::card icon=chat title="Verbal coordination" cite="P13"
 > We tried to coordinate verbally by describing positions relative to the Scatter structure.
 :::
-:::card title="Landmark navigation" cite="P10"
+:::card icon=flag title="Landmark navigation" cite="P10"
 > We used landmarks and described roughly in which area we found the targets.
 :::
-:::card title="Physical synchronization" cite="P6"
+:::card icon=align title="Physical synchronization" cite="P6"
 > We placed the Scatter in the same location in the room using the yellow triangle.
 :::
 ::caveat text="Top row, in pink: the strategies CAAV enabled."
