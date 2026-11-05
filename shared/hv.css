@@ -153,8 +153,9 @@ textarea.field { min-height: 88px; resize: vertical; }
 .q-note:empty { display: none; }
 
 /* ---------- the footer on every page ---------- */
-.site-foot { max-width: 780px; margin: 64px auto 0; padding: 12px 20px 56px; display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; justify-content: space-between; }
+.site-foot { max-width: 780px; margin: 64px auto 0; padding: 12px 20px 64px; display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; justify-content: space-between; }
 .site-foot p { margin: 0; font-size: 13px; color: var(--fg-3); line-height: 1.5; }
+.site-foot .foot-cookies { width: 100%; text-align: center; }
 .site-foot .made { width: 100%; font-size: 14px; color: var(--fg-2); text-align: center; }
 .made svg { display: inline-block; width: 15px; height: 15px; margin: 0 1px; vertical-align: -2px; color: var(--accent); --fa-secondary-opacity: 1; }
 .made a { color: inherit; font-weight: var(--w-strong); text-decoration: none; }
@@ -272,7 +273,7 @@ html::-webkit-scrollbar, .toc-inner::-webkit-scrollbar, .page-toc::-webkit-scrol
 .qs .count.has { background: color-mix(in srgb, var(--accent) 16%, var(--bg)); color: var(--accent); }
 .qs-body { padding: 8px 0 14px; display: grid; gap: 16px; }
 /* the contents beside the script: wraps, never scrolls sideways, follows what you're reading */
-.toc-inner { z-index: 25; position: sticky; top: calc(var(--stage-h, 0px) + 16px); max-height: calc(100vh - var(--stage-h, 0px) - 16px); overflow: hidden auto; padding: 24px 6px 24px 0; }
+.toc-inner { z-index: 24; position: sticky; top: calc(var(--stage-h, 0px) + 16px); max-height: calc(100vh - var(--stage-h, 0px) - 16px); overflow: hidden auto; padding: 24px 6px 24px 0; }
 .toc .ch { margin: 18px 0 4px; font-size: 15px; font-weight: var(--w-head); color: color-mix(in srgb, var(--sec, var(--c1)) 78%, var(--sec-ink)); }
 .toc .ch:first-of-type { margin-top: 0; }
 .toc a { display: flex; gap: 10px; align-items: center; min-width: 0; padding: 4px 8px; border-radius: var(--radius); color: var(--fg-2); font-size: 14.5px; line-height: 1.3; overflow-wrap: anywhere; text-decoration: none; }
@@ -300,7 +301,8 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 .soft-edges { --fade-t: 0px; --fade-b: 0px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%); }
 /* text softens as it leaves the page, under one blur and a fade. A single fixed layer stays steady while
    scrolling; stacking several of these is what flickers */
-.edge-blur { position: fixed; left: 0; right: 0; height: 40px; z-index: 24; pointer-events: none; }
+/* under the contents list, which is under the slide area */
+.edge-blur { position: fixed; left: 0; right: 0; height: 40px; z-index: 23; pointer-events: none; }
 .edge-blur::before, .edge-blur::after { content: ""; position: absolute; inset: 0; }
 .edge-blur::before { -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 .edge-blur.top { top: var(--stage-h, 0px); }
