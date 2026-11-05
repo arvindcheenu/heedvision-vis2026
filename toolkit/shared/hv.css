@@ -155,7 +155,7 @@ textarea.field { min-height: 88px; resize: vertical; }
 /* ---------- the footer on every page ---------- */
 .site-foot { max-width: 780px; margin: 64px auto 0; padding: 12px 20px 56px; display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; justify-content: space-between; }
 .site-foot p { margin: 0; font-size: 13px; color: var(--fg-3); line-height: 1.5; }
-.site-foot .made { width: 100%; font-size: 14px; color: var(--fg-2); }
+.site-foot .made { width: 100%; font-size: 14px; color: var(--fg-2); text-align: center; }
 .made svg { display: inline-block; width: 15px; height: 15px; margin: 0 1px; vertical-align: -2px; color: var(--accent); --fa-secondary-opacity: 1; }
 .made a { color: inherit; font-weight: var(--w-strong); text-decoration: none; }
 .made a:hover { color: var(--accent); }
