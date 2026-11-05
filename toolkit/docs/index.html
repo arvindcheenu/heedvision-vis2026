@@ -10,6 +10,7 @@
   <body>
     <nav class="site-nav" aria-label="Site">
       <a href="../">caav home</a>
+      <a href="https://github.com/arvindcheenu/caav">Source on GitHub</a>
       <a href="../llms-full.txt">These docs as plain text</a>
       <a href="../AGENTS.md">AGENTS.md</a>
     </nav>
@@ -18,7 +19,7 @@
 <p>caav attaches attention to 3D objects, records it separately for each person, and shows it back to them. It is the toolkit from the IEEE VIS 2026 paper <em>HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</em>. CAAV stands for collaborative attention-aware visualization, the term the paper introduces.</p>
 <p>The library has three layers. <code>caav</code> is the core and has no dependencies. <code>caav/three</code> connects it to three.js. <code>caav/react</code> adds hooks for React Three Fiber.</p>
 <h2 id="install">Install</h2>
-<p>The library is not on npm yet. You can load it directly from this site using an import map, with no build step:</p>
+<p>The library is not on npm yet, and the source is <a href="https://github.com/arvindcheenu/caav">on GitHub</a> under the MIT License. You can load it directly from this site using an import map, with no build step:</p>
 <pre tabindex="0"><code>&lt;script type="importmap"&gt;
   {
     "imports": {
@@ -227,7 +228,7 @@ session.reset(); <span class="c-comment">// clears recorded attention and keeps 
 <p>The miniature starts to the person&#39;s right and stays fixed in the world until moved:</p>
 <pre tabindex="0"><code>view.setPresentation(<span class="c-string">"world-separated"</span>);
 view.miniature?.moveTo(<span class="c-number">1.5</span>, <span class="c-number">1</span>, <span class="c-number">0</span>);</code></pre>
-<p>To let people drag it, raycast against <code>view.miniature.object</code>. The playground&#39;s source does this.</p>
+<p>To let people drag it, raycast against <code>view.miniature.object</code>. The <a href="https://github.com/arvindcheenu/caav/blob/main/site/playground/instance.ts">playground&#39;s source</a> does this.</p>
 <p><code>camera-separated</code> draws into an element you provide. Pass it as <code>overlay</code>, and give that element its own positioning context, for example <code>position: relative</code>. The panel has the class <code>caav-panel</code>, so you can restyle it, and a text description for screen readers.</p>
 <pre tabindex="0"><code><span class="c-keyword">import</span> { createAttentionView } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
 

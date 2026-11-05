@@ -6,7 +6,7 @@ The library has three layers. `caav` is the core and has no dependencies. `caav/
 
 ## Install
 
-The library is not on npm yet. You can load it directly from this site using an import map, with no build step:
+The library is not on npm yet, and the source is [on GitHub](https://github.com/arvindcheenu/caav) under the MIT License. You can load it directly from this site using an import map, with no build step:
 
 ```html
 <script type="importmap">
@@ -200,7 +200,7 @@ view.setPresentation("world-separated");
 view.miniature?.moveTo(1.5, 1, 0);
 ```
 
-To let people drag it, raycast against `view.miniature.object`. The playground's source does this.
+To let people drag it, raycast against `view.miniature.object`. The [playground's source](https://github.com/arvindcheenu/caav/blob/main/site/playground/instance.ts) does this.
 
 `camera-separated` draws into an element you provide. Pass it as `overlay`, and give that element its own positioning context, for example `position: relative`. The panel has the class `caav-panel`, so you can restyle it, and a text description for screen readers.
 

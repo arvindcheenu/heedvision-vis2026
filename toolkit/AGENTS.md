@@ -1,6 +1,6 @@
 # caav: notes for coding agents
 
-caav attaches attention to three.js objects, records it per person, and shows it in every mode of the HeedVision design space. Full docs: https://heedvision.arvindchee.nu/toolkit/llms-full.txt
+caav attaches attention to three.js objects, records it per person, and shows it in every mode of the HeedVision design space. Full docs: https://heedvision.arvindchee.nu/toolkit/llms-full.txt. Source: https://github.com/arvindcheenu/caav. MIT License.
 
 ## Using the library
 

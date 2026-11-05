@@ -9,6 +9,7 @@ Import names are `caav`, `caav/three` and `caav/react`. "Viewer" in the API mean
 - [Full documentation as plain text](https://heedvision.arvindchee.nu/toolkit/llms-full.txt): everything in one Markdown file, the best thing to read first
 - [Documentation](https://heedvision.arvindchee.nu/toolkit/docs/): the same content as a web page
 - [Agent instructions](https://heedvision.arvindchee.nu/toolkit/AGENTS.md): how to use and change the library correctly
+- [Source on GitHub](https://github.com/arvindcheenu/caav): MIT License
 
 ## Examples
 
