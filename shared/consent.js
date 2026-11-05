@@ -54,14 +54,18 @@
     var s = document.createElement("style");
     s.id = "hv-consent-style";
     s.textContent = ".hv-consent{position:fixed;right:16px;bottom:16px;z-index:80;box-sizing:border-box;width:min(360px,calc(100vw - 32px));padding:16px;border-radius:var(--r,14px);background:var(--bg,Canvas);color:var(--fg,CanvasText);color-scheme:light dark;box-shadow:0 0 0 .5px color-mix(in srgb,currentColor 18%,transparent),0 12px 32px -12px rgb(0 0 0/.35);font:var(--w-text,400) 15px/1.45 var(--f-text,inherit)}"
-      + ".hv-consent p{margin:0 0 12px}.hv-consent a{color:inherit}"
+      + ".hv-consent p{margin:0 0 12px}"
+      + ".hv-consent-link{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;color:var(--accent,LinkText);font-weight:var(--w-strong,600);text-decoration:none;border-radius:4px}"
+      + ".hv-consent-link:hover{color:var(--title,LinkText)}"
+      + ".hv-consent-link svg{flex:none;width:15px;height:15px;--fa-secondary-opacity:1}"
+      + ".hv-consent-link .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}"
       + ".hv-consent-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}"
       + ".hv-consent h2{margin:0;font:var(--w-head,700) 17px/1.25 var(--f-text,inherit);letter-spacing:-.008em;color:inherit}"
       + ".hv-consent-head svg{flex:none;width:30px;height:30px;color:var(--title,currentColor);--fa-secondary-opacity:.3}"
       + ".hv-consent-row{display:flex;gap:8px}"
       + ".hv-consent button{flex:1;min-height:40px;padding:0 14px;border:0;border-radius:var(--r,14px);background:color-mix(in srgb,currentColor 9%,transparent);color:inherit;font:var(--w-strong,600) 15px/1 var(--f-text,inherit);cursor:pointer}"
       + ".hv-consent button:hover{background:color-mix(in srgb,currentColor 15%,transparent)}"
-      + ".hv-consent button:focus-visible,.hv-cookie-link:focus-visible{outline:2px solid currentColor;outline-offset:2px}"
+      + ".hv-consent button:focus-visible,.hv-consent-link:focus-visible,.hv-cookie-link:focus-visible{outline:2px solid currentColor;outline-offset:2px}"
       + ".hv-cookie-link{appearance:none;padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;text-underline-offset:.16em;cursor:pointer}"
       + ".hv-cookie-foot{margin:24px 16px;font-size:13px;opacity:.75;text-align:center}"
       + "@media print{.hv-consent,.hv-cookie-foot{display:none!important}}";
@@ -77,7 +81,7 @@
     if (/^\/toolkit\//.test(location.pathname)) { box.style.right = "auto"; box.style.left = "16px"; }
     box.setAttribute("aria-labelledby", "hv-consent-title");
     box.innerHTML = '<div class="hv-consent-head"><svg data-fa="cookie-bite" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9 4 4 0 0 1-5-4 4 4 0 0 1-4-5z"/><path d="M9 10h.01M8 15h.01M13 14h.01M15 17h.01"/></svg><h2 id="hv-consent-title">Would you like some cookies?</h2></div>'
-      + '<p>Just the Google Analytics kind. They show us how people find this work, and Google handles the data. No ads, and everything works the same if you say no. <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">How Google uses this</a></p>'
+      + '<p>Just the Google Analytics kind. They show us how people find this work, and Google handles the data. No ads, and everything works the same if you say no. <a class="hv-consent-link" href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">How Google uses this<svg data-fa="arrow-up-right" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg><span class="sr"> (opens in a new tab)</span></a></p>'
       + '<div class="hv-consent-row"><button type="button" class="btn" data-yes>Yes, please</button><button type="button" class="btn" data-no>No, thanks</button></div>';
     document.body.appendChild(box);
     function done(v) {
