@@ -10,6 +10,7 @@ const MAX_TEXT = 600;
 const MAX_NAME = 60;
 const MAX_QUESTIONS = 2000;
 const MAX_NOTES = 12000;
+const MAX_ANSWER = 1200;
 
 export default {
   async fetch(req, env) {
@@ -40,6 +41,7 @@ export class Room extends DurableObject {
     this.sql.exec(`CREATE TABLE IF NOT EXISTS questions (
       id TEXT PRIMARY KEY, slide TEXT, text TEXT, name TEXT,
       votes INTEGER NOT NULL DEFAULT 0, ts INTEGER, hidden INTEGER NOT NULL DEFAULT 0)`);
+    try { this.sql.exec("ALTER TABLE questions ADD COLUMN answer TEXT NOT NULL DEFAULT ''"); } catch {} // already there
     this.sql.exec(`CREATE TABLE IF NOT EXISTS votes (qid TEXT, voter TEXT, PRIMARY KEY (qid, voter))`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, md TEXT, base TEXT, ts INTEGER)`);
@@ -57,7 +59,7 @@ export class Room extends DurableObject {
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({ presenter, ip });
-    server.send(JSON.stringify({ t: "init", presenter, slide: this.slide(), questions: this.questions(), notes: this.notes() }));
+    server.send(JSON.stringify({ t: "init", presenter, replies: true, slide: this.slide(), questions: this.questions(), notes: this.notes() }));
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -87,6 +89,7 @@ export class Room extends DurableObject {
         votes: 0,
         ts: Date.now(),
         hidden: false,
+        answer: "",
       };
       this.sql.exec("INSERT INTO questions (id, slide, text, name, votes, ts) VALUES (?, ?, ?, ?, 0, ?)", q.id, q.slide, q.text, q.name, q.ts);
       this.broadcast({ t: "question", q });
@@ -110,6 +113,14 @@ export class Room extends DurableObject {
       if (md.trim()) this.sql.exec("INSERT OR REPLACE INTO notes (id, md, base, ts) VALUES (?, ?, ?, ?)", id, md, base, ts);
       else this.sql.exec("DELETE FROM notes WHERE id = ?", id);
       this.broadcast({ t: "notes", id, md: md.trim() ? md : "", base, ts });
+    } else if (m.t === "answer") {
+      // presenter only: a reply under a question, or empty text to take it back
+      if (!presenter) return;
+      const id = cleanId(m.id, 64);
+      if (!id) return;
+      const answer = cleanText(m.text, MAX_ANSWER);
+      this.sql.exec("UPDATE questions SET answer = ? WHERE id = ?", answer, id);
+      this.broadcast({ t: "answered", id, answer });
     } else if (m.t === "hide") {
       if (!presenter) return;
       const id = cleanId(m.id, 64);
@@ -129,7 +140,7 @@ export class Room extends DurableObject {
 
   questions() {
     return this.sql
-      .exec("SELECT id, slide, text, name, votes, ts FROM questions WHERE hidden = 0 ORDER BY ts LIMIT 1000")
+      .exec("SELECT id, slide, text, name, votes, ts, answer FROM questions WHERE hidden = 0 ORDER BY ts LIMIT 1000")
       .toArray()
       .map((q) => ({ ...q, hidden: false }));
   }

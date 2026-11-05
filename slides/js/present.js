@@ -23,15 +23,19 @@
   function startLive() { if (!liveStarted) { liveStarted = true; live.start({ endpoint: set.live, room: set.room }); } }
   channel.onmessage = (e) => {
     const m = e.data || {};
-    if (m.t === "state") { deckSeen = Date.now(); onState(m); }
+    if (m.t === "state") {
+      deckSeen = Date.now();
+      // answers to the "are you there?" below change nothing, and shouldn't move the script
+      if (!state || m.id !== state.id || m.f !== state.f || m.ask !== state.ask || m.qa !== state.qa) onState(m);
+    }
     else if (m.t === "key" && m.key && !live.presenterKey) live.presenterKey = m.key;
   };
   channel.postMessage({ t: "hello" });
   setTimeout(startLive, 700); // gives the slides a moment to hand over the presenter key
   setInterval(() => {
-    const ok = Date.now() - deckSeen < 4000 || (deckSeen && document.hidden);
+    const ok = Date.now() - deckSeen < 6000 || (deckSeen && document.hidden);
     $(".pv-link").textContent = ok ? "" : "Open the slides in this browser";
-    if (!ok) channel.postMessage({ t: "hello" });
+    channel.postMessage({ t: "hello" });
   }, 2000);
   const go = (msg) => channel.postMessage({ t: "go", ...msg });
   live.on("slide", (s) => { if (Date.now() - deckSeen > 4000) onState({ ...s, builds: slides.get(s.id)?.clicks || 0, backup: !!slides.get(s.id)?.backup }); });
@@ -58,6 +62,7 @@
   function onState(s) {
     const first = !state;
     const moved = !first && (s.id !== state.id || s.f !== state.f);
+    if (editing && s.id !== editing) finishEdit();
     state = s;
     const newSlide = s.id !== lastId;
     if (newSlide) { enteredAt = Date.now(); lastId = s.id; }
@@ -84,6 +89,13 @@
   const KEY = `hv.timer.${set.room}`;
   const timer = { done: 0, since: 0, running: false, started: false, auto: true, ...store.get(KEY, {}) };
   const saveTimer = () => store.set(KEY, timer);
+  // Closing this window stops the timer. If it went without saying goodbye, the timer stopped at its last beat.
+  if (timer.running) {
+    timer.done += Math.max(0, (timer.beat || timer.since) - timer.since) / 1000;
+    timer.running = false;
+    saveTimer();
+  }
+  addEventListener("pagehide", () => { if (timer.running) pauseTimer(); });
   const elapsed = () => timer.done + (timer.running ? (Date.now() - timer.since) / 1000 : 0);
   const fmt = (sec) => { const a = Math.abs(Math.round(sec)); return `${Math.floor(a / 60)}:${String(a % 60).padStart(2, "0")}`; };
   function resumeTimer() { timer.running = true; timer.started = true; timer.since = Date.now(); saveTimer(); tick(); }
@@ -92,6 +104,7 @@
   $(".pv-timer .reset").addEventListener("click", () => { Object.assign(timer, { done: 0, since: 0, running: false, started: false }); saveTimer(); tick(); });
   $(".pv-timer .auto").addEventListener("click", () => { timer.auto = !timer.auto; saveTimer(); tick(); });
   function tick() {
+    if (timer.running) { timer.beat = Date.now(); saveTimer(); }
     const el = elapsed();
     $(".pv-timer .elapsed").textContent = fmt(el);
     $(".pv-timer .toggle").textContent = timer.running ? "Pause" : timer.started ? "Resume" : "Start";
@@ -109,14 +122,19 @@
   }
   setInterval(tick, 500);
 
-  // ---------------------------------------------------------- script (read-only: edit it in dev mode)
-  const notesEl = $(".notes");
+  // ---------------------------------------------------------- script
+  // Whoever holds the presenter key can edit it here: every keystroke reaches the script page and this
+  // view over the relay. talk.md stays the source; an edit is dropped once talk.md's text for that slide changes.
+  const notesEl = $(".notes"), area = $(".notes-edit"), editBtn = $(".pn-edit"), editState = $(".pn-state");
+  let editing = null, editTimer = 0;
+  const scriptOf = (sl) => { const e = live.noteFor(sl); return e ? e.md : sl.notesMd; };
   function renderNotes(scroll) {
-    if (!state) return;
+    if (!state || editing) return;
     const sl = slides.get(state.id);
     if (!sl) return;
     let k = 0;
-    notesEl.innerHTML = MDeck.renderNotes(sl.notesMd).replace(/\[click\]/g, () => `<span class="click" data-k="${k++}">click</span>`);
+    notesEl.innerHTML = MDeck.renderNotes(scriptOf(sl)).replace(/\[click\]/g, () => `<span class="click" data-k="${k++}">click</span>`);
+    editState.textContent = live.noteFor(sl) ? "Edited live" : "";
     notesEl.querySelectorAll(".click").forEach((c) => {
       const i = +c.dataset.k;
       c.classList.toggle("passed", i <= state.f);
@@ -126,6 +144,39 @@
     if (target && state.f >= 0) target.scrollIntoView({ block: "center", behavior: scroll ? "auto" : "smooth" });
     else if (scroll) notesEl.parentElement.scrollTop = 0;
   }
+  live.on("notes", () => renderNotes(false));
+  function pushEdit() {
+    clearTimeout(editTimer);
+    const sl = slides.get(editing);
+    if (!sl) return;
+    // back to what talk.md says: no edit needed
+    live.saveNotes(editing, area.value.trim() === sl.notesMd.trim() ? "" : area.value, sl.notesHash);
+    editState.textContent = live.status === "open" ? "Live" : "Waiting for the connection";
+  }
+  function startEdit() {
+    const sl = state && slides.get(state.id);
+    if (!sl) return;
+    editing = sl.id;
+    area.value = scriptOf(sl);
+    notesEl.hidden = true;
+    area.hidden = false;
+    editBtn.textContent = "Done";
+    editBtn.setAttribute("aria-pressed", "true");
+    editState.textContent = "Reaches everyone as you type";
+    area.focus();
+  }
+  function finishEdit() {
+    pushEdit();
+    editing = null;
+    area.hidden = true;
+    notesEl.hidden = false;
+    editBtn.textContent = "Edit live";
+    editBtn.setAttribute("aria-pressed", "false");
+    renderNotes(false);
+  }
+  editBtn.addEventListener("click", () => (editing ? finishEdit() : startEdit()));
+  area.addEventListener("input", () => { clearTimeout(editTimer); editTimer = setTimeout(pushEdit, 350); });
+  area.addEventListener("keydown", (e) => { if (e.key === "Escape") { finishEdit(); editBtn.focus(); } });
 
   // ---------------------------------------------------------- backups + questions
   function renderBackups() {
@@ -134,14 +185,92 @@
     $(".pv-backups ol").innerHTML = list.map((s) => `<li><button type="button" class="btn" data-jump="${esc(s.id)}">${esc(s.title)}</button></li>`).join("");
   }
   $(".pv-backups").addEventListener("click", (e) => { const b = e.target.closest("[data-jump]"); if (b) go({ id: b.dataset.jump, f: -1 }); });
+  // Every question, live: not yet answered first, most votes first. Whoever holds the presenter key can
+  // reply in writing (it appears under the question for everyone), mark it answered aloud, or remove it.
+  const qList = $(".pq-list");
+  const SAID = "Answered in the talk.";
+  const drafts = new Map();
+  let replying = null, qWas = "";
+  function questionRow(q) {
+    const slide = slides.get(q.slide);
+    const can = live.presenter, canReply = can && live.replies;
+    const where = slide ? `${slide.id === state?.id ? "This slide" : esc(slide.title)}` : "General";
+    return `<li class="pq${q.answer ? " done" : ""}" data-id="${esc(q.id)}">
+      <div class="pq-votes" aria-label="${q.votes} ${q.votes === 1 ? "vote" : "votes"}">${q.votes}</div>
+      <div>
+        <p>${esc(q.text)}</p>
+        <small>${esc(q.name || "Anonymous")} · ${where}</small>
+        ${q.answer ? `<p class="q-answer"><b>You:</b> ${esc(q.answer)}</p>` : ""}
+        ${replying === q.id ? `<form>
+          <label class="sr" for="pq-reply">Your reply to: ${esc(q.text)}</label>
+          <textarea class="field" id="pq-reply" maxlength="1200" placeholder="Everyone sees this under the question" required></textarea>
+          <div class="row"><button type="submit" class="btn">Send reply</button><button type="button" class="btn" data-act="cancel">Cancel</button></div>
+        </form>` : `<div class="pq-acts">
+          ${slide && slide.id !== state?.id ? `<button type="button" class="btn" data-act="show">Go to slide</button>` : ""}
+          ${canReply ? `<button type="button" class="btn" data-act="reply">${q.answer ? "Change reply" : "Reply"}</button>` : ""}
+          ${canReply && !q.answer ? `<button type="button" class="btn" data-act="said">Answered aloud</button>` : ""}
+          ${can ? `<button type="button" class="btn" data-act="remove">Remove</button>` : ""}
+        </div>`}
+      </div>
+    </li>`;
+  }
   function renderQuestions() {
     const on = set.questions === "on" && live.enabled;
     $("[data-qa]").hidden = !on;
-    const top = on ? live.top(8) : [];
-    $(".pv-questions").hidden = !top.length;
-    $(".pv-questions ol").innerHTML = top.map((q) => `<li><b>${q.votes}</b>${esc(q.text)}<small>${esc(slides.get(q.slide)?.title || "General")}${q.name ? " · " + esc(q.name) : ""}</small></li>`).join("");
+    $(".pv-questions").hidden = !on;
+    if (!on) return;
+    editBtn.hidden = !live.presenter;
+    const qs = live.all();
+    $(".pq-count").textContent = qs.length || "";
+    $(".pq-hint").innerHTML = live.status !== "open" ? "Connecting to the questions…"
+      : !live.presenter ? "To reply, open the slides with your key: add <code>?present=your-key</code> to their address, then press P."
+      : !live.replies ? "Written replies need the updated relay. Run <code>npx wrangler deploy</code> in <code>worker/</code>." : "";
+    const html = qs.length ? qs.map(questionRow).join("") : `<li class="pq-empty">No questions yet. They appear here the moment someone asks, most upvoted first.</li>`;
+    if (html === qWas) return;
+    // the list is rebuilt when anything changes: keep the keyboard where it was
+    const now = document.activeElement, typing = now?.id === "pq-reply";
+    const row = qList.contains(now) ? now.closest("[data-id]")?.dataset.id : null, act = now?.dataset?.act;
+    qList.innerHTML = qWas = html;
+    const box = $("#pq-reply");
+    if (box) { box.value = drafts.get(replying) || ""; if (typing) box.focus(); }
+    if (row && !typing) {
+      const r = qList.querySelector(`[data-id="${CSS.escape(row)}"]`);
+      (r?.querySelector(`[data-act="${act}"]`) || r?.querySelector("button"))?.focus();
+    }
   }
   live.on("questions", renderQuestions);
+  live.on("status", renderQuestions);
+  qList.addEventListener("input", (e) => { if (e.target.id === "pq-reply") drafts.set(replying, e.target.value); });
+  qList.addEventListener("keydown", (e) => {
+    if (e.target.id !== "pq-reply") return;
+    if (e.key === "Escape") { replying = null; renderQuestions(); }
+    else if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) e.target.form.requestSubmit();
+  });
+  qList.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const id = replying;
+    live.answer(id, e.target.querySelector("textarea").value);
+    drafts.delete(id);
+    replying = null;
+    renderQuestions();
+    qList.querySelector(`[data-id="${CSS.escape(id)}"] button`)?.focus();
+  });
+  qList.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const id = b.closest("[data-id]").dataset.id, q = live.questions.get(id);
+    if (b.dataset.act === "show") go({ id: q.slide, f: -1 });
+    else if (b.dataset.act === "reply") { replying = id; if (q.answer && q.answer !== SAID && !drafts.has(id)) drafts.set(id, q.answer); renderQuestions(); $("#pq-reply").focus(); }
+    else if (b.dataset.act === "cancel") { replying = null; renderQuestions(); }
+    else if (b.dataset.act === "said") live.answer(id, SAID);
+    else if (b.dataset.act === "remove") {
+      // removing can't be undone from here: it takes a second press
+      if (b.dataset.sure) return live.hide(id);
+      b.dataset.sure = "1";
+      b.textContent = "Remove for everyone?";
+      setTimeout(() => { if (b.isConnected) { delete b.dataset.sure; b.textContent = "Remove"; } }, 3000);
+    }
+  });
 
   // ---------------------------------------------------------- controls
   document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => go({ dir: b.dataset.go })));
@@ -149,7 +278,9 @@
   $("[data-qa]").addEventListener("click", () => channel.postMessage({ t: "qa", on: !qa }));
   addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.closest("textarea, input, select")) return;
     const k = e.key;
+    if ((k === " " || k === "Enter") && e.target.closest("button, a, summary")) return;
     if ([" ", "ArrowRight", "ArrowDown", "PageDown", "Enter", "n", "N"].includes(k)) { e.preventDefault(); go({ dir: "next" }); }
     else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(k)) { e.preventDefault(); go({ dir: "prev" }); }
     else if (k === "b" || k === "B") channel.postMessage({ t: "backups" });

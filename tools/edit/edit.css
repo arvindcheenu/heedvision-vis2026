@@ -6,12 +6,11 @@ html, body { height: 100%; overflow: hidden; }
 .ed-list { grid-area: list; overflow-y: auto; padding: 8px; }
 .ed-list button { all: unset; border-radius: var(--radius); box-sizing: border-box; cursor: pointer; display: flex; gap: 8px; width: 100%; padding: 6px 8px; font-size: 14px; line-height: 1.3; }
 .ed-list button:hover { background: var(--surface-2); }
-.ed-list button[aria-current="true"] { background: var(--vis-brown); color: #fff; }
+.ed-list button[aria-current="true"] { background: var(--accent); color: var(--on-accent); }
 .ed-list .n { flex: none; width: 2ch; text-align: right; opacity: 0.6; font-variant-numeric: tabular-nums; }
 .ed-text { grid-area: text; display: grid; grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; padding: 12px; min-height: 0; }
 .ed-text label { display: flex; flex-direction: column; gap: 4px; min-height: 0; font-size: 14px; font-weight: 600; }
-.ed-text textarea { flex: 1; min-height: 0; padding: 10px 12px; border: 0; border-radius: var(--radius); resize: none; outline: 0; background: var(--surface-2); color: var(--fg); font: 400 14px/1.5 ui-monospace, Menlo, monospace; }
-.ed-text textarea:focus { box-shadow: inset 0 0 0 2px var(--vis-orange); }
+.ed-text textarea { flex: 1; min-height: 0; padding: 10px 12px; border: 0; border-radius: var(--radius); resize: none; background: var(--surface-2); color: var(--fg); font: 400 14px/1.5 ui-monospace, Menlo, monospace; }
 .ed-view { grid-area: view; padding: 12px 12px 12px 0; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .ed-view .frame { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); border-radius: var(--radius); overflow: hidden; }
 .ed-view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }

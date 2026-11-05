@@ -45,24 +45,27 @@
       chEl.className = "chapter";
       chapterNo++;
       chEl.style.setProperty("--sec", colourOf(chapterNo));
-      chEl.innerHTML = `<h2 class="section-title">${esc(chapter)}${s.backup ? ` <span class="sub">Spare slides for questions</span>` : ""}</h2>`;
+      chEl.setAttribute("aria-labelledby", `ch-${chapterNo}`);
+      chEl.innerHTML = `<h2 class="section-title" id="ch-${chapterNo}">${esc(chapter)}${s.backup ? ` <span class="sub">Spare slides for questions</span>` : ""}</h2>`;
       root.appendChild(chEl);
       tocList.insertAdjacentHTML("beforeend", `<li class="ch" style="--sec:${colourOf(chapterNo)}">${esc(chapter)}</li>`);
     }
     const art = document.createElement("article");
     art.className = "entry";
     art.id = `s-${s.id}`;
+    art.setAttribute("aria-labelledby", `t-${s.id}`);
     art.innerHTML = `
-      <h3 data-f="-1"><span class="n">${n}</span>${esc(s.title)}<span class="live-tag">On screen now</span></h3>
+      <h3 data-f="-1" id="t-${esc(s.id)}"><span class="n">${n}</span><button type="button" class="entry-go" title="Show this slide">${esc(s.title)}</button><span class="live-tag">On screen now</span></h3>
       <div class="prose script"></div>
-      ${useQuestions ? `<details class="qs card">
-        <summary>Questions <span class="count">0</span></summary>
+      ${useQuestions ? `<details class="qs">
+        <summary>Questions <span class="count"><span class="sr">asked so far: </span><span class="num">0</span></span></summary>
         <div class="qs-body">
-          <div class="list"></div>
-          <form>
-            <textarea name="text" maxlength="600" placeholder="Ask about this slide…" required></textarea>
-            <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button class="btn" type="submit">Ask</button></div>
-            <div class="note"></div>
+          <ul class="q-list" role="list" aria-live="polite"></ul>
+          <form class="ask-form">
+            <label class="sr" for="q-${esc(s.id)}">Your question about ${esc(s.title)}</label>
+            <textarea class="field" id="q-${esc(s.id)}" name="text" maxlength="600" placeholder="Ask about this slide…" required></textarea>
+            <div class="row"><label class="sr" for="n-${esc(s.id)}">Your name, optional</label><input class="field" id="n-${esc(s.id)}" name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button class="btn" type="submit">Ask</button></div>
+            <p class="q-note" role="status"></p>
           </form>
         </div>
       </details>` : set.questions === "link" ? `<a class="btn" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask in the venue's Q&amp;A ↗</a>` : ""}`;
@@ -101,7 +104,8 @@
       .replace(/\[click\]/g, () => `<button type="button" class="click" data-f="${k++}" title="Show this build">click</button>`);
     e.markers = [...e.el.querySelectorAll("[data-f]")];
   }
-  live.on("notes", () => entries.forEach(renderScript));
+  // the presenter's edits arrive while you read
+  live.on("notes", () => { entries.forEach(renderScript); if (shown) markReading(shown.id, shown.f); });
 
   // ---------------------------------------------------------- the pinned slide
   let ready = false, shown = null, want = null;
@@ -155,11 +159,12 @@
     document.querySelectorAll(".script .click.at").forEach((c) => c.classList.remove("at"));
     const m = markerOf(id, f);
     if (m && m.classList.contains("click")) m.classList.add("at");
-    tocList.querySelectorAll("a.here").forEach((a) => a.classList.remove("here"));
+    tocList.querySelectorAll("a.here").forEach((a) => { a.classList.remove("here"); a.removeAttribute("aria-current"); });
     // keep the current entry in view in the sidebar, without moving the page
     const here = tocList.querySelector(`a[data-slide="${CSS.escape(id)}"]`);
     if (here) {
       here.classList.add("here");
+      here.setAttribute("aria-current", "location");
       const box = document.querySelector(".toc-inner");
       if (box && box.scrollHeight > box.clientHeight) {
         const a = here.getBoundingClientRect(), b = box.getBoundingClientRect();
@@ -213,6 +218,7 @@
   // tap a line (or a click chip) to show its slide
   root.addEventListener("click", (ev) => {
     if (ev.target.closest("details, a, form")) return;
+    if (!getSelection().isCollapsed) return; // selecting text, not asking for a slide
     const art = ev.target.closest(".entry");
     if (!art) return;
     const e = byId(art.id.slice(2));
@@ -228,14 +234,14 @@
   if (useQuestions) {
     entries.forEach(({ id, el }) => {
       const form = el.querySelector("form");
-      const note = form.querySelector(".note");
+      const note = form.querySelector(".q-note");
       form.addEventListener("submit", (ev) => {
         ev.preventDefault();
         const ok = live.ask(id, form.text.value, form.name.value);
-        note.textContent = ok ? (live.status === "open" ? "Sent. Thanks!" : "Saved; it will send when the connection is back.") : "Questions are offline right now.";
+        note.textContent = ok ? (live.status === "open" ? "Sent. Thanks! The speaker can see it now." : "Saved; it will send when the connection is back.") : "Questions are offline right now.";
         if (ok) form.text.value = "";
       });
-      el.querySelector(".list").addEventListener("click", (ev) => {
+      el.querySelector(".q-list").addEventListener("click", (ev) => {
         const b = ev.target.closest("button[data-vote]");
         if (b) { live.vote(b.dataset.vote); renderQuestions(); }
       });
@@ -247,11 +253,9 @@
     entries.forEach(({ id, el }) => {
       const qs = live.forSlide(id);
       const c = el.querySelector(".count");
-      if (c) { c.textContent = qs.length; c.classList.toggle("has", qs.length > 0); }
-      const list = el.querySelector(".list");
-      if (list) list.innerHTML = qs.length
-        ? qs.map((q) => `<div class="q"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" class="btn" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}" aria-label="Upvote">▲ ${q.votes}</button></div>`).join("")
-        : `<div class="empty">No questions yet.</div>`;
+      if (c) { c.querySelector(".num").textContent = qs.length; c.classList.toggle("has", qs.length > 0); }
+      const list = el.querySelector(".q-list");
+      if (list) live.fill(list, qs, "No questions yet. Be the first.");
       const t = tocList.querySelector(`a[data-slide="${CSS.escape(id)}"] .qn`);
       if (t) t.textContent = qs.length || "";
     });

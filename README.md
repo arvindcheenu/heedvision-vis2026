@@ -61,11 +61,13 @@ Math works anywhere as `$x^2$` and `$$x^2$$`. A fenced ` ```mermaid ` block draw
 
 ### Sections on the pages
 
-The project page and the script page have no rules or native scrollbars: a quiet tint separates sections. `--c1` to `--c6` in `shared/hv.css` set the colour, all orange for now. `shared/progress.js` draws the scroll progress.
+The project page and the script page have no rules or native scrollbars. On the project page a quiet tint separates sections; on the script page each section's heading sits on the right, over plain paragraphs. `--c1` to `--c6` in `shared/hv.css` set a colour per section, all the same for now. `shared/progress.js` draws the scroll progress.
 
 ### Styles
 
-The palette, the font and the border radius are at the top of `shared/hv.css`; the slides' own sizes, and what each colour means, are in `slides/css/deck.css`. The palette is the IEEE VIS 2026 template's. Everything is flat colour. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.
+Font, corners and palette live in one file, `shared/theme.css`. Change them there, or live on the **Theme** page in dev mode (the button at the top of the editor, or `/tools/edit/theme.html`), which previews the real pages, reads out contrast and saves the file. Commit and push to publish. The palette is the IEEE VIS 2026 template's, and the font is Nunito, which ships in `shared/fonts/` under the SIL Open Font License so it looks the same in every browser, in the PDF and offline. SF Pro Rounded can't be shipped with a website; choosing it only takes effect in Safari on Apple devices.
+
+Shared components are in `shared/hv.css`, one block each. The slides' own sizes, and what each colour means, are in `slides/css/deck.css`. Everything is flat colour. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.
 
 ## Editing
 
@@ -103,9 +105,19 @@ Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **
 
 `worker/` is one Durable Object per room, on the Workers free plan. Deploy with `npx wrangler deploy` in `worker/`; allowed origins are in `worker/wrangler.jsonc`. Set the key with `npx wrangler secret put PRESENTER_KEY`.
 
+### Questions and live updates
+
+Open the slides as `/slides/?present=your-key` and press **P**. The presenter view lists every question as it arrives, not yet answered first, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Remove** takes it down (press twice). **Questions on slide** (Q) projects the top unanswered ones.
+
+**Edit live** above the script changes it for that slide as you type, in the presenter view and on the script page, with no refresh. These edits are kept on the relay, not in `talk.md`: copy anything you want to keep into `talk.md`, because an edit is dropped once `talk.md`'s text for that slide changes. Without the key, the presenter view can only read questions.
+
+The timer stops when the presenter view closes, and picks up again with **Resume** or, with Auto-resume on, on the next slide change.
+
+To try all of this without touching the real room, run `npx wrangler dev --port 8787 --var PRESENTER_KEY:test` in `worker/` and add `live=http://127.0.0.1:8787` to each page's address.
+
 ## Tools
 
-- `node tools/serve.mjs`: serves the site on :8000, read-only. `--dev` adds editing and live reload.
+- `node tools/serve.mjs`: serves the site on :8000, read-only. `--dev` adds editing, the Theme page and live reload.
 - `tools/make-pdf.sh`: the slides as a PDF. Needs the local server and Google Chrome.
 - `python3 tools/figures/make_figures.py`: redraws the result plots from `tools/figures/data/`. The per-pair and condition CSVs come from the OSF package and reproduce the paper's means; `attention_fig9.csv` is read back from the paper's Fig. 9 image.
 
@@ -113,4 +125,4 @@ If you change a `.js` or `.css` file, bump the `?v=` number on its `<script>` an
 
 ## Links
 
-Data, analysis code and system source: <https://osf.io/frsp8/>. reveal.js, marked, qrcode-generator, KaTeX, Mermaid, three.js and three-mesh-bvh are vendored in `slides/vendor/`, under their own licenses.
+Data, analysis code and system source: <https://osf.io/frsp8/>. reveal.js, marked, qrcode-generator, KaTeX, Mermaid, three.js and three-mesh-bvh are vendored in `slides/vendor/`, under their own licenses. Nunito is in `shared/fonts/`, under the SIL Open Font License.

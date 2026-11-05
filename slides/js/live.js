@@ -9,15 +9,20 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
 
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
   let clientId = store.get("hv.cid", null);
   if (!clientId) { clientId = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set("hv.cid", clientId); }
 
+  const filled = new WeakMap();
   const bus = new EventTarget();
   let cfg = {};
   const live = {
     enabled: false,
     status: "off",          // off | connecting | open | closed
     presenterKey: params.get("present") || "",
+    presenter: false,       // the relay accepted the presenter key
+    replies: false,
     slide: null,            // last slide broadcast by the presenter
     questions: new Map(),   // id -> question
     notes: new Map(),       // slide id -> { md, base, ts }: script edits from the presenter view
@@ -29,9 +34,28 @@
       return [...this.questions.values()].filter((q) => q.slide === id && !q.hidden)
         .sort((a, b) => b.votes - a.votes || a.ts - b.ts);
     },
-    top(n) {
+    // everything still visible: not yet answered first, then most votes first
+    all() {
       return [...this.questions.values()].filter((q) => !q.hidden)
-        .sort((a, b) => b.votes - a.votes || a.ts - b.ts).slice(0, n);
+        .sort((a, b) => !!a.answer - !!b.answer || b.votes - a.votes || a.ts - b.ts);
+    },
+    // what's worth putting on the projected slide
+    top(n) { return this.all().filter((q) => !q.answer).slice(0, n); },
+    // a list of questions: replaced only when it changed, so screen readers announce only what's new,
+    // and the keyboard stays on the button it was on
+    fill(list, qs, empty) {
+      const html = qs.length ? qs.map((q) => this.questionHTML(q)).join("") : `<li class="q-empty">${esc(empty)}</li>`;
+      if (filled.get(list) === html) return;
+      const on = list.contains(document.activeElement) ? document.activeElement.dataset.vote : null;
+      list.innerHTML = html;
+      filled.set(list, html);
+      if (on) list.querySelector(`[data-vote="${CSS.escape(on)}"]`)?.focus();
+    },
+    // one question, the same on the script page and the slides
+    questionHTML(q) {
+      const who = q.name || "Anonymous";
+      return `<li class="q"><div><p>${esc(q.text)}</p><small>${esc(who)}</small>${q.answer ? `<p class="q-answer"><b>Speaker:</b> ${esc(q.answer)}</p>` : ""}</div>` +
+        `<button type="button" class="btn" data-vote="${esc(q.id)}" aria-pressed="${this.voted.has(q.id)}" aria-label="Upvote this question, ${q.votes} ${q.votes === 1 ? "vote" : "votes"} so far"><span aria-hidden="true">▲ ${q.votes}</span></button></li>`;
     },
 
     ask(slide, text, name) {
@@ -45,6 +69,8 @@
       return send({ t: "vote", id, cid: clientId });
     },
     hide(id) { return send({ t: "hide", id }); },
+    // presenter only: a written reply, shown under the question for everyone (empty text removes it)
+    answer(id, text) { return send({ t: "answer", id, text: String(text || "").trim().slice(0, 1200) }); },
     broadcast(slide) { if (this.presenterKey) send({ t: "slide", slide }); },
     // presenter only: replace a slide's script for everyone; `base` is the hash of
     // the talk.md text it replaces, so the edit is dropped once talk.md changes
@@ -91,8 +117,9 @@
       if (m.t === "init") {
         live.questions = new Map(m.questions.map((q) => [q.id, q]));
         live.notes = new Map((m.notes || []).map((n) => [n.id, n]));
-        live.emit("notes");
         live.presenter = !!m.presenter;
+        live.replies = !!m.replies; // this relay can store replies
+        live.emit("notes");
         live.emit("questions");
         if (m.slide) { live.slide = m.slide; live.emit("slide", m.slide); }
         if (live.presenterKey && !m.presenter) live.emit("error", "Presenter key was not accepted");
@@ -104,6 +131,8 @@
         const q = live.questions.get(m.id); if (q) { q.votes = m.votes; live.emit("questions"); }
       } else if (m.t === "hidden") {
         const q = live.questions.get(m.id); if (q) { q.hidden = true; live.emit("questions"); }
+      } else if (m.t === "answered") {
+        const q = live.questions.get(m.id); if (q) { q.answer = m.answer; live.emit("questions"); }
       } else if (m.t === "notes") {
         if (m.md) live.notes.set(m.id, { id: m.id, md: m.md, base: m.base, ts: m.ts }); else live.notes.delete(m.id);
         live.emit("notes", m.id);

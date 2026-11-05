@@ -209,14 +209,14 @@
 
     // the HeedVision demo, forked: two headsets side by side over one shared voxel store (js/hvdemo.js)
     live: (a) => wrap("div", a, "c-live",
-      `<div class="hvd-panes">${["A", "B"].map((u, i) => `<div class="hvd-pane"><canvas data-user="${i}" aria-label="User ${u}'s headset: drag to move them, click the sphere to hide or show their voxels"></canvas><span class="who">User ${u}'s headset</span></div>`).join("")}</div>` +
+      `<div class="hvd-panes">${["A", "B"].map((u, i) => `<div class="hvd-pane"><canvas data-user="${i}" role="img" aria-label="User ${u}'s headset: drag to move them, click the sphere to hide or show their voxels"></canvas><span class="who">User ${u}'s headset</span></div>`).join("")}</div>` +
       `<div class="live-bar"><span class="tag">${esc(a.tag || "Live")}</span><span class="hint">${mdi(a.hint || "Drag a view to move that person · click the sphere to hide or show their voxels")}</span><button type="button" class="btn" data-act="reset">Reset</button></div>`,
       ` data-voxdemo data-stepper data-at="0"`),
 
 
     // animations (js/explain.js); `steps` walks through their phases
-    bvh: (a) => wrap("div", a, "c-canvas c-explain", `<canvas data-explain="bvh" aria-label="${esc(a.alt || "Animation: a bounding volume hierarchy voxelizes a chart and head rays collect attention")}"></canvas>${stepSpans(a, 2)}`, ' data-stepper data-at="0"'),
-    hv: (a) => wrap("div", a, "c-canvas c-explain", `<canvas data-explain="hv" aria-label="${esc(a.alt || "Animation: two people look at one shared voxelized sphere; voxels turn blue, orange or pink where they look")}"></canvas>${stepSpans(a, 1)}`, ' data-stepper data-at="0"'),
+    bvh: (a) => wrap("div", a, "c-canvas c-explain", `<canvas data-explain="bvh" role="img" aria-label="${esc(a.alt || "Animation: a bounding volume hierarchy voxelizes a chart and head rays collect attention")}"></canvas>${stepSpans(a, 2)}`, ' data-stepper data-at="0"'),
+    hv: (a) => wrap("div", a, "c-canvas c-explain", `<canvas data-explain="hv" role="img" aria-label="${esc(a.alt || "Animation: two people look at one shared voxelized sphere; voxels turn blue, orange or pink where they look")}"></canvas>${stepSpans(a, 1)}`, ' data-stepper data-at="0"'),
 
 
     // modes are shown in the order given; `steps` moves to the next one on each
@@ -228,7 +228,7 @@
       const from = a.steps && a.steps !== true ? +a.steps : null;
       const steps = a.steps ? modes.slice(1).map((m, i) => `<span class="fragment step" data-mode="${m}"${from != null ? ` data-fragment-index="${from + i}"` : ""}></span>`).join("") : "";
       return wrap("div", a, `c-demo${a.bare ? " bare" : ""}${a.steps ? " stepped" : ""}${a.snapshot ? " snapshot" : ""}`,
-        `<div class="c-canvas"><canvas data-field="demo" aria-label="Simulation of two people's attention"></canvas>${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}</div><div class="seg-ctl" role="group" aria-label="Aggregation">${btn}</div>${steps}`);
+        `<div class="c-canvas"><canvas data-field="demo" role="img" aria-label="Simulation of two people's attention"></canvas>${a.tag ? `<span class="tag">${esc(a.tag)}</span>` : ""}</div><div class="seg-ctl" role="group" aria-label="Aggregation">${btn}</div>${steps}`);
     },
 
     // highlight / done take one or more quadrant ids: world-embedded world-separated camera-embedded camera-separated
@@ -312,16 +312,19 @@
   };
 
   // Beamer's headline and footline. Every slide carries its own, so they print and stay put.
+  // ties a live edit of the script to the talk.md text it replaces
+  const hashOf = (t) => { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h * 33) ^ t.charCodeAt(i)) >>> 0; return h.toString(36); };
+
   function chrome(slide, all, m) {
     const main = all.filter((s) => !s.backup);
     const chapters = [];
     main.forEach((s) => { let c = chapters.find((x) => x.name === s.chapter); if (!c) chapters.push((c = { name: s.chapter, slides: [] })); c.slides.push(s); });
     const at = main.indexOf(slide);
-    const link = (s, cls, text, label) => `<a class="${cls}" href="#/${esc(s.id)}" data-to="${esc(s.id)}" title="${esc(label)}" aria-label="${esc(label)}">${text}</a>`;
-    const dots = (c) => c.slides.map((s) => { const i = main.indexOf(s); return link(s, i < at ? "done" : i === at ? "now" : "", "", s.title); }).join("");
+    const link = (s, cls, text, label, extra = "") => `<a class="${cls}" href="#/${esc(s.id)}" data-to="${esc(s.id)}" title="${esc(label)}" aria-label="${esc(label)}"${extra}>${text}</a>`;
+    const dots = (c) => c.slides.map((s) => { const i = main.indexOf(s); return link(s, i < at ? "done" : i === at ? "now" : "", "", s.title, i === at ? ' aria-current="page"' : ""); }).join("");
     const here = chapters.findIndex((c) => c.name === slide.chapter);
     const head = `<nav class="headline" aria-label="Sections">${chapters.map((c, i) => `<div class="sec${i === here ? " now" : i < here ? " past" : ""}">${link(c.slides[0], "sec-name", esc(c.name), c.name)}<span class="dots">${dots(c)}</span></div>`).join("")}</nav>`;
-    const foot = `<div class="footline"><span class="f-who">${esc(m.authors || "")}</span><span class="f-what">${main[0] ? link(main[0], "", esc(m.title || ""), "Title page") : esc(m.title || "")}</span><span class="f-logos">${LOGOS("")}</span><span class="count">${slide.backup ? "Backup" : `${at + 1} / ${main.length}`}</span></div>`;
+    const foot = `<div class="footline" role="contentinfo" aria-label="About this talk"><span class="f-who">${esc(m.authors || "")}</span><span class="f-what">${main[0] ? link(main[0], "", esc(m.title || ""), "Title page") : esc(m.title || "")}</span><span class="f-logos">${LOGOS("")}</span><span class="count">${slide.backup ? "Backup" : `${at + 1} / ${main.length}`}</span></div>`;
     return head + foot;
   }
 
@@ -366,7 +369,7 @@
         const contacts = (m.contacts || "").split(";");
         const people = (m.authors || "").split(",").map((v, i) => ({ name: v.trim(), photo: photos[i], mail: ((contacts[i] || "").split("·")[1] || "").trim() }));
         // the text runs on a circle 7.5 units outside the band's centre line, so its letters sit centred in the band
-        const ring = (txt) => `<svg class="ring" viewBox="0 0 270 270" aria-label="${esc(txt)}"><circle cx="135" cy="135" r="117" class="ring-band"/><g class="ring-spin"><path id="ring-path" d="M135 135m-109.5 0a109.5 109.5 0 1 1 219 0a109.5 109.5 0 1 1 -219 0" fill="none"/><text class="ring-text"><textPath href="#ring-path" textLength="688" lengthAdjust="spacing">${esc(txt)} · ${esc(txt)} · </textPath></text></g></svg>`;
+        const ring = (txt) => `<svg class="ring" viewBox="0 0 270 270" role="img" aria-label="${esc(txt)}"><circle cx="135" cy="135" r="117" class="ring-band"/><g class="ring-spin"><path id="ring-path" d="M135 135m-109.5 0a109.5 109.5 0 1 1 219 0a109.5 109.5 0 1 1 -219 0" fill="none"/><text class="ring-text"><textPath href="#ring-path" textLength="688" lengthAdjust="spacing">${esc(txt)} · ${esc(txt)} · </textPath></text></g></svg>`;
         const person = (p, i) => `<div class="e-person${i === 0 ? " first" : ""}"><div class="e-face">${i === 0 && m["open-to-work"] ? ring(m["open-to-work"]) : ""}${p.photo ? `<img src="${esc(p.photo)}" alt="">` : ""}</div><div class="e-who"><b>${esc(p.name)}</b>${p.mail ? `<span>${esc(p.mail)}</span>` : ""}${i === 0 && m.slug ? `<p class="e-slug">${mdi(m.slug)}</p>` : ""}</div></div>`;
         inner = `<header class="frametitle"><h2>${mdi(dek || "Takeaways")}</h2></header>
           <div class="e-body">${items.join("")}</div>
@@ -384,7 +387,7 @@
           <div class="s-main"><div class="s-body" style="grid-template-columns:${cols}${rows ? `;grid-template-rows:${rows}` : ""}">${body.join("")}</div>${notes.length ? `<footer class="s-foot">${notes.join("")}</footer>` : ""}</div>`;
       }
       const kind = LAYOUTS[layout] ? "frame" : layout;
-      return { id, title, chapter, layout, kind, backup, sm, time: parseFloat(sm.time) || 0, notes: renderNotes(notesMd), notesMd, inner };
+      return { id, title, chapter, layout, kind, backup, sm, time: parseFloat(sm.time) || 0, notes: renderNotes(notesMd), notesMd, notesHash: hashOf(notesMd), inner };
     });
 
     let sectionNo = 0;

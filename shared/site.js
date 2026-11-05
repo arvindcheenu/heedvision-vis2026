@@ -28,7 +28,7 @@
     el.setAttribute("role", "group");
     el.setAttribute("aria-label", "Theme");
     el.innerHTML = MODES.map(function (m) {
-      return '<button type="button" data-mode="' + m + '" title="' + m[0].toUpperCase() + m.slice(1) + '" aria-label="' + m + '" aria-pressed="' + (m === mode()) + '"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICON[m] + "</svg></button>";
+      return '<button type="button" data-mode="' + m + '" title="' + m[0].toUpperCase() + m.slice(1) + '" aria-label="' + m[0].toUpperCase() + m.slice(1) + ' theme" aria-pressed="' + (m === mode()) + '"><svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICON[m] + "</svg></button>";
     }).join("");
   }
   window.HVTheme = {

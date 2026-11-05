@@ -20,14 +20,17 @@
 <meta property="og:image" content="assets/teaser.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="shared/logos/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="shared/hv.css?v=20261201">
-<script src="shared/site.js?v=20261201"></script>
+<link rel="preload" href="shared/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="shared/theme.css?v=20261204">
+<link rel="stylesheet" href="shared/hv.css?v=20261204">
+<script src="shared/site.js?v=20261204"></script>
 </head>
 <body>
 
+<a class="btn skip" href="#main">Skip to the page</a>
 <div class="page-bar" aria-hidden="true"><i></i></div>
-<nav class="page-toc" aria-label="Contents"><ol></ol></nav>
-<main class="page">
+<nav class="page-toc" aria-label="Contents"><ol role="list"></ol></nav>
+<main class="page" id="main">
   <h1 class="page-title">HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</h1>
   <p class="page-sub">Tracking, recording, and revisualizing the collective attention of collaborators in shared immersive environments.</p>
 
@@ -42,11 +45,11 @@
 
   <div class="actions">
     <!-- ARXIV_URL: replace the href once the preprint is posted. -->
-    <a class="btn" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg> arXiv</a>
-    <a class="btn" id="pdf-btn" href="heedvision.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg> PDF</a>
-    <a class="btn" href="talk/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg> Talk</a>
-    <a class="btn" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg> OSF</a>
-    <a class="btn" href="slides/heedvision-slides.pdf?v=20261201" target="_blank" rel="noopener">Slides as PDF</a>
+    <a class="btn" id="arxiv-btn" href="ARXIV_URL" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg> arXiv</a>
+    <a class="btn" id="pdf-btn" href="heedvision.pdf" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg> PDF</a>
+    <a class="btn" href="talk/"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 21h10"/><path d="M12 17v4"/><path d="M10 7.5v5l4 -2.5z"/></svg> Talk</a>
+    <a class="btn" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg> OSF</a>
+    <a class="btn" href="slides/heedvision-slides.pdf?v=20261204" target="_blank" rel="noopener">Slides as PDF</a>
   </div>
 
   <figure class="figure card section">
@@ -81,17 +84,17 @@
     <h2 class="section-title">Talk</h2>
     <p class="prose">Ten minutes at IEEE VIS 2026 in Boston on letting collaborators see each other's attention, and on when that helps.</p>
     <div class="links">
-      <a class="link-card card" href="talk/"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></svg></span><span><b>Slides &amp; script</b><span>Every slide next to what is said over it</span></span><span class="go" aria-hidden="true">›</span></a>
-      <a class="link-card card" href="slides/" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/></svg></span><span><b>Full-screen slides</b><span>The deck itself; press P for the presenter view</span></span><span class="go" aria-hidden="true">›</span></a>
+      <a class="link-card card" href="talk/"><span class="ico"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h14"/></svg></span><span><b>Slides &amp; script</b><span>Every slide next to what is said over it</span></span><span class="go" aria-hidden="true">›</span></a>
+      <a class="link-card card" href="slides/" target="_blank" rel="noopener"><span class="ico"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/></svg></span><span><b>Full-screen slides</b><span>The deck itself; press P for the presenter view</span></span><span class="go" aria-hidden="true">›</span></a>
     </div>
   </section>
 
   <section class="section">
     <h2 class="section-title">Materials</h2>
     <div class="links">
-      <a class="link-card card" id="arxiv-resource" href="ARXIV_URL" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg></span><span><b>arXiv preprint</b><span>Open-access author version, including appendices</span></span><span class="go" aria-hidden="true">›</span></a>
-      <a class="link-card card" href="heedvision.pdf" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg></span><span><b>Paper (PDF)</b><span>Full text with appendices: quotes and bootstrap analysis</span></span><span class="go" aria-hidden="true">›</span></a>
-      <a class="link-card card" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg></span><span><b>OSF repository</b><span>Data, analysis code, study materials, and source code (CC BY 4.0)</span></span><span class="go" aria-hidden="true">›</span></a>
+      <a class="link-card card" id="arxiv-resource" href="ARXIV_URL" target="_blank" rel="noopener"><span class="ico"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 17h6"/><path d="M9 13h6"/></svg></span><span><b>arXiv preprint</b><span>Open-access author version, including appendices</span></span><span class="go" aria-hidden="true">›</span></a>
+      <a class="link-card card" href="heedvision.pdf" target="_blank" rel="noopener"><span class="ico"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"/><path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"/><path d="M17 18h2"/><path d="M20 15h-3v6"/><path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"/></svg></span><span><b>Paper (PDF)</b><span>Full text with appendices: quotes and bootstrap analysis</span></span><span class="go" aria-hidden="true">›</span></a>
+      <a class="link-card card" href="https://osf.io/frsp8/" target="_blank" rel="noopener"><span class="ico"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 0 0 -3 3v12a3 3 0 0 0 6 0v-12a3 3 0 0 0 -3 -3z"/><path d="M12 9m-9 3a9 3 0 1 0 18 0a9 3 0 1 0 -18 0" transform="rotate(45 12 12)"/></svg></span><span><b>OSF repository</b><span>Data, analysis code, study materials, and source code (CC BY 4.0)</span></span><span class="go" aria-hidden="true">›</span></a>
     </div>
   </section>
 
@@ -106,14 +109,14 @@
   year    = {2026},
   note    = {To appear. Presented at IEEE VIS 2026.},
 }</code></pre>
-      <button class="btn" type="button" id="bibtex-copy">Copy BibTeX</button>
+      <button class="btn" type="button" id="bibtex-copy" aria-live="polite">Copy BibTeX</button>
     </div>
   </section>
 </main>
 
 <footer class="site-foot">
   <div class="foot-end"><span data-theme-picker></span></div>
-  <div class="logos">
+  <div class="logos" role="group" aria-label="IEEE VIS 2026, Aarhus University and the Center for Anytime Anywhere Analytics">
     <img src="shared/logos/vis2026.png" alt="IEEE VIS 2026">
     <img class="mono" src="shared/logos/au.svg" alt="Aarhus University">
     <img class="mono" src="shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics">
@@ -121,7 +124,7 @@
   <p>© 2026 the authors. Paper © IEEE.<br>Supplemental materials released under CC BY 4.0.</p>
 </footer>
 
-<script src="shared/progress.js?v=20261201"></script>
+<script src="shared/progress.js?v=20261204"></script>
 <script>
   // Contents, built from the page's sections, with its scroll progress.
   (function () {

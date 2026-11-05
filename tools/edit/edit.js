@@ -11,6 +11,7 @@
         <button type="button" class="btn" data-a="down">Move down</button>
         <button type="button" class="btn" data-a="del">Delete</button>
         <span class="state"></span>
+        <a class="btn" href="/tools/edit/theme.html">Theme</a>
         <a class="btn" href="/slides/" target="_blank" rel="noopener">Slides</a>
         <a class="btn" href="/slides/?view=print&amp;autoprint" target="_blank" rel="noopener">Export PDF</a>
         <span data-theme-picker></span>

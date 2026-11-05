@@ -19,7 +19,7 @@
   <script>
     fetch("/__dev/session", { cache: "no-store" }).then(function (r) {
       if (r.status !== 204) throw 0;
-      ["/shared/hv.css", "/tools/edit/edit.css"].forEach(function (h) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = h; document.head.appendChild(l); });
+      ["/shared/theme.css", "/shared/hv.css", "/tools/edit/edit.css"].forEach(function (h) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = h; document.head.appendChild(l); });
       ["/shared/site.js", "/tools/edit/edit.js"].reduce(function (p, src) { return p.then(function () { return new Promise(function (ok) { var s = document.createElement("script"); s.src = src; s.onload = ok; document.head.appendChild(s); }); }); }, Promise.resolve());
     }).catch(function () { document.getElementById("gate").hidden = false; });
   </script>

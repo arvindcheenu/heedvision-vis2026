@@ -17,7 +17,10 @@
       // the rail takes the colour of the section you're in
       const c = getComputedStyle(items[i].link).getPropertyValue("--sec").trim();
       if (c) list.style.setProperty("--rail", c);
-      if (mark) items.forEach((it, k) => it.link.classList.toggle("here", k === i));
+      if (mark) items.forEach((it, k) => {
+        it.link.classList.toggle("here", k === i);
+        if (k === i) it.link.setAttribute("aria-current", "location"); else it.link.removeAttribute("aria-current");
+      });
     }
     addEventListener("scroll", update, { passive: true });
     addEventListener("resize", update, { passive: true });

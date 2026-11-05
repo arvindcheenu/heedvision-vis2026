@@ -94,7 +94,7 @@ function textTexture(lines, { size = 64, color = "#000", bg = null, w = 512, h =
   if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); }
   g.fillStyle = color;
   g.textAlign = "center"; g.textBaseline = "middle";
-  g.font = `${weight} ${size}px "Inter", system-ui, sans-serif`;
+  g.font = `${weight} ${size}px ${getComputedStyle(document.documentElement).getPropertyValue("--f-text") || "system-ui"}`;
   const ls = [].concat(lines);
   ls.forEach((t, i) => g.fillText(t, w / 2, h / 2 + (i - (ls.length - 1) / 2) * size * 1.6));
   const tex = new THREE.CanvasTexture(c);

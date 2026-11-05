@@ -213,7 +213,7 @@
           }
           if (this.mode === "count" && this.count(i)) {
             ctx.fillStyle = this.theme.numeral;
-            ctx.font = `650 ${Math.round(cell * 0.46)}px -apple-system, BlinkMacSystemFont, system-ui, sans-serif`;
+            ctx.font = `700 ${Math.round(cell * 0.46)}px ${getComputedStyle(document.documentElement).getPropertyValue("--f-text") || "system-ui"}`;
             ctx.textAlign = "center"; ctx.textBaseline = "middle";
             ctx.fillText(String(this.count(i)), px + cell / 2, py + cell / 2 + 1);
           }
@@ -229,7 +229,7 @@
         ctx.lineWidth = 3;
         ctx.beginPath(); ctx.arc(px, py, cell * 0.36, 0, Math.PI * 2); ctx.stroke();
         if (!this.ambient) {
-          ctx.font = "600 20px -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+          ctx.font = `700 20px ${getComputedStyle(document.documentElement).getPropertyValue("--f-text") || "system-ui"}`;
           ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
           ctx.lineJoin = "round"; ctx.lineWidth = 6;
           ctx.strokeStyle = document.documentElement.classList.contains("dark") ? "#0b0c10" : "#ffffff";

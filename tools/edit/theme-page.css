@@ -1,0 +1,31 @@
+/* Dev-mode theme page: the controls on the left, a live preview of the real pages on the right. */
+html, body { height: 100%; overflow: hidden; }
+.th { height: 100%; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 16px; padding: 16px; }
+.th-side { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 2px; scrollbar-width: thin; }
+.th-side h1 { font-size: 26px; font-weight: 800; }
+.th-side h2 { margin-bottom: 8px; font-size: 18px; font-weight: 800; }
+.th-side p { margin: 0; font-size: 14.5px; line-height: 1.45; color: var(--fg-2); }
+.th-row { display: flex; align-items: center; gap: 12px; }
+.th-row input[type="range"] { flex: 1; min-width: 0; height: 36px; }
+.th-row output { min-width: 5ch; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.th-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.th-table th { padding: 3px 0; font-weight: 600; text-align: left; }
+.th-table thead th { font-weight: 800; }
+.th-table td, .th-table thead th:not(:first-child) { width: 60px; text-align: center; }
+input[type="color"] { width: 44px; height: 32px; padding: 0; border: 0; border-radius: var(--radius); background: none; cursor: pointer; }
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: 0; border-radius: var(--radius); box-shadow: inset 0 0 0 1px var(--line); }
+.th-read { display: grid; gap: 2px; font-size: 14px; color: var(--fg-2); font-variant-numeric: tabular-nums; }
+.th-read .low { color: var(--accent); font-weight: 700; }
+.th-acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.th-view { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.th-tabs { display: flex; gap: 6px; align-items: center; }
+.th-tabs [data-theme-picker] { margin-left: auto; }
+.th-frame { flex: 1; min-height: 0; overflow: hidden; border-radius: var(--radius); background: var(--surface-2); }
+.th-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+@media (max-width: 860px) {
+  html, body { height: auto; overflow: auto; }
+  .th { height: auto; grid-template-columns: minmax(0, 1fr); }
+  .th-side { overflow: visible; }
+  .th-frame { height: 60vh; flex: none; }
+}

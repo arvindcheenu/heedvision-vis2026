@@ -37,6 +37,23 @@
     if (/[./]/.test(talk.meta.bullet)) document.documentElement.style.setProperty("--bullet", `url("${talk.meta.bullet}")`);
     else document.documentElement.dataset.bullet = talk.meta.bullet;
   }
+  // bullets, in the palette's colours
+  const bulletStyle = document.head.appendChild(document.createElement("style"));
+  function paintBullets() {
+    const cs = getComputedStyle(document.documentElement);
+    const t = cs.getPropertyValue("--title").trim(), a = cs.getPropertyValue("--accent").trim();
+    const url = (inner) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>${inner}</svg>`)}")`;
+    const ring = (cx, cy, r, c) => `<circle cx='${cx}' cy='${cy}' r='${r}' fill='${c}'/>`;
+    const vis = [[16, 4.2], [27.8, 16], [16, 27.8], [4.2, 16]].map(([x, y]) => ring(x, y, 3.7, t)).join("") +
+      [[7.6, 7.6], [24.4, 7.6], [24.4, 24.4], [7.6, 24.4]].map(([x, y]) => ring(x, y, 3.2, a)).join("") + `<circle cx='16' cy='16' r='4' fill='${t}' fill-opacity='.6'/>`;
+    const shapes = { triangle: `<path d='M8 5l18 11-18 11z' fill='${t}'/>`, dot: ring(16, 16, 8, t), square: `<rect x='8' y='8' width='16' height='16' rx='3' fill='${t}'/>`, dash: `<rect x='5' y='14' width='22' height='4' rx='2' fill='${t}'/>` };
+    bulletStyle.textContent = `:root, .bullet-vis { --bullet: ${url(vis)}; }\n` +
+      Object.entries(shapes).map(([n, svg]) => `[data-bullet="${n}"], .bullet-${n} { --bullet: ${url(svg)}; }`).join("\n") +
+      `\n[data-bullet="none"], .bullet-none { --bullet: none; }`;
+  }
+  paintBullets();
+  addEventListener("hv-theme", paintBullets);
+
   const set = talk.settings;
   const slidesEl = document.querySelector(".reveal .slides");
   slidesEl.innerHTML = talk.slides.filter((x) => !single || x.id === single).map((x) => x.html).join("");
@@ -119,7 +136,11 @@
     qr.addData(target);
     qr.make();
     const svg = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
-    document.querySelectorAll('[data-qr="talk"]').forEach((el) => (el.innerHTML = svg));
+    document.querySelectorAll('[data-qr="talk"]').forEach((el) => {
+      el.innerHTML = svg;
+      el.setAttribute("role", "img");
+      el.setAttribute("aria-label", `QR code for ${short(target)}`);
+    });
     document.querySelectorAll("[data-talk-url]").forEach((el) => (el.textContent = short(target)));
     const label = !ask ? "Paper, video & slides" : useQuestions && set.follow ? "Follow along & ask questions" : set.follow && set.live ? "Follow along" : "Slides & script";
     document.querySelectorAll("[data-qr-label]").forEach((el) => (el.textContent = label));
@@ -151,7 +172,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261201"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261204"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -207,7 +228,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261201", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261204", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -374,9 +395,11 @@
   function buildAudienceUI() {
     fab = document.createElement("div");
     fab.className = "hv-fab";
+    fab.setAttribute("role", "group");
+    fab.setAttribute("aria-label", "Talk controls");
     const ask = set.questions === "link"
       ? `<a class="btn ask" href="${esc(set.questionsUrl)}" target="_blank" rel="noopener">Ask</a>`
-      : useQuestions ? `<button type="button" class="btn ask" aria-expanded="false" title="Questions on this slide (Q)">Ask <span class="badge" hidden>0</span></button>` : "";
+      : useQuestions ? `<button type="button" class="btn ask" aria-expanded="false" aria-controls="hv-sheet" title="Questions on this slide (Q)">Ask <span class="badge" hidden>0</span></button>` : "";
     fab.innerHTML = (set.follow && live.enabled ? `<button type="button" class="btn follow" hidden>Rejoin live</button>` : "") +
       ask + `<a class="btn script" href="../talk/">Script</a><span data-theme-picker></span>`;
     document.body.appendChild(fab);
@@ -397,14 +420,18 @@
     if (useQuestions) {
       sheet = document.createElement("section");
       sheet.className = "hv-sheet";
+      sheet.id = "hv-sheet";
       sheet.hidden = true;
+      sheet.setAttribute("role", "dialog");
+      sheet.setAttribute("aria-labelledby", "hv-sheet-title");
       sheet.innerHTML = `
-        <header><b class="sheet-title"></b><span>Questions on this slide</span></header>
-        <div class="list"></div>
-        <form>
-          <textarea name="text" maxlength="600" placeholder="Ask something about this slide…" required></textarea>
-          <div class="row"><input name="name" maxlength="60" placeholder="Name (optional)"><button type="submit" class="btn">Send</button></div>
-          <div class="note"></div>
+        <header><div><h2 id="hv-sheet-title" class="sheet-title"></h2><span>Questions on this slide</span></div><button type="button" class="btn close" aria-label="Close questions">×</button></header>
+        <ul class="q-list" role="list" aria-live="polite"></ul>
+        <form class="ask-form">
+          <label class="sr" for="hv-q">Your question about this slide</label>
+          <textarea class="field" id="hv-q" name="text" maxlength="600" placeholder="Ask something about this slide…" required></textarea>
+          <div class="row"><label class="sr" for="hv-n">Your name, optional</label><input class="field" id="hv-n" name="name" maxlength="60" placeholder="Name (optional)" autocomplete="name"><button type="submit" class="btn">Ask</button></div>
+          <p class="q-note" role="status"></p>
         </form>`;
       document.body.appendChild(sheet);
       const askBtn = fab.querySelector(".ask");
@@ -412,7 +439,9 @@
         sheet.hidden = !open;
         askBtn.setAttribute("aria-expanded", String(open));
         if (open) { renderSheet(); sheet.querySelector("textarea").focus({ preventScroll: true }); }
+        else askBtn.focus({ preventScroll: true });
       };
+      sheet.querySelector(".close").addEventListener("click", () => toggleSheet(false));
       askBtn.addEventListener("click", () => toggleSheet());
       deck.addKeyBinding({ keyCode: 81, key: "Q", description: "Questions on this slide" }, () => toggleSheet());
       sheet.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Escape") toggleSheet(false); });
@@ -420,10 +449,10 @@
         e.preventDefault();
         const f = e.target;
         const ok = live.ask(deck.getCurrentSlide().id, f.text.value, f.name.value);
-        f.querySelector(".note").textContent = ok ? "Sent. Thanks!" : "Questions are offline right now.";
+        f.querySelector(".q-note").textContent = ok ? "Sent. Thanks! The speaker can see it now." : "Questions are offline right now.";
         if (ok) f.text.value = "";
       });
-      sheet.querySelector(".list").addEventListener("click", (e) => {
+      sheet.querySelector(".q-list").addEventListener("click", (e) => {
         const b = e.target.closest("button[data-vote]");
         if (b) { live.vote(b.dataset.vote); renderSheet(); }
       });
@@ -452,9 +481,7 @@
     badge.textContent = qs.length;
     if (sheet.hidden) return;
     sheet.querySelector(".sheet-title").textContent = titleOf(cur.id);
-    sheet.querySelector(".list").innerHTML = qs.length
-      ? qs.map((q) => `<div class="q-item"><div><p>${esc(q.text)}</p><small>${esc(q.name || "Anonymous")}</small></div><button type="button" class="btn" data-vote="${esc(q.id)}" aria-pressed="${live.voted.has(q.id)}">▲ ${q.votes}</button></div>`).join("")
-      : `<div class="q-empty">No questions yet. Be the first.</div>`;
+    live.fill(sheet.querySelector(".q-list"), qs, "No questions yet. Be the first.");
   }
 
   const qaKey = `hv.qa.${set.room}`;
@@ -466,7 +493,7 @@
     const cur = deck.getCurrentSlide();
     const show = qaOn() || (cur && cur.hasAttribute("data-qa"));
     const top = show ? live.top(4) : [];
-    if (!qaPanel) { qaPanel = document.createElement("aside"); qaPanel.className = "hv-qa"; document.body.appendChild(qaPanel); }
+    if (!qaPanel) { qaPanel = document.createElement("aside"); qaPanel.className = "hv-qa"; qaPanel.setAttribute("aria-label", "Top questions"); document.body.appendChild(qaPanel); }
     qaPanel.hidden = !top.length;
     qaPanel.innerHTML = top.map((q) => `<p><b>${q.votes}</b> ${esc(q.text)}</p>`).join("");
   }
@@ -526,6 +553,8 @@
 
   // ---------------------------------------------------------- wiring
   function onSlide(cur) {
+    // only the slide on screen can take keyboard focus, or be read out
+    if (!flat && !isPrint) slides().forEach((s) => (s.inert = s !== cur));
     syncItems();
     syncSteppers();
     runAnimations(cur);
@@ -561,6 +590,8 @@
     live.on("status", (s) => { if (s === "open") broadcast(); });
     live.on("error", (m) => console.warn("[live]", m));
     renderBoard();
+    // the canvases drew their labels before the font had arrived
+    document.fonts.ready.then(() => { fields.forEach((f) => f.draw()); explainers.forEach((ex) => ex.draw()); });
     onSlide(e.currentSlide);
     postState();
     postConsole();

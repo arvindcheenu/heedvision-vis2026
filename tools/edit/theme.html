@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Theme</title>
+  <style>
+    #gate { font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 520px; margin: 18vh auto; padding: 0 24px; }
+    #gate code { font: 14px ui-monospace, Menlo, monospace; }
+  </style>
+</head>
+<body>
+  <!-- Nothing below loads unless the dev server recognizes this browser. -->
+  <div id="gate" hidden>
+    <b>Changing the theme needs dev mode.</b>
+    <p>Run <code>node tools/serve.mjs --dev</code> on your computer and open the link it prints. Or edit <code>shared/theme.css</code> by hand.</p>
+  </div>
+  <script>
+    fetch("/__dev/session", { cache: "no-store" }).then(function (r) {
+      if (r.status !== 204) throw 0;
+      ["/shared/theme.css", "/shared/hv.css", "/tools/edit/theme-page.css"].forEach(function (h) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = h; document.head.appendChild(l); });
+      ["/shared/site.js", "/tools/edit/theme-page.js"].reduce(function (p, src) { return p.then(function () { return new Promise(function (ok) { var s = document.createElement("script"); s.src = src; s.onload = ok; document.head.appendChild(s); }); }); }, Promise.resolve());
+    }).catch(function () { document.getElementById("gate").hidden = false; });
+  </script>
+</body>
+</html>

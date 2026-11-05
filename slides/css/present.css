@@ -1,39 +1,73 @@
-/* The presenter view: the slide and its controls on the left; the next build and the script on the right. */
+/* The presenter view: the slide, its controls and the questions on the left; the next build and the script on the right. */
 html, body { height: 100%; }
 body { overflow: hidden; display: flex; flex-direction: column; }
+
+/* timer */
 .pv-head { flex: none; display: flex; align-items: center; gap: 6px; padding: 10px 16px 0; }
 .pv-timer { display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
-.pv-timer .elapsed { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; min-width: 3ch; margin-right: 6px; }
-.pv-timer .pace { font-size: 14px; font-weight: 600; color: var(--fg-2); margin-right: 8px; min-width: 7ch; }
-.pv-timer .pace.late { color: #bb4a72; }
-.pv-link { margin-left: auto; margin-right: 10px; font-size: 13px; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-timer .elapsed { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; min-width: 3ch; margin-right: 6px; }
+.pv-timer .pace { font-size: 14px; font-weight: 700; color: var(--fg-2); margin-right: 8px; min-width: 7ch; }
+.pv-timer .pace.late { color: var(--accent); }
+.pv-link { margin-left: auto; margin-right: 10px; font-size: 13.5px; color: var(--fg-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* columns */
 .pv-main { flex: 1; min-height: 0; display: grid; gap: 16px; padding: 10px 16px 16px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: stretch; }
-.pv-current { min-width: 0; min-height: 0; overflow-y: auto; }
-.pv-right { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
-.pv-next { flex: none; display: flex; flex-direction: column; gap: 6px; }
-.pv-notes { flex: 1; min-height: 0; overflow-y: auto; }
+.pv-left, .pv-right { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.pv-left { overflow-y: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+.pv-current, .pv-next { flex: none; isolation: isolate; }
 .pv-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--surface-2); border-radius: var(--radius); }
 .pv-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
-.pv-frame .end { position: absolute; inset: 0; display: grid; place-content: center; font-weight: 600; color: var(--fg-2); }
+.pv-frame .end { position: absolute; inset: 0; display: grid; place-content: center; font-weight: 700; color: var(--fg-2); }
 .pv-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 15px; }
-.pv-meta .pos { font-weight: 700; font-variant-numeric: tabular-nums; }
+.pv-meta .pos { font-weight: 800; font-variant-numeric: tabular-nums; }
 .pv-meta .title { color: var(--fg-2); }
-.next-title { font-size: 14px; color: var(--fg-2); }
 .pv-ctl { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.next-title { margin-top: 6px; font-size: 14px; color: var(--fg-2); }
+.pv-backups { flex: none; }
+.pv-backups ol { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* a heading with what belongs beside it */
+.pv-bar { display: flex; align-items: center; gap: 10px; min-height: 36px; margin-bottom: 6px; }
+.pv-bar h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+
+/* questions */
+.pv-questions { flex: 1 0 200px; min-height: 0; isolation: isolate; display: flex; flex-direction: column; }
+.pq-count { min-width: 28px; height: 28px; padding: 0 8px; border-radius: var(--radius); display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 16%, var(--bg)); color: var(--accent); font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pq-count:empty { display: none; }
+.pq-hint { margin: 0 0 8px; font-size: 14px; line-height: 1.4; color: var(--fg-3); }
+.pq-hint:empty { display: none; }
+.pq-hint code { font-size: 13px; }
+.pq-list { flex: 1; min-height: 0; overflow-y: auto; display: grid; align-content: start; gap: 16px; padding: 2px; scrollbar-width: thin; }
+.pq { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; }
+.pq.done { opacity: 0.62; }
+.pq.done:focus-within, .pq.done:hover { opacity: 1; }
+.pq-votes { font-size: 20px; font-weight: 800; line-height: 1.25; text-align: center; color: var(--accent); font-variant-numeric: tabular-nums; }
+.pq p { margin: 0; font-size: 18px; line-height: 1.35; overflow-wrap: anywhere; }
+.pq small { display: block; margin-top: 2px; font-size: 14px; color: var(--fg-3); }
+.pq .q-answer { margin-top: 6px; font-size: 15.5px; color: var(--fg-2); }
+.pq .q-answer b { color: var(--accent); }
+.pq-acts, .pq form .row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pq .btn { min-height: 34px; padding: 0 12px; font-size: 14px; }
+.pq form { margin-top: 8px; }
+.pq-empty { margin: 0; font-size: 15px; color: var(--fg-3); }
+
+/* script */
+.pv-notes { flex: 1; min-height: 0; overflow-y: auto; isolation: isolate; display: flex; flex-direction: column; border-radius: var(--radius); scrollbar-width: thin; }
+.pv-notes .pv-bar { flex: none; position: sticky; top: 0; z-index: 1; background: var(--bg); }
+.pn-state { font-size: 13.5px; color: var(--fg-3); }
+.pn-edit { margin-left: auto; min-height: 34px; padding: 0 12px; font-size: 14px; }
 .notes { font-size: 24px; line-height: 1.45; }
 .notes p { margin: 0 0 12px; }
 .notes .click { display: inline-block; padding: 0 8px; font-size: 13px; font-weight: 700; color: var(--fg-3); background: var(--surface-2); border-radius: var(--radius); vertical-align: 2px; }
 .notes .click.passed { opacity: 0.45; }
-.notes .click.next { color: #fff; background: #bb4a72; }
-.pv-questions, .pv-backups { margin-top: 12px; }
-.pv-questions ol, .pv-backups ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 15px; }
-.pv-questions b { color: #bb4a72; margin-right: 8px; }
-.pv-questions small { display: block; color: var(--fg-3); }
+.notes .click.next { color: var(--on-accent); background: var(--accent); }
+.notes-edit { flex: 1; min-height: 200px; font-size: 20px; line-height: 1.45; resize: none; }
+
 @media (max-width: 860px) {
   html, body { height: auto; overflow: auto; }
   .pv-head { flex-wrap: wrap; }
   .pv-main { grid-template-columns: minmax(0, 1fr); align-content: start; }
-  .pv-current, .pv-notes { overflow: visible; }
-  .pv-next { order: 2; }
+  .pv-left, .pv-notes, .pq-list { overflow: visible; }
+  .pv-right .pv-next { order: 2; }
   .notes { font-size: 19px; }
 }

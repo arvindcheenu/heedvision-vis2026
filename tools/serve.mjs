@@ -7,7 +7,7 @@
 // Dev mode is off unless you ask for it, and even then only this machine, holding the
 // token printed in your terminal, can write. It binds to 127.0.0.1 and checks Host and
 // Origin on every dev request, so a web page can't reach it from your browser (no CSRF,
-// no DNS rebinding). Only talk.md can be written. The published site is
+// no DNS rebinding). Only talk.md and theme.css can be written. The published site is
 // static, so none of this exists there: the editor page just says it needs dev mode.
 import { createServer } from "node:http";
 import { readFile, writeFile, stat, rename } from "node:fs/promises";
@@ -20,7 +20,7 @@ const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const argv = process.argv.slice(2);
 const DEV = argv.includes("--dev");
 const port = Number((argv.find((a) => a.startsWith("--port=")) || "").slice(7) || process.env.PORT || 8000);
-const WRITABLE = new Set(["slides/talk.md"]);
+const WRITABLE = new Set(["slides/talk.md", "shared/theme.css"]);
 const MAX = 2_000_000;
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
@@ -80,6 +80,14 @@ async function devRoute(req, res, url) {
     await writeFile(tmp, body, "utf8");
     await rename(tmp, join(root, rel));
     console.log(`saved ${rel} (${body.length} bytes)`);
+    // a new theme reaches returning visitors at once
+    if (rel === "shared/theme.css") {
+      const v = new Date().toISOString().replace(/\D/g, "").slice(0, 12);
+      for (const page of ["index.html", "talk/index.html", "slides/index.html", "slides/present.html"]) {
+        const p = join(root, page);
+        await writeFile(p, String(await readFile(p)).replace(/theme\.css\?v=\w+/, `theme.css?v=${v}`), "utf8");
+      }
+    }
     res.writeHead(204).end();
     return;
   }
