@@ -42,6 +42,7 @@ export class Room extends DurableObject {
       id TEXT PRIMARY KEY, slide TEXT, text TEXT, name TEXT,
       votes INTEGER NOT NULL DEFAULT 0, ts INTEGER, hidden INTEGER NOT NULL DEFAULT 0)`);
     try { this.sql.exec("ALTER TABLE questions ADD COLUMN answer TEXT NOT NULL DEFAULT ''"); } catch {} // already there
+    try { this.sql.exec("ALTER TABLE questions ADD COLUMN pending INTEGER NOT NULL DEFAULT 0"); } catch {} // already there
     this.sql.exec(`CREATE TABLE IF NOT EXISTS votes (qid TEXT, voter TEXT, PRIMARY KEY (qid, voter))`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, md TEXT, base TEXT, ts INTEGER)`);
@@ -51,7 +52,7 @@ export class Room extends DurableObject {
   async fetch(req) {
     const url = new URL(req.url);
     if (url.pathname.endsWith("/state")) {
-      return Response.json({ slide: this.slide(), questions: this.questions(), notes: this.notes() });
+      return Response.json({ slide: this.slide(), questions: this.questions(false), notes: this.notes() });
     }
     const key = url.searchParams.get("key") || "";
     const presenter = await isPresenterKey(key, this.env.PRESENTER_KEY);
@@ -59,7 +60,7 @@ export class Room extends DurableObject {
     const [client, server] = Object.values(new WebSocketPair());
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({ presenter, ip });
-    server.send(JSON.stringify({ t: "init", presenter, replies: true, slide: this.slide(), questions: this.questions(), notes: this.notes() }));
+    server.send(JSON.stringify({ t: "init", presenter, replies: true, moderation: true, moderate: this.moderate(), slide: this.slide(), questions: this.questions(presenter), notes: this.notes() }));
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -90,15 +91,18 @@ export class Room extends DurableObject {
         ts: Date.now(),
         hidden: false,
         answer: "",
+        // with "approve first" on, only the presenter sees it until they approve it
+        pending: this.moderate() && !presenter,
       };
-      this.sql.exec("INSERT INTO questions (id, slide, text, name, votes, ts) VALUES (?, ?, ?, ?, 0, ?)", q.id, q.slide, q.text, q.name, q.ts);
-      this.broadcast({ t: "question", q });
+      this.sql.exec("INSERT INTO questions (id, slide, text, name, votes, ts, pending) VALUES (?, ?, ?, ?, 0, ?, ?)", q.id, q.slide, q.text, q.name, q.ts, q.pending ? 1 : 0);
+      if (q.pending) this.toPresenters({ t: "question", q });
+      else this.broadcast({ t: "question", q });
     } else if (m.t === "vote") {
       if (!this.allow(`vote:${ip}`, 60, 60_000)) return;
       const id = cleanId(m.id, 64);
       const voter = String(m.cid || "").slice(0, 64);
       if (!id || !voter) return;
-      const ins = this.sql.exec("INSERT OR IGNORE INTO votes (qid, voter) SELECT id, ? FROM questions WHERE id = ? AND hidden = 0", voter, id);
+      const ins = this.sql.exec("INSERT OR IGNORE INTO votes (qid, voter) SELECT id, ? FROM questions WHERE id = ? AND hidden = 0 AND pending = 0", voter, id);
       if (!ins.rowsWritten) return;
       const votes = this.sql.exec("UPDATE questions SET votes = votes + 1 WHERE id = ? RETURNING votes", id).one().votes;
       this.broadcast({ t: "votes", id, votes });
@@ -121,11 +125,26 @@ export class Room extends DurableObject {
       const answer = cleanText(m.text, MAX_ANSWER);
       this.sql.exec("UPDATE questions SET answer = ? WHERE id = ?", answer, id);
       this.broadcast({ t: "answered", id, answer });
-    } else if (m.t === "hide") {
+    } else if (m.t === "approve") {
+      // presenter only: a held question goes public
       if (!presenter) return;
       const id = cleanId(m.id, 64);
       if (!id) return;
-      this.sql.exec("UPDATE questions SET hidden = 1 WHERE id = ?", id);
+      const row = this.sql.exec("UPDATE questions SET pending = 0 WHERE id = ? AND pending = 1 RETURNING id, slide, text, name, votes, ts, answer", id).toArray()[0];
+      if (row) this.broadcast({ t: "question", q: { ...row, hidden: false, pending: false } });
+    } else if (m.t === "moderate") {
+      // presenter only: hold new questions for approval, or not. Questions already held stay held.
+      if (!presenter) return;
+      const on = !!m.on;
+      this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('moderate', ?)", on ? "1" : "0");
+      this.broadcast({ t: "moderate", on });
+    } else if (m.t === "hide") {
+      // presenter only: delete a question and its votes for good
+      if (!presenter) return;
+      const id = cleanId(m.id, 64);
+      if (!id) return;
+      this.sql.exec("DELETE FROM votes WHERE qid = ?", id);
+      this.sql.exec("DELETE FROM questions WHERE id = ?", id);
       this.broadcast({ t: "hidden", id });
     }
   }
@@ -138,11 +157,25 @@ export class Room extends DurableObject {
     return row ? JSON.parse(row.v) : null;
   }
 
-  questions() {
+  // held questions go to the presenter only
+  questions(withHeld) {
     return this.sql
-      .exec("SELECT id, slide, text, name, votes, ts, answer FROM questions WHERE hidden = 0 ORDER BY ts LIMIT 1000")
+      .exec(`SELECT id, slide, text, name, votes, ts, answer, pending FROM questions WHERE hidden = 0${withHeld ? "" : " AND pending = 0"} ORDER BY ts LIMIT 1000`)
       .toArray()
-      .map((q) => ({ ...q, hidden: false }));
+      .map((q) => ({ ...q, hidden: false, pending: !!q.pending }));
+  }
+
+  moderate() {
+    const row = this.sql.exec("SELECT v FROM meta WHERE k = 'moderate'").toArray()[0];
+    return !!row && row.v === "1";
+  }
+
+  toPresenters(msg) {
+    const data = JSON.stringify(msg);
+    for (const ws of this.ctx.getWebSockets()) {
+      if (!ws.deserializeAttachment()?.presenter) continue;
+      try { ws.send(data); } catch {}
+    }
   }
 
   notes() {

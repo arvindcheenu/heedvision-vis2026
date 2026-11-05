@@ -172,7 +172,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261204"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261205"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -228,7 +228,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261204", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261205", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -449,7 +449,7 @@
         e.preventDefault();
         const f = e.target;
         const ok = live.ask(deck.getCurrentSlide().id, f.text.value, f.name.value);
-        f.querySelector(".q-note").textContent = ok ? "Sent. Thanks! The speaker can see it now." : "Questions are offline right now.";
+        f.querySelector(".q-note").textContent = ok ? live.sentNote() : "Questions are offline right now.";
         if (ok) f.text.value = "";
       });
       sheet.querySelector(".q-list").addEventListener("click", (e) => {

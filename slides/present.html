@@ -6,11 +6,11 @@
   <title>HeedVision · Presenter</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="../shared/logos/mark.svg" type="image/svg+xml">
-  <script src="../shared/site.js?v=20261204"></script>
+  <script src="../shared/site.js?v=20261205"></script>
   <link rel="preload" href="../shared/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../shared/theme.css?v=20261204">
-  <link rel="stylesheet" href="../shared/hv.css?v=20261204">
-  <link rel="stylesheet" href="css/present.css?v=20261204">
+  <link rel="stylesheet" href="../shared/theme.css?v=20261205">
+  <link rel="stylesheet" href="../shared/hv.css?v=20261205">
+  <link rel="stylesheet" href="css/present.css?v=20261205">
 </head>
 <!-- Press P on the slides for this view. It drives them. -->
 <body>
@@ -41,7 +41,7 @@
       </section>
       <nav class="pv-backups" aria-label="Backup slides" hidden><ol role="list"></ol></nav>
       <section class="pv-questions" aria-labelledby="pq-title" hidden>
-        <header class="pv-bar"><h2 id="pq-title">Questions</h2><span class="pq-count"></span></header>
+        <header class="pv-bar"><h2 id="pq-title" tabindex="-1">Questions</h2><span class="pq-count"></span><button type="button" class="btn pq-mod" aria-pressed="false" hidden title="On: new questions wait for your approval before anyone else sees them. Off: they appear for everyone straight away.">Approve first</button></header>
         <p class="pq-hint"></p>
         <ol class="pq-list" role="list" aria-live="polite"></ol>
       </section>
@@ -60,9 +60,9 @@
     </div>
   </main>
 
-  <script src="vendor/marked.js?v=20261204"></script>
-  <script src="js/mdeck.js?v=20261204"></script>
-  <script src="js/live.js?v=20261204"></script>
-  <script src="js/present.js?v=20261204"></script>
+  <script src="vendor/marked.js?v=20261205"></script>
+  <script src="js/mdeck.js?v=20261205"></script>
+  <script src="js/live.js?v=20261205"></script>
+  <script src="js/present.js?v=20261205"></script>
 </body>
 </html>

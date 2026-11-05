@@ -186,7 +186,8 @@
   }
   $(".pv-backups").addEventListener("click", (e) => { const b = e.target.closest("[data-jump]"); if (b) go({ id: b.dataset.jump, f: -1 }); });
   // Every question, live: not yet answered first, most votes first. Whoever holds the presenter key can
-  // reply in writing (it appears under the question for everyone), mark it answered aloud, or remove it.
+  // reply in writing (it appears under the question for everyone), mark it answered aloud, delete it for good,
+  // or switch on "Approve first", which holds new questions here until they're approved.
   const qList = $(".pq-list");
   const SAID = "Answered in the talk.";
   const drafts = new Map();
@@ -199,9 +200,11 @@
       <div class="pq-votes" aria-label="${q.votes} ${q.votes === 1 ? "vote" : "votes"}">${q.votes}</div>
       <div>
         <p>${esc(q.text)}</p>
-        <small>${esc(q.name || "Anonymous")} · ${where}</small>
+        <small>${q.pending ? "<b>Only you can see this.</b> " : ""}${esc(q.name || "Anonymous")} · ${where}</small>
         ${q.answer ? `<p class="q-answer"><b>You:</b> ${esc(q.answer)}</p>` : ""}
-        ${replying === q.id ? `<form>
+        ${q.pending ? `<div class="pq-acts">
+          ${can ? `<button type="button" class="btn" data-act="approve">Approve</button><button type="button" class="btn" data-act="remove">Delete</button>` : ""}
+        </div>` : replying === q.id ? `<form>
           <label class="sr" for="pq-reply">Your reply to: ${esc(q.text)}</label>
           <textarea class="field" id="pq-reply" maxlength="1200" placeholder="Everyone sees this under the question" required></textarea>
           <div class="row"><button type="submit" class="btn">Send reply</button><button type="button" class="btn" data-act="cancel">Cancel</button></div>
@@ -209,7 +212,7 @@
           ${slide && slide.id !== state?.id ? `<button type="button" class="btn" data-act="show">Go to slide</button>` : ""}
           ${canReply ? `<button type="button" class="btn" data-act="reply">${q.answer ? "Change reply" : "Reply"}</button>` : ""}
           ${canReply && !q.answer ? `<button type="button" class="btn" data-act="said">Answered aloud</button>` : ""}
-          ${can ? `<button type="button" class="btn" data-act="remove">Remove</button>` : ""}
+          ${can ? `<button type="button" class="btn" data-act="remove">Delete</button>` : ""}
         </div>`}
       </div>
     </li>`;
@@ -220,11 +223,17 @@
     $(".pv-questions").hidden = !on;
     if (!on) return;
     editBtn.hidden = !live.presenter;
+    const mod = $(".pq-mod");
+    mod.hidden = !live.presenter || !live.moderation;
+    mod.setAttribute("aria-pressed", String(live.moderate));
     const qs = live.all();
     $(".pq-count").textContent = qs.length || "";
+    const held = qs.filter((q) => q.pending).length;
     $(".pq-hint").innerHTML = live.status !== "open" ? "Connecting to the questions…"
       : !live.presenter ? "To reply, open the slides with your key: add <code>?present=your-key</code> to their address, then press P."
-      : !live.replies ? "Written replies need the updated relay. Run <code>npx wrangler deploy</code> in <code>worker/</code>." : "";
+      : !live.replies || !live.moderation ? "Some actions need the updated relay. Run <code>npx wrangler deploy</code> in <code>worker/</code>."
+      : held ? `${held} waiting for your approval.`
+      : live.moderate ? "New questions wait here for your approval." : "";
     const html = qs.length ? qs.map(questionRow).join("") : `<li class="pq-empty">No questions yet. They appear here the moment someone asks, most upvoted first.</li>`;
     if (html === qWas) return;
     // the list is rebuilt when anything changes: keep the keyboard where it was
@@ -235,11 +244,13 @@
     if (box) { box.value = drafts.get(replying) || ""; if (typing) box.focus(); }
     if (row && !typing) {
       const r = qList.querySelector(`[data-id="${CSS.escape(row)}"]`);
-      (r?.querySelector(`[data-act="${act}"]`) || r?.querySelector("button"))?.focus();
+      // its row may have just been deleted: then the keyboard goes back to the heading
+      (r?.querySelector(`[data-act="${act}"]`) || r?.querySelector("button") || $("#pq-title")).focus();
     }
   }
   live.on("questions", renderQuestions);
   live.on("status", renderQuestions);
+  $(".pq-mod").addEventListener("click", () => live.setModerate(!live.moderate));
   qList.addEventListener("input", (e) => { if (e.target.id === "pq-reply") drafts.set(replying, e.target.value); });
   qList.addEventListener("keydown", (e) => {
     if (e.target.id !== "pq-reply") return;
@@ -263,12 +274,13 @@
     else if (b.dataset.act === "reply") { replying = id; if (q.answer && q.answer !== SAID && !drafts.has(id)) drafts.set(id, q.answer); renderQuestions(); $("#pq-reply").focus(); }
     else if (b.dataset.act === "cancel") { replying = null; renderQuestions(); }
     else if (b.dataset.act === "said") live.answer(id, SAID);
+    else if (b.dataset.act === "approve") live.approve(id);
     else if (b.dataset.act === "remove") {
-      // removing can't be undone from here: it takes a second press
+      // deleting can't be undone: it takes a second press
       if (b.dataset.sure) return live.hide(id);
       b.dataset.sure = "1";
-      b.textContent = "Remove for everyone?";
-      setTimeout(() => { if (b.isConnected) { delete b.dataset.sure; b.textContent = "Remove"; } }, 3000);
+      b.textContent = "Delete for everyone?";
+      setTimeout(() => { if (b.isConnected) { delete b.dataset.sure; b.textContent = "Delete"; } }, 3000);
     }
   });
 

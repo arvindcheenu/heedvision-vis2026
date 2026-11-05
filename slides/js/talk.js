@@ -238,7 +238,7 @@
       form.addEventListener("submit", (ev) => {
         ev.preventDefault();
         const ok = live.ask(id, form.text.value, form.name.value);
-        note.textContent = ok ? (live.status === "open" ? "Sent. Thanks! The speaker can see it now." : "Saved; it will send when the connection is back.") : "Questions are offline right now.";
+        note.textContent = ok ? live.sentNote() : "Questions are offline right now.";
         if (ok) form.text.value = "";
       });
       el.querySelector(".q-list").addEventListener("click", (ev) => {

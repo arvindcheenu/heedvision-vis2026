@@ -34,6 +34,8 @@ body { overflow: hidden; display: flex; flex-direction: column; }
 .pv-questions { flex: 1 0 200px; min-height: 0; isolation: isolate; display: flex; flex-direction: column; }
 .pq-count { min-width: 28px; height: 28px; padding: 0 8px; border-radius: var(--radius); display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 16%, var(--bg)); color: var(--accent); font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .pq-count:empty { display: none; }
+.pq-mod { margin-left: auto; min-height: 34px; padding: 0 12px; font-size: 14px; }
+.pq small b { color: var(--accent); }
 .pq-hint { margin: 0 0 8px; font-size: 14px; line-height: 1.4; color: var(--fg-3); }
 .pq-hint:empty { display: none; }
 .pq-hint code { font-size: 13px; }

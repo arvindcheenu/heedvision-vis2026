@@ -23,6 +23,8 @@
     presenterKey: params.get("present") || "",
     presenter: false,       // the relay accepted the presenter key
     replies: false,
+    moderation: false,      // this relay can hold questions for approval
+    moderate: false,        // ...and is doing so
     slide: null,            // last slide broadcast by the presenter
     questions: new Map(),   // id -> question
     notes: new Map(),       // slide id -> { md, base, ts }: script edits from the presenter view
@@ -31,16 +33,21 @@
     emit(type, detail) { bus.dispatchEvent(new CustomEvent(type, { detail })); },
 
     forSlide(id) {
-      return [...this.questions.values()].filter((q) => q.slide === id && !q.hidden)
+      return [...this.questions.values()].filter((q) => q.slide === id && !q.hidden && !q.pending)
         .sort((a, b) => b.votes - a.votes || a.ts - b.ts);
     },
-    // everything still visible: not yet answered first, then most votes first
+    // everything this client may see: waiting for approval first, then not yet answered, then most votes
     all() {
       return [...this.questions.values()].filter((q) => !q.hidden)
-        .sort((a, b) => !!a.answer - !!b.answer || b.votes - a.votes || a.ts - b.ts);
+        .sort((a, b) => !!b.pending - !!a.pending || !!a.answer - !!b.answer || b.votes - a.votes || a.ts - b.ts);
     },
     // what's worth putting on the projected slide
-    top(n) { return this.all().filter((q) => !q.answer).slice(0, n); },
+    top(n) { return this.all().filter((q) => !q.answer && !q.pending).slice(0, n); },
+    // what to tell someone who just asked
+    sentNote() {
+      if (this.status !== "open") return "Saved; it will send when the connection is back.";
+      return this.moderate ? "Sent. Thanks! It will appear here once the speaker approves it." : "Sent. Thanks! The speaker can see it now.";
+    },
     // a list of questions: replaced only when it changed, so screen readers announce only what's new,
     // and the keyboard stays on the button it was on
     fill(list, qs, empty) {
@@ -68,7 +75,10 @@
       this.voted.add(id); store.set("hv.voted", [...this.voted]);
       return send({ t: "vote", id, cid: clientId });
     },
+    // presenter only: delete for everyone, approve a held question, hold new questions or not
     hide(id) { return send({ t: "hide", id }); },
+    approve(id) { return send({ t: "approve", id }); },
+    setModerate(on) { return send({ t: "moderate", on: !!on }); },
     // presenter only: a written reply, shown under the question for everyone (empty text removes it)
     answer(id, text) { return send({ t: "answer", id, text: String(text || "").trim().slice(0, 1200) }); },
     broadcast(slide) { if (this.presenterKey) send({ t: "slide", slide }); },
@@ -119,6 +129,8 @@
         live.notes = new Map((m.notes || []).map((n) => [n.id, n]));
         live.presenter = !!m.presenter;
         live.replies = !!m.replies; // this relay can store replies
+        live.moderation = !!m.moderation;
+        live.moderate = !!m.moderate;
         live.emit("notes");
         live.emit("questions");
         if (m.slide) { live.slide = m.slide; live.emit("slide", m.slide); }
@@ -130,7 +142,9 @@
       } else if (m.t === "votes") {
         const q = live.questions.get(m.id); if (q) { q.votes = m.votes; live.emit("questions"); }
       } else if (m.t === "hidden") {
-        const q = live.questions.get(m.id); if (q) { q.hidden = true; live.emit("questions"); }
+        if (live.questions.delete(m.id)) live.emit("questions");
+      } else if (m.t === "moderate") {
+        live.moderate = !!m.on; live.emit("questions");
       } else if (m.t === "answered") {
         const q = live.questions.get(m.id); if (q) { q.answer = m.answer; live.emit("questions"); }
       } else if (m.t === "notes") {

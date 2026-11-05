@@ -107,7 +107,9 @@ Keys on the slides: **→ / space** next, **←** back, **P** presenter view, **
 
 ### Questions and live updates
 
-Open the slides as `/slides/?present=your-key` and press **P**. The presenter view lists every question as it arrives, not yet answered first, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Remove** takes it down (press twice). **Questions on slide** (Q) projects the top unanswered ones.
+Open the slides as `/slides/?present=your-key` and press **P**. The presenter view lists every question as it arrives: waiting for approval first, then not yet answered, then most upvoted. **Go to slide** jumps to the slide it was asked on, **Reply** writes an answer that appears under the question for everyone at once, **Answered aloud** marks it done, and **Delete** erases it and its votes for everyone (press twice; it can't be undone).
+
+**Approve first** holds new questions until you **Approve** them: only you can see them until then, and they can't be voted on or projected. It's off by default, and the setting stays on the relay. Turning it off doesn't release questions already held. **Questions on slide** (Q) projects the top unanswered ones.
 
 **Edit live** above the script changes it for that slide as you type, in the presenter view and on the script page, with no refresh. These edits are kept on the relay, not in `talk.md`: copy anything you want to keep into `talk.md`, because an edit is dropped once `talk.md`'s text for that slide changes. Without the key, the presenter view can only read questions.
 
