@@ -71,7 +71,7 @@ Shared components are in `shared/hv.css`, one block each. The slides' own sizes,
 
 `shared/tactile.js` adds that light and the sounds, which it synthesizes, so there are no audio files. The speaker button turns sounds on or off, and the choice is remembered. On the paper and script pages they start on with a mouse and off on a phone. The presenter view has its own switch, off until you turn it on, because that laptop usually feeds the room's speakers. The slides have `data-silent` on `<html>` and never make a sound.
 
-**Icons.** The site's own simple icons are committed. Font Awesome Pro replaces them wherever `shared/icons.svg` exists, using `shared/icons.js`. `python3 tools/build-icons.py` makes that file from the private `arvindcheenu/chimistry-vendor` repository. It is git-ignored and must never be committed, because this repository is public and the licence doesn't allow redistribution. Choose icons with `data-fa="name"` on an `<svg>`, or in `shared/icons.tsv` for slides.
+**Icons.** Font Awesome Pro duotone, in `shared/icons.svg`, which holds only the icons this site uses. Choose an icon with `data-fa="name"` on an `<svg>`, or in `shared/icons.tsv` for slides, then run `python3 tools/build-icons.py`, which fetches the full set from the private `arvindcheenu/chimistry-vendor` repository.
 
 ## Editing
 

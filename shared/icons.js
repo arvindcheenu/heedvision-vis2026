@@ -1,9 +1,9 @@
-// Font Awesome Pro icons, when shared/icons.svg is there (tools/build-icons.py makes it; it is never
-// committed, because this repository is public). Without it, everything keeps its own simpler icon.
+// Font Awesome Pro icons, from shared/icons.svg (tools/build-icons.py makes it). If that can't load,
+// everything keeps its own simpler icon.
 //   <svg data-fa="file-pdf">fallback paths</svg>   filled from fa-file-pdf; hidden if it has no fallback
 //   <use href="#ic-eye">                           the slide icons, named in shared/icons.tsv
 (function () {
-  var url = document.currentScript.src.replace(/icons\.js.*$/, "icons.svg");
+  var url = document.currentScript.src.replace("icons.js", "icons.svg");
   fetch(url).then(function (r) { return r.ok ? r.text() : null; }).then(function (text) {
     if (!text) return;
     var doc = new DOMParser().parseFromString(text, "image/svg+xml");

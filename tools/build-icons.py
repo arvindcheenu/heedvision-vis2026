@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Builds shared/icons.svg: only the Font Awesome Pro icons this site uses.
 
-Font Awesome Pro is licensed to Arvind Srinivasan and lives in the private repository
-arvindcheenu/chimistry-vendor. This repository is public, so the result is git-ignored
-and must never be committed. Without it the site uses its own simpler icons.
+Font Awesome Pro is licensed to Arvind Srinivasan and the full set lives in the private
+repository arvindcheenu/chimistry-vendor. Only the result is committed here. Run this again
+after using a new icon.
 
     python3 tools/build-icons.py                  # fetches the sprite with the gh CLI
     python3 tools/build-icons.py path/to/sprite.svg
@@ -40,7 +40,7 @@ def main():
     out += [symbols[fa].replace(f'id="{fa}"', f'id="ic-{name}"', 1) for name, fa in aliases]
     out.append("</svg>\n")
     (ROOT / "shared/icons.svg").write_text("\n".join(out))
-    print(f"shared/icons.svg: {len(names)} interface icons, {len(aliases)} slide icons (git-ignored)")
+    print(f"shared/icons.svg: {len(names)} interface icons, {len(aliases)} slide icons ")
 
 
 main()
