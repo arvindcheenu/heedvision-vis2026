@@ -6,19 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>caav docs</title>
     <meta name="description" content="Documentation for caav: attach attention to three.js objects, record it per person, and show it in every mode of the HeedVision design space." />
-    <link rel="stylesheet" crossorigin href="../assets/style-DCl0HOPp.css">
+    <link rel="icon" href="../../shared/logos/mark.svg" type="image/svg+xml">
+    <link rel="preload" href="../shared/fonts/sn-pro-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../shared/theme.css">
+    <link rel="stylesheet" href="../shared/hv.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../shared/site.js"></script>
+    <script src="../shared/tactile.js" defer></script>
+    <script src="../../shared/icons.js"></script>
+    <script src="../shared/keys.js"></script>
+    <script src="../shared/progress.js"></script>
+    <script type="module" crossorigin src="../assets/page-CP4gunAm.js"></script>
   </head>
   <body>
-    <nav class="site-nav" aria-label="Site">
-      <a href="../">caav home</a>
-      <a href="https://github.com/arvindcheenu/caav">Source on GitHub</a>
-      <a href="../llms-full.txt">These docs as plain text</a>
-      <a href="../AGENTS.md">AGENTS.md</a>
-    </nav>
-    <main class="docs-layout">
-      <nav class="contents" aria-label="On this page"><ul><li><a href="#install">Install</a></li><li><a href="#quickstart">Quickstart</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#attaching-to-objects">Attaching to objects</a></li><li><a href="#people-and-sources">People and sources</a></li><li><a href="#recording">Recording</a></li><li><a href="#accumulators">Accumulators</a></li><li><a href="#presentations">Presentations</a></li><li><a href="#giving-each-person-their-own-view">Giving each person their own view</a></li><li><a href="#triggers">Triggers</a></li><li><a href="#shared-colour">Shared colour</a></li><li><a href="#events-and-spatial-tooltips">Events and spatial tooltips</a></li><li><a href="#react-three-fiber">React Three Fiber</a></li><li><a href="#api-reference">API reference</a></li><li><a href="#limits">Limits</a></li><li><a href="#where-this-differs-from-the-paper">Where this differs from the paper</a></li></ul></nav><article class="prose"><h1 id="caav-docs">caav docs</h1>
+    <a class="btn skip" href="#main">Skip to the page</a>
+    <div class="page-tools"><span data-sound-toggle></span></div>
+    <div class="page-bar" aria-hidden="true"><i></i></div>
+    <nav class="page-toc" aria-label="Contents" data-headings=".prose h2"><ol role="list"></ol></nav>
+
+    <main class="page" id="main">
+      <div class="actions">
+        <a class="btn" href="../"><svg data-fa="arrow-left" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg> caav home</a>
+        <a class="btn" href="https://github.com/arvindcheenu/caav"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/><path d="M14 4l-4 16"/></svg> Source</a>
+        <a class="btn" href="../llms-full.txt">Plain text</a>
+        <a class="btn" href="../AGENTS.md">AGENTS.md</a>
+      </div>
+      <article class="prose">
+        <h1 id="caav-docs">caav docs</h1>
 <p>caav attaches attention to 3D objects, records it separately for each person, and shows it back to them. It is the toolkit from the IEEE VIS 2026 paper <em>HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</em>. CAAV stands for collaborative attention-aware visualization, the term the paper introduces.</p>
 <p>The library has three layers. <code>caav</code> is the core and has no dependencies. <code>caav/three</code> connects it to three.js. <code>caav/react</code> adds hooks for React Three Fiber.</p>
+<ol class="inline-toc" role="list" aria-label="On this page"><li><a href="#install">Install</a></li><li><a href="#quickstart">Quickstart</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#attaching-to-objects">Attaching to objects</a></li><li><a href="#people-and-sources">People and sources</a></li><li><a href="#recording">Recording</a></li><li><a href="#accumulators">Accumulators</a></li><li><a href="#presentations">Presentations</a></li><li><a href="#giving-each-person-their-own-view">Giving each person their own view</a></li><li><a href="#triggers">Triggers</a></li><li><a href="#shared-colour">Shared colour</a></li><li><a href="#events-and-spatial-tooltips">Events and spatial tooltips</a></li><li><a href="#react-three-fiber">React Three Fiber</a></li><li><a href="#api-reference">API reference</a></li><li><a href="#limits">Limits</a></li><li><a href="#where-this-differs-from-the-paper">Where this differs from the paper</a></li></ol>
 <h2 id="install">Install</h2>
 <p>The library is not on npm yet, and the source is <a href="https://github.com/arvindcheenu/caav">on GitHub</a> under the MIT License. You can load it directly from this site using an import map, with no build step:</p>
 <pre tabindex="0"><code>&lt;script type="importmap"&gt;
@@ -516,6 +533,10 @@ session.on(<span class="c-string">"dwell"</span>, (event) =&gt; {
 <td>Change one view</td>
 </tr>
 <tr>
+<td><code>view.setStyle({ surface, ink })</code></td>
+<td>Changes the neutrals drawn around attention, for a theme switch</td>
+</tr>
+<tr>
 <td><code>view.visible</code>, <code>view.shading</code>, <code>view.presentation</code>, <code>view.trigger</code></td>
 <td>Its current state</td>
 </tr>
@@ -576,7 +597,21 @@ session.on(<span class="c-string">"dwell"</span>, (event) =&gt; {
 <li>The paper&#39;s region of influence is a single voxel, which is the default here too. <code>influenceRadius</code> lets you widen it.</li>
 <li>The paper&#39;s system uses Spatialstrates for syncing and was evaluated in world-space, embedded, explicit mode. The other three quadrants were proofs of concept there, and they are unevaluated here too.</li>
 </ul>
-</article>
+
+      </article>
     </main>
+
+    <div class="edge-blur top" aria-hidden="true"></div>
+    <div class="edge-blur foot" aria-hidden="true"></div>
+    <footer class="site-foot">
+      <div class="foot-end"><span data-theme-picker></span></div>
+      <p class="seen-at">As seen at IEEE VIS 2026.</p>
+      <div class="logos" role="group" aria-label="IEEE VIS 2026, Aarhus University and the Center for Anytime Anywhere Analytics">
+        <img src="../../shared/logos/vis2026.png" alt="IEEE VIS 2026" onerror="this.remove()">
+        <img class="mono" src="../../shared/logos/au.svg" alt="Aarhus University" onerror="this.remove()">
+        <img class="mono" src="../../shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics" onerror="this.remove()">
+      </div>
+      <p>Code under the <a href="../LICENSE.txt">MIT License</a>. <a href="https://github.com/arvindcheenu/caav">Source on GitHub</a>.<br>SN Pro under the <a href="../shared/fonts/OFL.txt">SIL Open Font License</a>.<br>Hold ⌘ (Ctrl on Windows) to see a key for every control.</p>
+    </footer>
   </body>
 </html>

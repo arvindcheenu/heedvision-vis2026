@@ -129,7 +129,7 @@ To try all of this without touching the real room, run `npx wrangler dev --port 
 
 ## Toolkit
 
-`toolkit/` is the built site for the caav attention library, published at `/toolkit/`. Its source is in `/Users/au758519/Ideas/caav`. Don't edit it here: build it there, then run `tools/copy-toolkit.sh`, which also adds the analytics to its pages.
+`toolkit/` is the built site for the caav attention library, published at `/toolkit/`. Its source is in `/Users/au758519/Ideas/caav`. Don't edit it here: build it there, then run `tools/copy-toolkit.sh`, which also gives it the site's current shared files and adds the analytics to its pages.
 
 ## Likes and visits
 

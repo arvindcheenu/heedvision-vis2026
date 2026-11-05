@@ -32,6 +32,8 @@ def main():
     names = set()
     for f in ["index.html", "talk/index.html", "slides/present.html", "shared/site.js", "shared/tactile.js", "slides/js/present.js"]:
         names |= set(re.findall(r'data-fa="([a-z0-9-]+)"', (ROOT / f).read_text()))
+    for f in list((ROOT / "toolkit").glob("**/*.html")) + list((ROOT / "toolkit/assets").glob("*.js")):
+        names |= set(re.findall(r'data-fa="([a-z0-9-]+)"', f.read_text()))
     missing = sorted(n for n in names | {a[1] for a in aliases} if n not in symbols)
     if missing:
         sys.exit("Not in the sprite: " + ", ".join(missing))

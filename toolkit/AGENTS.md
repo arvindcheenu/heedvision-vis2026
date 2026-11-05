@@ -48,6 +48,8 @@ Layout:
 - `src/three`: voxelize, attach, tooltip, view, and `presentations/` with one file per quadrant.
 - `src/react`: thin hooks over `src/three`.
 - `site`: landing page, docs, playground and examples.
+- `site/public/shared`: unchanged copies of the HeedVision paper site's `shared/` (theme, buttons, scroll progress, sound, hold-for-keys, fonts). Copy new versions over them rather than editing them here, and put toolkit changes in `site/public/style.css`.
+- Font Awesome Pro icons and institution logos are deliberately not in this repository. Pages load them from the paper site's `/shared/` when hosted at `/toolkit/`, and do without them elsewhere.
 - `site/content`: `docs.md` and `landing.md` become the pages. `docs.md` is also published as `llms-full.txt`.
 - `test`: Vitest. `test/samples.test.ts` typechecks the code blocks in the docs and landing page, and the playground's generated code.
 

@@ -57,6 +57,8 @@ export declare class AttentionView {
     setAccumulator(accumulator: AccumulatorKind): void;
     setColourPolicy(colour: ColourPolicy): void;
     setThreshold(threshold: number | undefined): void;
+    /** Changes the neutrals drawn around attention, for a theme switch. A moved miniature keeps its place. */
+    setStyle(style: PresentationStyle): void;
     /** Runs the trigger and redraws what changed. Call once per frame, after `session.tick`. */
     update(dt: number): void;
     /** The voxels changed, so everything built from them is rebuilt. A moved miniature keeps its place. */
