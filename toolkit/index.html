@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>caav: attention awareness for 3D objects</title>
+    <meta name="description" content="A small JavaScript library that attaches attention to three.js objects, records it per person, and shows it in every mode of the HeedVision design space." />
+    <script type="module" crossorigin src="./assets/main-C4_ddQIy.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/view-CpjY-1f_.js">
+    <link rel="stylesheet" crossorigin href="./assets/style-DCl0HOPp.css">
+  </head>
+  <body>
+    <header class="hero">
+      <h1>caav</h1>
+      <p class="lead">Attach attention to any 3D object, record it per person, and show it back.</p>
+      <p class="quiet">The toolkit from <a href="https://heedvision.arvindchee.nu/">HeedVision</a>, IEEE VIS 2026. CAAV stands for collaborative attention-aware visualization.</p>
+      <nav class="site-nav" aria-label="Site">
+        <a href="./docs/">Docs</a>
+        <a href="#try-it">Try it</a>
+        <a href="#examples">Examples</a>
+        <a href="./llms.txt">llms.txt</a>
+        <a href="./AGENTS.md">AGENTS.md</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="try-it" aria-labelledby="try-it-heading">
+        <h2 id="try-it-heading">Try it</h2>
+        <p class="reading">Each view is one person looking at the same object, recording attention from their head direction. Give each person their own settings in the panel. Drag a view to steer that person, or focus it and use the arrow keys.</p>
+        <div id="playground"></div>
+        <noscript><p>The playground needs JavaScript and WebGL. The examples below and the docs do not.</p></noscript>
+      </section>
+
+      <section id="examples" class="reading">
+        <h2>Examples</h2>
+        <h3 id="1-attach-attention-to-an-object">1. Attach attention to an object</h3>
+<p>Any three.js object with meshes under it works, including a group. It is split into voxels, keeping only the ones that touch its surface.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { createSession } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+<span class="c-keyword">import</span> { attachAttention } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> session = createSession({ captureRate: <span class="c-number">10</span> });
+<span class="c-keyword">const</span> attached = attachAttention(session, object, { voxelSize: <span class="c-number">0.05</span> });</code></pre>
+<h3 id="2-register-each-person">2. Register each person</h3>
+<p>A person has a colour and a source of attention. Here it is the direction their head points. Each person&#39;s attention is recorded separately.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { headRaySource } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+session.registerViewer({ id: <span class="c-string">"a"</span>, colour: <span class="c-string">"#3d8bff"</span>, source: headRaySource(cameraA) });
+session.registerViewer({ id: <span class="c-string">"b"</span>, colour: <span class="c-string">"#f08a3c"</span>, source: headRaySource(cameraB) });</code></pre>
+<h3 id="3-give-each-person-their-own-view">3. Give each person their own view</h3>
+<p>Person A can see voxels on the object while Person B sees a small panel beside it. These are the four quadrants of the paper&#39;s design space, and each person chooses their own.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { alwaysOn, explicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+<span class="c-keyword">import</span> { createAttentionView } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> viewA = createAttentionView({
+  session, attached, viewer: <span class="c-string">"a"</span>, camera: cameraA, scene, layer: <span class="c-number">1</span>,
+  presentation: <span class="c-string">"world-embedded"</span>,
+  trigger: explicitTrigger(),
+});
+
+<span class="c-keyword">const</span> viewB = createAttentionView({
+  session, attached, viewer: <span class="c-string">"b"</span>, camera: cameraB, scene, layer: <span class="c-number">2</span>, overlay: stageB,
+  presentation: <span class="c-string">"camera-separated"</span>,
+  trigger: alwaysOn(),
+  accumulator: <span class="c-string">"count"</span>,
+});
+
+<span class="c-keyword">function</span> update(dt: number) {
+  session.tick(dt);
+  viewA.update(dt);
+  viewB.update(dt);
+}</code></pre>
+<h3 id="4-choose-when-attention-shows">4. Choose when attention shows</h3>
+<p>It can always be on, appear when a person asks, or appear when the system decides. By default the system shows it when someone&#39;s gaze rests on a spot, or when someone else looks at the same spot.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { implicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+viewA.setTrigger(implicitTrigger({ dwell: <span class="c-number">1.5</span>, hold: <span class="c-number">2</span> }));</code></pre>
+<h3 id="5-colour-for-shared-attention">5. Colour for shared attention</h3>
+<p>When people overlap, their colours blend, weighted by how much attention each gave. Blue and orange meet at a pink. If you would rather pick the colour yourself, you can.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { explicitColours } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+viewA.setColourPolicy(explicitColours({ shared: <span class="c-string">"#ec4f9c"</span> }));</code></pre>
+<h3 id="6-tooltips-that-follow-attention">6. Tooltips that follow attention</h3>
+<p>The session reports what people do as events, each with a point in space. Pin a label to that point and you have a tooltip triggered by attention.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { createSpatialTooltip } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> tooltip = createSpatialTooltip({ camera: cameraA, overlay: stageA });
+
+session.on(<span class="c-string">"dwell"</span>, (event) =&gt; {
+  <span class="c-keyword">if</span> (event.viewer === <span class="c-string">"a"</span>) tooltip.show(event.point, <span class="c-string">"You rested here"</span>, { seconds: <span class="c-number">3</span> });
+});</code></pre>
+<h3 id="7-change-anything-while-it-runs">7. Change anything while it runs</h3>
+<p>Radius, gain, capture rate and decay can all change on the fly. Voxel resolution can too, though recorded attention starts again because the voxels themselves change.</p>
+<pre tabindex="0"><code>session.configure({ influenceRadius: <span class="c-number">2</span>, gain: <span class="c-number">0.8</span> });
+attached.setVoxelSize(<span class="c-number">0.1</span>);</code></pre>
+<p>The <a href="./docs/">docs</a> cover all of this in detail, including <a href="./docs/#install">how to load the library</a>, the <a href="./docs/#api-reference">API</a>, and <a href="./docs/#react-three-fiber">React Three Fiber hooks</a>. There is also a <a href="./examples/quickstart.html">one-file example</a> you can save and open.</p>
+
+      </section>
+    </main>
+
+    <footer>
+      <p>Built for the paper <a href="https://heedvision.arvindchee.nu/">HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</a>. Works with three.js, with optional React Three Fiber hooks. The core has no dependencies.</p>
+    </footer>
+
+  </body>
+</html>

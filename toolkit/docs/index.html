@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>caav docs</title>
+    <meta name="description" content="Documentation for caav: attach attention to three.js objects, record it per person, and show it in every mode of the HeedVision design space." />
+    <link rel="stylesheet" crossorigin href="../assets/style-DCl0HOPp.css">
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../">caav home</a>
+      <a href="../llms-full.txt">These docs as plain text</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+    </nav>
+    <main class="docs-layout">
+      <nav class="contents" aria-label="On this page"><ul><li><a href="#install">Install</a></li><li><a href="#quickstart">Quickstart</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#attaching-to-objects">Attaching to objects</a></li><li><a href="#people-and-sources">People and sources</a></li><li><a href="#recording">Recording</a></li><li><a href="#accumulators">Accumulators</a></li><li><a href="#presentations">Presentations</a></li><li><a href="#giving-each-person-their-own-view">Giving each person their own view</a></li><li><a href="#triggers">Triggers</a></li><li><a href="#shared-colour">Shared colour</a></li><li><a href="#events-and-spatial-tooltips">Events and spatial tooltips</a></li><li><a href="#react-three-fiber">React Three Fiber</a></li><li><a href="#api-reference">API reference</a></li><li><a href="#limits">Limits</a></li><li><a href="#where-this-differs-from-the-paper">Where this differs from the paper</a></li></ul></nav><article class="prose"><h1 id="caav-docs">caav docs</h1>
+<p>caav attaches attention to 3D objects, records it separately for each person, and shows it back to them. It is the toolkit from the IEEE VIS 2026 paper <em>HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments</em>. CAAV stands for collaborative attention-aware visualization, the term the paper introduces.</p>
+<p>The library has three layers. <code>caav</code> is the core and has no dependencies. <code>caav/three</code> connects it to three.js. <code>caav/react</code> adds hooks for React Three Fiber.</p>
+<h2 id="install">Install</h2>
+<p>The library is not on npm yet. You can load it directly from this site using an import map, with no build step:</p>
+<pre tabindex="0"><code>&lt;script type="importmap"&gt;
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.18/build/index.module.js",
+      "caav": "https://heedvision.arvindchee.nu/toolkit/lib/core/index.js",
+      "caav/three": "https://heedvision.arvindchee.nu/toolkit/lib/three/index.js"
+    }
+  }
+&lt;/script&gt;</code></pre>
+<p>The <a href="../examples/quickstart.html">one-file example</a> is a complete page built this way. Save it, change the paths to the absolute ones above, and open it through any local server.</p>
+<p>The React hooks are at <code>lib/react/index.js</code>. They also need <code>react</code> and <code>@react-three/fiber</code>, which is easiest with a bundler.</p>
+<p>It has been tested with three 0.180, three-mesh-bvh 0.9.18 and @react-three/fiber 9.8. Type declarations sit next to each file under <code>lib/</code>.</p>
+<h2 id="quickstart">Quickstart</h2>
+<p>This sets up two people looking at one object, each rendering their own view. <code>object</code>, <code>scene</code>, the two cameras and the two renderers are your own.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { alwaysOn, createSession, interpolatedColours } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+<span class="c-keyword">import</span> { attachAttention, createAttentionView, headRaySource } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> session = createSession({ captureRate: <span class="c-number">10</span>, influenceRadius: <span class="c-number">1.5</span> });
+<span class="c-keyword">const</span> attached = attachAttention(session, object, { voxelSize: <span class="c-number">0.05</span> });
+<span class="c-keyword">const</span> colour = interpolatedColours();
+
+session.registerViewer({ id: <span class="c-string">"a"</span>, colour: <span class="c-string">"#3d8bff"</span>, source: headRaySource(cameraA) });
+session.registerViewer({ id: <span class="c-string">"b"</span>, colour: <span class="c-string">"#f08a3c"</span>, source: headRaySource(cameraB) });
+
+<span class="c-keyword">const</span> viewA = createAttentionView({
+  session, attached, viewer: <span class="c-string">"a"</span>, camera: cameraA, scene, layer: <span class="c-number">1</span>,
+  presentation: <span class="c-string">"world-embedded"</span>, trigger: alwaysOn(), colour,
+});
+<span class="c-keyword">const</span> viewB = createAttentionView({
+  session, attached, viewer: <span class="c-string">"b"</span>, camera: cameraB, scene, layer: <span class="c-number">2</span>,
+  presentation: <span class="c-string">"world-separated"</span>, trigger: alwaysOn(), colour,
+});
+
+<span class="c-keyword">let</span> last = performance.now();
+<span class="c-keyword">function</span> frame(now: number) {
+  <span class="c-keyword">const</span> dt = (now - last) / <span class="c-number">1000</span>;
+  last = now;
+  session.tick(dt);
+  viewA.update(dt);
+  viewB.update(dt);
+  rendererA.render(scene, cameraA);
+  rendererB.render(scene, cameraB);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);</code></pre>
+<p>The playground on the <a href="../">home page</a> writes this code for whatever settings you choose, so it is often the quickest way to get a setup you can copy.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>The paper splits attention awareness into three parts, and so does the library.</p>
+<p><strong>Capture</strong> finds what each person is looking at. Ten times a second by default, a ray goes out from each person&#39;s head and finds the nearest voxel it hits.</p>
+<p><strong>Recording</strong> adds to that voxel&#39;s value for that person. Each person has their own value at every voxel, between 0 and 1, and those values fade over time. Keeping them separate is what makes this collaborative: you can always ask who attended what, and combine the values however you like.</p>
+<p><strong>Revisualizing</strong> shows it. Each person has a view that decides how to combine the values, what colour they become, where they are drawn and when.</p>
+<p>Capture and recording never stop, whatever a view is showing. A trigger only controls what a person sees.</p>
+<h2 id="attaching-to-objects">Attaching to objects</h2>
+<p><code>attachAttention(session, object, options)</code> works on any object with at least one mesh under it, including groups and instanced meshes. It merges the meshes into the object&#39;s local space and voxelizes the result with a bounding volume hierarchy, keeping only cells that touch the surface.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { attachAttention } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> attached = attachAttention(session, object, {
+  id: <span class="c-string">"terrain"</span>,   <span class="c-comment">// defaults to the object's uuid</span>
+  voxelSize: <span class="c-number">0.05</span>, <span class="c-comment">// in the object's local units, defaults to 1/32 of its longest side</span>
+});</code></pre>
+<p>Attention is stored in the object&#39;s local space, so it stays on the object when the object moves, rotates or scales.</p>
+<h3 id="voxel-resolution">Voxel resolution</h3>
+<p>Smaller voxels show finer detail, but each view does more work and each voxel takes longer to fill, since a gaze spends less time in any one of them. Change the size at any time:</p>
+<pre tabindex="0"><code>attached.setVoxelSize(<span class="c-number">0.1</span>);</code></pre>
+<p>Views rebuild themselves on their next update. Recorded attention for that object starts again from zero, because the old values belong to voxels that no longer exist. A miniature that someone moved stays where they put it.</p>
+<h3 id="several-objects">Several objects</h3>
+<p>Attach as many as you like. Each person&#39;s attention goes only to the nearest voxel along their gaze, so one object can block the view of another. Each object needs its own view for each person.</p>
+<h2 id="people-and-sources">People and sources</h2>
+<p><code>session.registerViewer</code> adds a person. The library calls them viewers.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { headRaySource } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+session.registerViewer({
+  id: <span class="c-string">"a"</span>,
+  colour: <span class="c-string">"#3d8bff"</span>,
+  label: <span class="c-string">"Arvind"</span>,                  <span class="c-comment">// optional display name</span>
+  source: headRaySource(camera),
+});</code></pre>
+<p>Nothing limits the number of people. The paper notes that telling people apart by colour works well for 2 to 4, and gets harder beyond that.</p>
+<p>Change a person&#39;s colour by assigning <code>session.viewers.get(&quot;a&quot;).colour</code>. Calling <code>session.removeViewer(id)</code> forgets that person and everything they recorded.</p>
+<h3 id="other-sources-of-attention">Other sources of attention</h3>
+<p>A source is anything with a <code>sample()</code> method that returns a world-space ray, or <code>null</code> when there is none, for instance when tracking is lost. This is how you would connect an eye tracker:</p>
+<pre tabindex="0"><code>session.registerViewer({
+  id: <span class="c-string">"eyes"</span>,
+  colour: <span class="c-string">"#17a67e"</span>,
+  source: { sample: () =&gt; eyeTracker.gazeRay() },
+});</code></pre>
+<h2 id="recording">Recording</h2>
+<p>These options go to <code>createSession</code>, and any of them can change later through <code>session.configure</code>. Changing them keeps recorded attention.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>captureRate</code></td>
+<td><code>10</code></td>
+<td>Samples per second. The paper uses 10.</td>
+</tr>
+<tr>
+<td><code>gain</code></td>
+<td><code>0.4</code></td>
+<td>Attention gained per second of steady gaze. At 0.4 a voxel fills in 2.5 seconds. It does not depend on the capture rate.</td>
+</tr>
+<tr>
+<td><code>influenceRadius</code></td>
+<td><code>0</code></td>
+<td>How far each sample spreads, in voxels. 0 is the single voxel the paper uses. Above that, the centre gets the most, falling to a quarter at the edge.</td>
+</tr>
+<tr>
+<td><code>decay</code></td>
+<td><code>halfLifeDecay(30)</code></td>
+<td>How attention fades. Use <code>noDecay</code> to keep it for good.</td>
+</tr>
+<tr>
+<td><code>regionRadius</code></td>
+<td><code>2</code></td>
+<td>Gazes within this many voxels count as the same region, for dwell and joint attention.</td>
+</tr>
+<tr>
+<td><code>dwellTime</code></td>
+<td><code>1.5</code></td>
+<td>Seconds of steady gaze before a <code>dwell</code> event fires.</td>
+</tr>
+</tbody></table>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { halfLifeDecay, noDecay } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+session.configure({ influenceRadius: <span class="c-number">2</span>, decay: halfLifeDecay(<span class="c-number">60</span>) });
+session.configure({ decay: noDecay });
+session.reset(); <span class="c-comment">// clears recorded attention and keeps everyone registered</span></code></pre>
+<p>You can read the values directly. Each one is a <code>Float32Array</code> with one number per voxel:</p>
+<pre tabindex="0"><code><span class="c-keyword">const</span> values = attached.target.field.channel(<span class="c-string">"a"</span>);
+<span class="c-keyword">const</span> gaze = session.gaze(<span class="c-string">"a"</span>); <span class="c-comment">// { target, voxel, distance, point }, or null</span></code></pre>
+<h2 id="accumulators">Accumulators</h2>
+<p>An accumulator combines everyone&#39;s values at a voxel into one number, which sets how opaque that voxel is. Each view chooses its own.</p>
+<table>
+<thead>
+<tr>
+<th>Accumulator</th>
+<th>Value at a voxel</th>
+<th>Good for seeing</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sum</code></td>
+<td>Total across people, shown up to 1</td>
+<td>Everything the group has looked at</td>
+</tr>
+<tr>
+<td><code>max</code></td>
+<td>The highest single person</td>
+<td>Where anyone looked hard</td>
+</tr>
+<tr>
+<td><code>difference</code></td>
+<td>Highest minus lowest. With one person, their value</td>
+<td>Division of labour. Places everyone looked at equally fade out</td>
+</tr>
+<tr>
+<td><code>count</code></td>
+<td>How many people reached the threshold, as a share of the group</td>
+<td>Where people overlap</td>
+</tr>
+</tbody></table>
+<p><code>threshold</code> on a view sets the point below which a voxel stays transparent, and defaults to 0.05.</p>
+<h2 id="presentations">Presentations</h2>
+<p>Each person&#39;s view draws attention in one of four ways, following the paper&#39;s design space. Switch with <code>view.setPresentation(kind)</code>.</p>
+<table>
+<thead>
+<tr>
+<th><code>presentation</code></th>
+<th>Situatedness</th>
+<th>Presentation</th>
+<th>What it draws</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>world-embedded</code></td>
+<td>World</td>
+<td>Embedded</td>
+<td>Translucent voxels on the object. This is HeedVision itself.</td>
+</tr>
+<tr>
+<td><code>world-separated</code></td>
+<td>World</td>
+<td>Separated</td>
+<td>A small replica beside the object, which can be moved.</td>
+</tr>
+<tr>
+<td><code>camera-embedded</code></td>
+<td>Camera</td>
+<td>Embedded</td>
+<td>Attention flattened onto the faces of the bounding box that face the person.</td>
+</tr>
+<tr>
+<td><code>camera-separated</code></td>
+<td>Camera</td>
+<td>Separated</td>
+<td>A 2D panel over the view, turning with the person&#39;s angle.</td>
+</tr>
+</tbody></table>
+<p>World-space presentations stay put in the shared space, so people can point at them. Camera-space ones stay readable from wherever a person stands, at the cost of that shared reference.</p>
+<p>The miniature starts to the person&#39;s right and stays fixed in the world until moved:</p>
+<pre tabindex="0"><code>view.setPresentation(<span class="c-string">"world-separated"</span>);
+view.miniature?.moveTo(<span class="c-number">1.5</span>, <span class="c-number">1</span>, <span class="c-number">0</span>);</code></pre>
+<p>To let people drag it, raycast against <code>view.miniature.object</code>. The playground&#39;s source does this.</p>
+<p><code>camera-separated</code> draws into an element you provide. Pass it as <code>overlay</code>, and give that element its own positioning context, for example <code>position: relative</code>. The panel has the class <code>caav-panel</code>, so you can restyle it, and a text description for screen readers.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { createAttentionView } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> view = createAttentionView({
+  session, attached, viewer: <span class="c-string">"a"</span>, camera, scene,
+  overlay: stage,
+  presentation: <span class="c-string">"camera-separated"</span>,
+  style: { surface: <span class="c-string">"#10131a"</span>, ink: <span class="c-string">"#8a93a6"</span> }, <span class="c-comment">// the neutrals drawn around attention</span>
+});</code></pre>
+<h2 id="giving-each-person-their-own-view">Giving each person their own view</h2>
+<p>Everything about a view belongs to that person: presentation, trigger, accumulator, colour policy and threshold. This reflects the paper&#39;s point that the presentation can be left to each collaborator.</p>
+<p>If every person has their own scene, or their own headset, no setup is needed. If several views render one shared scene, as the playground does, give each view a <code>layer</code>. That puts its objects on a three.js layer that only its camera can see, so Person A&#39;s voxels do not appear in Person B&#39;s view. Keep your shared content on layer 0, which cameras see by default.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { alwaysOn, explicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+<span class="c-keyword">import</span> { createAttentionView } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> viewA = createAttentionView({
+  session, attached, viewer: <span class="c-string">"a"</span>, camera: cameraA, scene, layer: <span class="c-number">1</span>,
+  presentation: <span class="c-string">"world-embedded"</span>,
+  trigger: explicitTrigger(),
+  accumulator: <span class="c-string">"sum"</span>,
+});
+
+<span class="c-keyword">const</span> viewB = createAttentionView({
+  session, attached, viewer: <span class="c-string">"b"</span>, camera: cameraB, scene, layer: <span class="c-number">2</span>, overlay: stageB,
+  presentation: <span class="c-string">"camera-separated"</span>,
+  trigger: alwaysOn(),
+  accumulator: <span class="c-string">"difference"</span>,
+});</code></pre>
+<p>Changing a setting affects one view only:</p>
+<pre tabindex="0"><code>viewB.setPresentation(<span class="c-string">"world-embedded"</span>);
+viewB.setAccumulator(<span class="c-string">"max"</span>);
+viewB.setThreshold(<span class="c-number">0.2</span>);</code></pre>
+<h2 id="triggers">Triggers</h2>
+<p>A trigger decides when a person sees attention. Each view has its own, and <code>view.setTrigger</code> swaps it.</p>
+<p><strong>Always on</strong> shows attention all the time. The paper warns that this risks the Midas touch, where people&#39;s own gaze keeps setting things off, and reinforcing loops.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { alwaysOn } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+view.setTrigger(alwaysOn());</code></pre>
+<p><strong>Explicit</strong> shows it when the person asks. HeedVision uses this, with a controller button. Connect <code>request</code> to whatever input you have:</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { explicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+view.setTrigger(explicitTrigger());
+button.onclick = () =&gt; view.trigger.request();     <span class="c-comment">// toggles</span>
+holdStart.onclick = () =&gt; view.trigger.request(<span class="c-keyword">true</span>);
+holdEnd.onclick = () =&gt; view.trigger.request(<span class="c-keyword">false</span>);</code></pre>
+<p><strong>Implicit</strong> lets the system decide. By default attention appears once a person&#39;s gaze has rested for <code>dwell</code> seconds or someone else looks at the same region, and stays for <code>hold</code> seconds after that ends, so it does not flicker.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { implicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+view.setTrigger(implicitTrigger({ dwell: <span class="c-number">1.5</span>, hold: <span class="c-number">2</span> }));</code></pre>
+<p>Pass <code>when</code> to write your own rule. It receives how long the gaze has rested and how many others share the region:</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { implicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+<span class="c-comment">// Only when at least two other people are looking at the same spot.</span>
+view.setTrigger(implicitTrigger({ when: (context) =&gt; context.joint &gt;= <span class="c-number">2</span> }));</code></pre>
+<h3 id="triggering-from-events">Triggering from events</h3>
+<p>An explicit trigger can also be driven by the <a href="#events-and-spatial-tooltips">events</a> below. This shows attention to Person A for as long as they are sharing a region with someone:</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { explicitTrigger } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+view.setTrigger(explicitTrigger());
+session.on(<span class="c-string">"jointstart"</span>, (event) =&gt; {
+  <span class="c-keyword">if</span> (event.viewer === <span class="c-string">"a"</span>) view.trigger.request(<span class="c-keyword">true</span>);
+});
+session.on(<span class="c-string">"jointend"</span>, (event) =&gt; {
+  <span class="c-keyword">if</span> (event.viewer === <span class="c-string">"a"</span>) view.trigger.request(<span class="c-keyword">false</span>);
+});</code></pre>
+<h2 id="shared-colour">Shared colour</h2>
+<p>Each person has a colour. A voxel only one person attended takes that person&#39;s exact colour. When two or more overlap, the view&#39;s colour policy decides.</p>
+<p><strong>Interpolated is the default.</strong> The colours blend, weighted by how much attention each person gave, so the result shifts as attention shifts. Blue and orange at equal attention make the pink <code>#db6cc2</code>.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { interpolatedColours } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+view.setColourPolicy(interpolatedColours());</code></pre>
+<p>The blend happens in OKLab, a colour space built around how colours look. Lightness and chroma are averaged, and hue takes the circular mean, which goes the short way round the colour wheel. Averaging RGB directly would turn blue and orange into grey. Three or four people use the same formula, and the order of people makes no difference. If their hues cancel out, the result fades to a neutral grey instead of jumping to an arbitrary hue. A blend does not tell you how many people overlapped, so use the <code>count</code> accumulator if that matters.</p>
+<p><strong>Choosing a colour is optional.</strong> Any overlap, however many people, takes the colour you give:</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { explicitColours } <span class="c-keyword">from</span> <span class="c-string">"caav"</span>;
+
+view.setColourPolicy(explicitColours({ shared: <span class="c-string">"#ec4f9c"</span> }));</code></pre>
+<p>Both policies count a person as attending a voxel when their value is at least 0.05. Pass <code>threshold</code> to change that.</p>
+<p>You can write your own policy: an object with a <code>kind</code> and a <code>resolve(viewers)</code> method that returns an sRGB colour or <code>null</code>.</p>
+<h2 id="events-and-spatial-tooltips">Events and spatial tooltips</h2>
+<p>The session reports what people do as events, so your code can react to attention in space. <code>session.on</code> returns a function that stops listening.</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>When it fires</th>
+<th>Extra fields</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>gazeenter</code></td>
+<td>A person&#39;s gaze lands on an object</td>
+<td></td>
+</tr>
+<tr>
+<td><code>gazeleave</code></td>
+<td>A person&#39;s gaze leaves an object</td>
+<td></td>
+</tr>
+<tr>
+<td><code>dwell</code></td>
+<td>Their gaze has rested in one region for <code>dwellTime</code>. Fires once until they look away</td>
+<td><code>seconds</code></td>
+</tr>
+<tr>
+<td><code>jointstart</code></td>
+<td>Someone else starts looking at the same region as this person</td>
+<td><code>others</code></td>
+</tr>
+<tr>
+<td><code>jointend</code></td>
+<td>This person is no longer sharing a region with anyone</td>
+<td><code>others</code></td>
+</tr>
+</tbody></table>
+<p>Every event also has <code>viewer</code>, <code>target</code>, <code>voxel</code>, <code>point</code> in world space, and <code>localPoint</code>, the voxel&#39;s centre in the object&#39;s own space. Joint events fire once for each person involved, so each person can react separately.</p>
+<h3 id="spatial-tooltips">Spatial tooltips</h3>
+<p><code>createSpatialTooltip</code> pins a text label to a point in space. It follows the point as the camera moves, and hides when the point is off screen. Together with an event, that makes a tooltip triggered by attention.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { createSpatialTooltip } <span class="c-keyword">from</span> <span class="c-string">"caav/three"</span>;
+
+<span class="c-keyword">const</span> tooltip = createSpatialTooltip({ camera, overlay: stage });
+
+session.on(<span class="c-string">"dwell"</span>, (event) =&gt; {
+  <span class="c-keyword">if</span> (event.viewer === <span class="c-string">"a"</span>) tooltip.show(event.point, <span class="c-string">`Rested here for ${event.seconds.toFixed(1)} s`</span>, { seconds: <span class="c-number">3</span> });
+});
+session.on(<span class="c-string">"gazeleave"</span>, (event) =&gt; {
+  <span class="c-keyword">if</span> (event.viewer === <span class="c-string">"a"</span>) tooltip.hide();
+});
+
+<span class="c-comment">// In your frame loop:</span>
+tooltip.update(dt);</code></pre>
+<p>It is a DOM element with the class <code>caav-tooltip</code>, added to the <code>overlay</code> you give it, so restyle it with CSS. It has <code>role=&quot;status&quot;</code>, so screen readers announce it.</p>
+<h3 id="tooltips-for-specific-places">Tooltips for specific places</h3>
+<p>To react only to certain places on your data, check <code>localPoint</code>. Because it is in the object&#39;s own space, this keeps working when the object moves.</p>
+<pre tabindex="0"><code><span class="c-keyword">const</span> peak = [<span class="c-number">0.1</span>, <span class="c-number">0.9</span>, -<span class="c-number">0.2</span>];
+
+session.on(<span class="c-string">"dwell"</span>, (event) =&gt; {
+  <span class="c-keyword">const</span> [x, y, z] = event.localPoint;
+  <span class="c-keyword">if</span> (Math.hypot(x - peak[<span class="c-number">0</span>], y - peak[<span class="c-number">1</span>], z - peak[<span class="c-number">2</span>]) &lt; <span class="c-number">0.3</span>) {
+    tooltip.show(event.point, <span class="c-string">"The highest peak: 2,400 m"</span>, { seconds: <span class="c-number">4</span> });
+  }
+});</code></pre>
+<h2 id="react-three-fiber">React Three Fiber</h2>
+<p><code>caav/react</code> wraps the same calls in hooks. It needs React 19 and @react-three/fiber 9. There is a <a href="../examples/react/">working example</a>.</p>
+<pre tabindex="0"><code><span class="c-keyword">import</span> { useRef } <span class="c-keyword">from</span> <span class="c-string">"react"</span>;
+<span class="c-keyword">import</span> type { Mesh } <span class="c-keyword">from</span> <span class="c-string">"three"</span>;
+<span class="c-keyword">import</span> { useAttachAttention, useAttentionSession, useAttentionView, useHeadTrackedViewer } <span class="c-keyword">from</span> <span class="c-string">"caav/react"</span>;
+
+<span class="c-keyword">function</span> Terrain() {
+  <span class="c-keyword">const</span> mesh = useRef&lt;Mesh&gt;(<span class="c-keyword">null</span>);
+  <span class="c-keyword">const</span> session = useAttentionSession({ captureRate: <span class="c-number">10</span>, influenceRadius: <span class="c-number">1.5</span> });
+  <span class="c-keyword">const</span> attached = useAttachAttention(session, mesh, { voxelSize: <span class="c-number">0.05</span> });
+  useHeadTrackedViewer(session, { id: <span class="c-string">"you"</span>, colour: <span class="c-string">"#3d8bff"</span> });
+  useAttentionView(session, attached, <span class="c-string">"you"</span>, { presentation: <span class="c-string">"world-embedded"</span> });
+
+  <span class="c-keyword">return</span> (
+    &lt;mesh ref={mesh}&gt;
+      &lt;torusKnotGeometry /&gt;
+      &lt;meshStandardMaterial color=<span class="c-string">"#6c7078"</span> /&gt;
+    &lt;/mesh&gt;
+  );
+}</code></pre>
+<p>Pass new values to <code>useAttentionView</code> and the view updates in place. Keep trigger objects stable between renders, for example by creating them outside the component or with <code>useState</code>, because a new one resets its state.</p>
+<h2 id="api-reference">API reference</h2>
+<h3 id="caav"><code>caav</code></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>createSession(options?)</code></td>
+<td>Creates an <code>AttentionSession</code></td>
+</tr>
+<tr>
+<td><code>session.registerViewer({ id, colour, source, label? })</code></td>
+<td>Adds a person</td>
+</tr>
+<tr>
+<td><code>session.removeViewer(id)</code></td>
+<td>Removes a person and what they recorded</td>
+</tr>
+<tr>
+<td><code>session.registerTarget({ id, grid, toLocal })</code></td>
+<td>Adds a voxel grid directly. <code>attachAttention</code> does this for three.js</td>
+</tr>
+<tr>
+<td><code>session.removeTarget(id)</code></td>
+<td>Removes an object</td>
+</tr>
+<tr>
+<td><code>session.replaceGrid(id, grid)</code></td>
+<td>Swaps an object&#39;s voxels and clears its attention</td>
+</tr>
+<tr>
+<td><code>session.tick(dt)</code></td>
+<td>Advances time, capturing and decaying. Call once per frame</td>
+</tr>
+<tr>
+<td><code>session.configure(options)</code></td>
+<td>Changes settings while running</td>
+</tr>
+<tr>
+<td><code>session.on(type, listener)</code></td>
+<td>Listens for an event, and returns a function that stops</td>
+</tr>
+<tr>
+<td><code>session.gaze(id)</code></td>
+<td>A person&#39;s latest gaze, or <code>null</code></td>
+</tr>
+<tr>
+<td><code>session.triggerContext(id, dt)</code></td>
+<td>The <code>dt</code>, <code>dwell</code> and <code>joint</code> values triggers read</td>
+</tr>
+<tr>
+<td><code>session.reset()</code></td>
+<td>Clears recorded attention</td>
+</tr>
+<tr>
+<td><code>alwaysOn()</code>, <code>explicitTrigger(initial?)</code>, <code>implicitTrigger({ dwell?, hold?, when? })</code></td>
+<td>Trigger policies</td>
+</tr>
+<tr>
+<td><code>interpolatedColours({ threshold? })</code>, <code>explicitColours({ shared, threshold? })</code></td>
+<td>Colour policies</td>
+</tr>
+<tr>
+<td><code>halfLifeDecay(seconds)</code>, <code>noDecay</code></td>
+<td>Decay functions</td>
+</tr>
+<tr>
+<td><code>aggregate(kind, values, threshold?)</code>, <code>normalised(kind, value, viewerCount)</code></td>
+<td>The accumulators as plain functions</td>
+</tr>
+<tr>
+<td><code>AttentionField</code></td>
+<td>Per-person values for one object</td>
+</tr>
+<tr>
+<td><code>VoxelGrid</code></td>
+<td>Sparse voxels, with <code>raycast(ray)</code>, <code>centre(voxel)</code>, <code>at(i, j, k)</code></td>
+</tr>
+<tr>
+<td><code>createShading(count)</code>, <code>shade(session, target, shading, options)</code></td>
+<td>One colour and opacity per voxel, for drawing your own presentation</td>
+</tr>
+</tbody></table>
+<p>The core has no rendering dependency, so you can use it with another engine by building a <code>VoxelGrid</code> yourself and passing a <code>toLocal</code> function that moves rays into the grid&#39;s space.</p>
+<h3 id="caav-three"><code>caav/three</code></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>attachAttention(session, object, { id?, voxelSize? })</code></td>
+<td>Returns an <code>AttachedTarget</code></td>
+</tr>
+<tr>
+<td><code>attached.setVoxelSize(size)</code></td>
+<td>Voxelizes again at a new resolution</td>
+</tr>
+<tr>
+<td><code>attached.detach()</code></td>
+<td>Stops tracking the object</td>
+</tr>
+<tr>
+<td><code>headRaySource(camera)</code></td>
+<td>A source from a camera&#39;s view direction</td>
+</tr>
+<tr>
+<td><code>createAttentionView(options)</code></td>
+<td>Returns an <code>AttentionView</code></td>
+</tr>
+<tr>
+<td><code>view.update(dt)</code></td>
+<td>Runs the trigger and redraws. Call once per frame, after <code>session.tick</code></td>
+</tr>
+<tr>
+<td><code>view.setPresentation(kind)</code>, <code>setTrigger(trigger)</code>, <code>setAccumulator(kind)</code>, <code>setColourPolicy(policy)</code>, <code>setThreshold(value)</code></td>
+<td>Change one view</td>
+</tr>
+<tr>
+<td><code>view.visible</code>, <code>view.shading</code>, <code>view.presentation</code>, <code>view.trigger</code></td>
+<td>Its current state</td>
+</tr>
+<tr>
+<td><code>view.miniature</code></td>
+<td>The miniature, when that presentation is active, with <code>object</code> and <code>moveTo(x, y, z)</code></td>
+</tr>
+<tr>
+<td><code>view.dispose()</code></td>
+<td>Removes its objects from the scene</td>
+</tr>
+<tr>
+<td><code>createSpatialTooltip({ camera, overlay })</code></td>
+<td>Returns a tooltip with <code>show(point, text, { seconds? })</code>, <code>hide()</code>, <code>update(dt)</code>, <code>dispose()</code></td>
+</tr>
+<tr>
+<td><code>voxelize(geometry, size)</code>, <code>mergeGeometry(object)</code></td>
+<td>The steps <code>attachAttention</code> uses</td>
+</tr>
+</tbody></table>
+<p><code>createAttentionView</code> takes <code>session</code>, <code>attached</code>, <code>viewer</code>, <code>camera</code> and <code>scene</code>, and optionally <code>presentation</code>, <code>trigger</code>, <code>accumulator</code>, <code>colour</code>, <code>threshold</code>, <code>layer</code>, <code>overlay</code> and <code>style</code>. With nothing else set, you get HeedVision&#39;s own configuration: world-space, embedded, and explicitly triggered.</p>
+<h3 id="caav-react"><code>caav/react</code></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>useAttentionSession(options?)</code></td>
+<td>A session that ticks with the render loop</td>
+</tr>
+<tr>
+<td><code>useAttachAttention(session, ref, options?)</code></td>
+<td>Attaches to the object in a ref</td>
+</tr>
+<tr>
+<td><code>useHeadTrackedViewer(session, { id, colour, label? })</code></td>
+<td>Registers this canvas&#39;s camera as a person</td>
+</tr>
+<tr>
+<td><code>useAttentionView(session, attached, viewer, settings?)</code></td>
+<td>One person&#39;s view in this canvas</td>
+</tr>
+</tbody></table>
+<h2 id="limits">Limits</h2>
+<ul>
+<li><strong>No network sync.</strong> All people share one session in one page. To connect headsets, send gaze rays or recorded values over your own connection.</li>
+<li><strong>Not yet run on a headset.</strong> Head rays come from a three.js camera and an XR camera should fit, but WebXR has not been tested.</li>
+<li><strong>No eye tracking built in.</strong> The source interface is ready for it.</li>
+<li><strong>Fixed geometry.</strong> Voxels are computed from the geometry when you attach. For an object that changes shape, call <code>setVoxelSize</code> again, which also clears its attention.</li>
+<li><strong>One attention region per sample.</strong> The paper&#39;s data-agnostic capture, which would record every voxel a ray passes through, is not implemented.</li>
+</ul>
+<h2 id="where-this-differs-from-the-paper">Where this differs from the paper</h2>
+<ul>
+<li>The paper blends colours additively. Here the default blend is the OKLab one described above, and you can choose a fixed colour instead.</li>
+<li>The paper&#39;s region of influence is a single voxel, which is the default here too. <code>influenceRadius</code> lets you widen it.</li>
+<li>The paper&#39;s system uses Spatialstrates for syncing and was evaluated in world-space, embedded, explicit mode. The other three quadrants were proofs of concept there, and they are unevaluated here too.</li>
+</ul>
+</article>
+    </main>
+  </body>
+</html>
