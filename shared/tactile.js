@@ -89,8 +89,8 @@
     sent: function (c, d, t) { tone(c, d, t, 587, 0.07, 0.1); tone(c, d, t + 0.08, 880, 0.07, 0.15); },
     // a small bell, rising
     like: function (c, d, t) { tone(c, d, t, 740, 0.09, 0.16); tone(c, d, t + 0.07, 1109, 0.08, 0.24); tone(c, d, t + 0.07, 2218, 0.016, 0.2); },
-    // three bites of a biscuit, then a pleased little note
-    cookie: function (c, d, t) { tick(c, d, t, 1700, 0.8, 0.26, 0.03); tick(c, d, t + 0.05, 2600, 0.8, 0.2, 0.028); tick(c, d, t + 0.095, 1500, 0.8, 0.24, 0.034); tone(c, d, t + 0.16, 784, 0.06, 0.16); tone(c, d, t + 0.23, 1175, 0.06, 0.24); },
+    // three bites of a biscuit
+    cookie: function (c, d, t) { tick(c, d, t, 1700, 0.8, 0.26, 0.03); tick(c, d, t + 0.05, 2600, 0.8, 0.2, 0.028); tick(c, d, t + 0.095, 1500, 0.8, 0.24, 0.034); },
   };
   // browsers allow sound only after a press or a key, so nothing starts before then
   function wake() {
@@ -136,7 +136,7 @@
   }
 
   // ------------------------------------------------------------ a small celebration
-  // A handful of hearts or crumbs from a control. They float above the page, so nothing else moves.
+  // A handful of hearts bursting from a control, or crumbs falling from it. They float above the page, so nothing else moves.
   var HEART = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor"><path d="M12 21s-8.5-5.2-10-10.5C1 6.5 3.500 4 6.500 4c2.200 0 4 1.200 5.500 3.200C13.500 5.200 15.300 4 17.500 4 20.500 4 23 6.500 22 10.500 20.500 15.800 12 21 12 21z"/></svg>';
   var calm = matchMedia("(prefers-reduced-motion: reduce)");
   function burst(el, kind) {
@@ -152,14 +152,18 @@
       var p = document.createElement("span"), size = hearts ? 9 + Math.random() * 7 : 4 + Math.random() * 6;
       var angle = -Math.PI / 2 + (i / (n - 1) - 0.5) * Math.PI * 1.25 + (Math.random() - 0.5) * 0.3, dist = 42 + Math.random() * 52;
       var dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist, spin = (Math.random() - 0.5) * 300;
-      p.style.cssText = "position:absolute;left:" + (cx - size / 2) + "px;top:" + (cy - size / 2) + "px;width:" + size + "px;height:" + size + "px;color:" + colours[i % 3] + ";" + (hearts ? "" : "background:currentColor;border-radius:" + (35 + Math.random() * 30) + "% " + (40 + Math.random() * 30) + "%;");
+      var startX = hearts ? cx : el.getBoundingClientRect().left + Math.random() * el.getBoundingClientRect().width;
+      p.style.cssText = "position:absolute;left:" + (startX - size / 2) + "px;top:" + (cy - size / 2) + "px;width:" + size + "px;height:" + size + "px;color:" + colours[i % 3] + ";" + (hearts ? "" : "background:currentColor;border-radius:" + (35 + Math.random() * 30) + "% " + (40 + Math.random() * 30) + "%;");
       if (hearts) p.innerHTML = HEART;
       layer.appendChild(p);
-      p.animate([
+      p.animate(hearts ? [
         { transform: "translate(0, 0) scale(0.4) rotate(0deg)", opacity: 1 },
         { transform: "translate(" + dx + "px, " + dy + "px) scale(1) rotate(" + spin * 0.7 + "deg)", opacity: 1, offset: 0.55 },
         { transform: "translate(" + dx * 1.15 + "px, " + (dy + 34) + "px) scale(0.8) rotate(" + spin + "deg)", opacity: 0 },
-      ], { duration: 650 + Math.random() * 250, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" }).onfinish = function () { if (--left === 0) layer.remove(); };
+      ] : [
+        { transform: "translate(0, 0) rotate(0deg)", opacity: 1 },
+        { transform: "translate(" + (Math.random() - 0.5) * 16 + "px, " + (46 + Math.random() * 54) + "px) rotate(" + spin + "deg)", opacity: 0 },
+      ], { duration: hearts ? 650 + Math.random() * 250 : 520 + Math.random() * 260, delay: hearts ? 0 : Math.random() * 110, fill: "backwards", easing: hearts ? "cubic-bezier(0.2, 0.7, 0.3, 1)" : "cubic-bezier(0.45, 0, 0.9, 0.6)" }).onfinish = function () { if (--left === 0) layer.remove(); };
     }
     document.body.appendChild(layer);
     var mark = el.querySelector("svg");

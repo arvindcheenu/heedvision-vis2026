@@ -4,7 +4,7 @@
 //
 //   GET /rooms/:room/ws      WebSocket (add ?key=PRESENTER_KEY to present)
 //   GET /rooms/:room/state   current slide, visible questions and script edits as JSON
-//   GET /rooms/:room/stats   visits to the paper page by hour, and likes
+//   GET /rooms/:room/stats   visits to the paper page by hour, likes, and the toolkit's GitHub stars
 //   POST /rooms/:room/hit    counts one visit. Stores a number per hour, nothing about the visitor
 //   POST /rooms/:room/like   {target: "paper" | "slides", cid, on}
 import { DurableObject } from "cloudflare:workers";
@@ -16,6 +16,8 @@ const MAX_NOTES = 12000;
 const MAX_ANSWER = 1200;
 const LIKE_TARGETS = ["paper", "slides"];
 const HOUR = 3_600_000;
+const STARS_REPO = "arvindcheenu/caav";
+const STARS_EVERY = 120_000; // GitHub allows 60 anonymous requests an hour, and the relay shares its address
 
 export default {
   async fetch(req, env) {
@@ -61,7 +63,12 @@ export class Room extends DurableObject {
     if (url.pathname.endsWith("/state")) {
       return Response.json({ slide: this.slide(), questions: this.questions(false), notes: this.notes() });
     }
-    if (url.pathname.endsWith("/stats")) return Response.json(this.stats());
+    if (url.pathname.endsWith("/stats")) {
+      // the first ever request waits for the count; after that, answer at once and refresh behind the scenes
+      if (this.stats().stars === null) await this.refreshStars();
+      else this.ctx.waitUntil(this.refreshStars());
+      return Response.json(this.stats());
+    }
     if (url.pathname.endsWith("/hit") || url.pathname.endsWith("/like")) {
       if (req.method !== "POST") return new Response("Use POST\n", { status: 405 });
       const who = req.headers.get("CF-Connecting-IP") || "local";
@@ -179,11 +186,30 @@ export class Room extends DurableObject {
   stats() {
     const since = Math.floor(Date.now() / HOUR) - 24 * 7;
     const likes = Object.fromEntries(LIKE_TARGETS.map((t) => [t, this.sql.exec("SELECT COUNT(*) AS n FROM likes WHERE target = ?", t).one().n]));
+    const stars = this.sql.exec("SELECT v FROM meta WHERE k = 'stars'").toArray()[0];
     return {
+      stars: stars ? JSON.parse(stars.v).n : null,
       visits: this.sql.exec("SELECT COALESCE(SUM(n), 0) AS n FROM visits").one().n,
       hours: this.sql.exec("SELECT hour, n FROM visits WHERE hour >= ? ORDER BY hour", since).toArray(),
       likes,
     };
+  }
+
+  // The relay asks GitHub, not each visitor, and shares the answer. A failed check keeps the last count.
+  async refreshStars() {
+    const row = this.sql.exec("SELECT v FROM meta WHERE k = 'stars'").toArray()[0];
+    const had = row ? JSON.parse(row.v) : null;
+    if ((had && Date.now() - had.ts < STARS_EVERY) || this.starsBusy) return;
+    this.starsBusy = true;
+    try {
+      const r = await fetch(`https://api.github.com/repos/${STARS_REPO}`, { headers: { "User-Agent": "heedvision-live", Accept: "application/vnd.github+json" } });
+      if (r.ok) {
+        const n = (await r.json()).stargazers_count;
+        if (Number.isInteger(n)) this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('stars', ?)", JSON.stringify({ n, ts: Date.now() }));
+      } else if (had) {
+        this.sql.exec("INSERT OR REPLACE INTO meta (k, v) VALUES ('stars', ?)", JSON.stringify({ n: had.n, ts: Date.now() }));
+      }
+    } catch {} finally { this.starsBusy = false; }
   }
 
   slide() {

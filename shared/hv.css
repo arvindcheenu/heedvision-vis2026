@@ -329,6 +329,8 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 .like-btn.off, .reach.off > p, .reach.off > .vel, .reach.off > .vel-span { visibility: hidden; }
 .like-row { margin: 14px 0 0; }
 .star-row { margin: 2px 0 0; }
+.star-btn .n { font-variant-numeric: tabular-nums; }
+.star-btn .n:empty { display: none; }
 /* Font Awesome's duotone star, made solid */
 .star-btn svg { color: var(--title); --fa-secondary-opacity: 1; --fa-primary-opacity: 1; }
 .reach { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 44px; margin: 12px 0 0; font-size: 14.5px; color: var(--fg-2); }

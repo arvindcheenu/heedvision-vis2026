@@ -84,6 +84,20 @@
     box.removeAttribute("aria-busy");
   }
 
+  // ------------------------------------------------------------ GitHub stars, kept current while the page is open
+  function drawStars(n) {
+    if (typeof n !== "number") return;
+    document.querySelectorAll("[data-stars]").forEach(function (el) {
+      el.textContent = n.toLocaleString();
+      var b = el.closest("a");
+      if (b) b.setAttribute("aria-label", "Star caav on GitHub, " + n + (n === 1 ? " star" : " stars"));
+    });
+  }
+  setInterval(function () {
+    if (document.hidden || !document.querySelector("[data-stars]")) return;
+    fetch(BASE + "/stats").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) drawStars(d.stars); }).catch(function () {});
+  }, 60000);
+
   // ------------------------------------------------------------ start
   function start() {
     var box = document.querySelector("[data-reach]");
@@ -97,6 +111,7 @@
     }).then(function (d) {
       counts = d.likes;
       drawLikes();
+      drawStars(d.stars);
       if (box && d.visits > 0) velocity(box, d.hours, d.visits);
       else if (box) box.classList.add("off");
     }).catch(function () {
