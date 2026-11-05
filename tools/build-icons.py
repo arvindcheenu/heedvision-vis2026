@@ -30,7 +30,7 @@ def main():
     licence = re.search(r"<!--![\s\S]*?-->", text).group(0)
     aliases = [l.split("\t") for l in (ROOT / "shared/icons.tsv").read_text().splitlines() if l and not l.startswith("#")]
     names = set()
-    for f in ["index.html", "talk/index.html", "slides/present.html", "shared/site.js", "shared/tactile.js", "slides/js/present.js"]:
+    for f in ["index.html", "talk/index.html", "slides/present.html", "shared/site.js", "shared/tactile.js", "shared/consent.js", "slides/js/present.js"]:
         names |= set(re.findall(r'data-fa="([a-z0-9-]+)"', (ROOT / f).read_text()))
     for f in list((ROOT / "toolkit").glob("**/*.html")) + list((ROOT / "toolkit/assets").glob("*.js")):
         names |= set(re.findall(r'data-fa="([a-z0-9-]+)"', f.read_text()))

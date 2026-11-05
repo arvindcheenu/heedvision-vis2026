@@ -87,6 +87,10 @@
     on: function (c, d, t) { tone(c, d, t, 620, 0.07, 0.06); tone(c, d, t + 0.05, 930, 0.07, 0.08); },
     off: function (c, d, t) { tone(c, d, t, 930, 0.06, 0.06); tone(c, d, t + 0.05, 620, 0.06, 0.08); },
     sent: function (c, d, t) { tone(c, d, t, 587, 0.07, 0.1); tone(c, d, t + 0.08, 880, 0.07, 0.15); },
+    // a small bell, rising
+    like: function (c, d, t) { tone(c, d, t, 740, 0.09, 0.16); tone(c, d, t + 0.07, 1109, 0.08, 0.24); tone(c, d, t + 0.07, 2218, 0.016, 0.2); },
+    // three bites of a biscuit, then a pleased little note
+    cookie: function (c, d, t) { tick(c, d, t, 1700, 0.8, 0.26, 0.03); tick(c, d, t + 0.05, 2600, 0.8, 0.2, 0.028); tick(c, d, t + 0.095, 1500, 0.8, 0.24, 0.034); tone(c, d, t + 0.16, 784, 0.06, 0.16); tone(c, d, t + 0.23, 1175, 0.06, 0.24); },
   };
   // browsers allow sound only after a press or a key, so nothing starts before then
   function wake() {
@@ -123,10 +127,43 @@
       if (!c) return;
       if (e.detail === 0) play("press");
       // read a switch's state once its own handler has changed it
+      // liking and agreeing to cookies have sounds of their own, played by what handles them
+      if (c.hasAttribute("data-like") ? c.getAttribute("aria-pressed") === "false" : c.hasAttribute("data-yes")) return;
       if (c.hasAttribute("aria-pressed")) setTimeout(function () { play(c.getAttribute("aria-pressed") === "true" ? "on" : "off"); }, 0);
       else if (e.detail !== 0) play("release");
     });
     document.addEventListener("submit", function () { play("sent"); });
+  }
+
+  // ------------------------------------------------------------ a small celebration
+  // A handful of hearts or crumbs from a control. They float above the page, so nothing else moves.
+  var HEART = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor"><path d="M12 21s-8.5-5.2-10-10.5C1 6.5 3.500 4 6.500 4c2.200 0 4 1.200 5.500 3.200C13.500 5.200 15.300 4 17.500 4 20.500 4 23 6.500 22 10.500 20.500 15.800 12 21 12 21z"/></svg>';
+  var calm = matchMedia("(prefers-reduced-motion: reduce)");
+  function burst(el, kind) {
+    if (calm.matches || !el.animate) return;
+    var r = (el.querySelector("svg") || el).getBoundingClientRect(), hearts = kind === "heart";
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    var colours = hearts ? ["var(--accent, #bb4a72)", "var(--title, #df6824)", "var(--both, #ec4f9c)"] : ["#a9714b", "#d9a066", "#6b3f26"];
+    var layer = document.createElement("div");
+    layer.setAttribute("aria-hidden", "true");
+    layer.style.cssText = "position:fixed;inset:0;z-index:95;pointer-events:none;overflow:hidden";
+    var n = hearts ? 12 : 14, left = n;
+    for (var i = 0; i < n; i++) {
+      var p = document.createElement("span"), size = hearts ? 9 + Math.random() * 7 : 4 + Math.random() * 6;
+      var angle = -Math.PI / 2 + (i / (n - 1) - 0.5) * Math.PI * 1.25 + (Math.random() - 0.5) * 0.3, dist = 42 + Math.random() * 52;
+      var dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist, spin = (Math.random() - 0.5) * 300;
+      p.style.cssText = "position:absolute;left:" + (cx - size / 2) + "px;top:" + (cy - size / 2) + "px;width:" + size + "px;height:" + size + "px;color:" + colours[i % 3] + ";" + (hearts ? "" : "background:currentColor;border-radius:" + (35 + Math.random() * 30) + "% " + (40 + Math.random() * 30) + "%;");
+      if (hearts) p.innerHTML = HEART;
+      layer.appendChild(p);
+      p.animate([
+        { transform: "translate(0, 0) scale(0.4) rotate(0deg)", opacity: 1 },
+        { transform: "translate(" + dx + "px, " + dy + "px) scale(1) rotate(" + spin * 0.7 + "deg)", opacity: 1, offset: 0.55 },
+        { transform: "translate(" + dx * 1.15 + "px, " + (dy + 34) + "px) scale(0.8) rotate(" + spin + "deg)", opacity: 0 },
+      ], { duration: 650 + Math.random() * 250, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" }).onfinish = function () { if (--left === 0) layer.remove(); };
+    }
+    document.body.appendChild(layer);
+    var mark = el.querySelector("svg");
+    if (mark) mark.animate([{ transform: "scale(1)" }, { transform: "scale(1.4)", offset: 0.4 }, { transform: "scale(1)" }], { duration: 320, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" });
   }
 
   // ------------------------------------------------------------ the switch
@@ -205,5 +242,5 @@
     lastY = y;
   }, { passive: true });
 
-  var api = window.HVTactile = { isOn: isOn, play: play, voices: VOICES, last: null, state: function () { return ctx ? ctx.state : "not started"; } };
+  var api = window.HVTactile = { isOn: isOn, play: play, burst: burst, voices: VOICES, last: null, state: function () { return ctx ? ctx.state : "not started"; } };
 })();

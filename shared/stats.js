@@ -32,6 +32,7 @@
     put("hv.liked." + t, on ? "1" : null);
     counts[t] = Math.max(0, was + (on ? 1 : -1));
     drawLikes();
+    if (on && window.HVTactile) { window.HVTactile.play("like"); window.HVTactile.burst(b, "heart"); }
     post("/like", { target: t, cid: clientId(), on: on }).then(function (r) {
       if (!r.ok) throw new Error(r.status);
       return r.json();
@@ -62,7 +63,7 @@
     var when = function (d) { return new Date(d.hour * 3600000).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric" }); };
     box.querySelector("[data-visits]").textContent = total.toLocaleString() + (total === 1 ? " visit" : " visits");
     box.querySelector("[data-recent]").textContent = last24.toLocaleString() + " in the last day";
-    var svg = box.querySelector("svg");
+    var svg = box.querySelector(".vel svg");
     svg.setAttribute("aria-label", "Visits every six hours over the last seven days. " + last24 + " in the last day. The busiest six hours had " + peak + ".");
     svg.innerHTML = '<path class="vel-area" d="' + line + " L" + x(BINS - 1) + " " + (H - B) + " L" + x(0) + " " + (H - B) + ' Z"/><path class="vel-line" d="' + line + '"/><line class="vel-cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" hidden/><circle class="vel-dot" r="4" cx="' + x(BINS - 1) + '" cy="' + y(end.n) + '"/>';
     var dot = svg.querySelector(".vel-dot"), cross = svg.querySelector(".vel-cross"), tip = box.querySelector(".vz-tip");

@@ -316,6 +316,9 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 /* ---------- likes, visits and how fast they're coming in ---------- */
 /* the count has room from the start, and 9 to 10 doesn't move anything */
 .like-btn .n { display: inline-block; min-width: 3ch; text-align: left; font-variant-numeric: tabular-nums; }
+/* Font Awesome's duotone heart is all in its pale layer: make it solid */
+.like-btn svg { color: var(--accent); --fa-secondary-opacity: 1; }
+.like-btn[aria-pressed="true"] svg { color: inherit; }
 .like-btn[aria-busy] { cursor: default; }
 .like-btn[aria-busy] .n { color: transparent; border-radius: 4px; background: var(--line); animation: skel 1.1s ease-in-out infinite alternate; }
 .like-btn.off, .reach.off > p, .reach.off > .vel { visibility: hidden; }
