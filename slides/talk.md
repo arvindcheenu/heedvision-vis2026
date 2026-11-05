@@ -51,6 +51,7 @@ Blocks (`step` shows one on a click, `step=2` fixes its click number, `wide` spa
   ::caveat text="…"                      a footnote
   :::stack … :::  :::row … :::  :::grid cols=3 … :::    under, beside, or in a grid
   ::demo  ::bvh  ::hv  ::live  ::designspace            the animations
+  ::designspace next="world-separated" next-badge="…"   on a click, moves the highlight to these quadrants
 
 Math: $x^2$ and $$x^2$$. Diagrams: a fenced ```mermaid block. Research questions: <span class="rq">…</span>.
 Colours and type for every slide are at the top of shared/hv.css and slides/css/deck.css.
@@ -295,6 +296,23 @@ To make voxels for a chart, we first wrap its geometry in a bounding volume hier
 [click] Then we lay a grid over it. The boxes quickly rule out most cells, and only cells touching the geometry become voxels, so attention sticks to the chart.
 
 [click] Ten times a second, a ray goes out from each person's head and hits the nearest voxel, which gains attention for that person. Capture is head-based, so it works across consumer devices.
+:::
+
+---
+id: design-space-others
+layout: full
+chapter: System
+time: 7
+---
+
+# Display: a design space
+
+::designspace badge="HeedVision" highlight=world-embedded trigger=explicit next="world-separated camera-embedded camera-separated" next-badge="Prototype"
+
+:::notes
+That's the corner HeedVision covers.
+
+[click] But the design space has three more.
 :::
 
 ---

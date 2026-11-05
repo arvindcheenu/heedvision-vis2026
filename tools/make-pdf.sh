@@ -10,5 +10,10 @@ OUT="${OUT:-slides/heedvision-slides.pdf}"
 curl -sf -o /dev/null "$BASE/slides/index.html" || { echo "No server on $BASE; start one with: node tools/serve.mjs" >&2; exit 1; }
 CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
-"$CHROME" --headless=new --hide-scrollbars --mute-audio --no-pdf-header-footer --virtual-time-budget=15000 --user-data-dir="$TMP" --print-to-pdf="$OUT" "$BASE/slides/?view=print&theme=${THEME:-light}" >/dev/null 2>&1
-echo "wrote $OUT"
+# Chrome sometimes prints before the slides' links are ready, so check for them and try again.
+for try in 1 2 3; do
+  "$CHROME" --headless=new --hide-scrollbars --mute-audio --no-pdf-header-footer --virtual-time-budget=15000 --user-data-dir="$TMP" --print-to-pdf="$OUT" "$BASE/slides/?view=print&theme=${THEME:-light}" >/dev/null 2>&1
+  LINKS="$(LC_ALL=C grep -a -o '/Subtype */Link' "$OUT" | wc -l | tr -d ' ')"
+  if [ "$LINKS" -gt 0 ]; then echo "wrote $OUT, with $LINKS links"; exit 0; fi
+done
+echo "$OUT has no links after 3 tries" >&2; exit 1

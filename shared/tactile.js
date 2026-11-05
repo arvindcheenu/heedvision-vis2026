@@ -171,9 +171,10 @@
     function update() {
       queued = false;
       var max = el.scrollHeight - el.clientHeight, top = el.scrollTop, can = max > 4;
-      el.style.setProperty("--fade-t", (can ? Math.min(top, 28) : 0) + "px");
-      el.style.setProperty("--fade-b", (can ? Math.min(max - top, 28) : 0) + "px");
-      el.classList.toggle("scrolled", top > 2);
+      // these change only at the ends of the list, so nothing repaints on every frame of a scroll
+      var t = can && top > 2, b = can && max - top > 2;
+      if (t !== el.hvT) { el.hvT = t; el.style.setProperty("--fade-t", t ? "28px" : "0px"); }
+      if (b !== el.hvB) { el.hvB = b; el.style.setProperty("--fade-b", b ? "28px" : "0px"); }
       el.classList.toggle("more", can && max - top > 2);
       if (bar) {
         bar.hidden = !can;
@@ -195,15 +196,7 @@
 
   // The controls in the corner stay put. Reading down, they step back; scrolling up, they come forward.
   var tools = null, lastY = 0;
-  // the blur at the window's edges only starts once there's something passing under it
-  function edges() {
-    root.classList.toggle("page-scrolled", scrollY > 4);
-    root.classList.toggle("page-end", scrollY + innerHeight >= root.scrollHeight - 4);
-  }
-  addEventListener("load", edges);
-  addEventListener("resize", edges, { passive: true });
   addEventListener("scroll", function () {
-    edges();
     tools = tools || document.querySelector(".page-tools");
     if (!tools) return;
     var y = scrollY;

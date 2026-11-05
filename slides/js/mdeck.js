@@ -234,11 +234,12 @@
     // highlight / done take one or more quadrant ids: world-embedded world-separated camera-embedded camera-separated
     designspace(a) {
       const list = (v) => String(v || "").split(/[\s,]+/).filter(Boolean);
-      const hl = list(a.highlight || "world-embedded"), done = list(a.done);
+      const hl = list(a.highlight || "world-embedded"), done = list(a.done), next = list(a.next);
       const q = (id, label, svg, f) => {
         const on = hl.includes(id), was = done.includes(id);
-        const badge = on && a.badge ? a.badge : was && a["done-badge"] ? a["done-badge"] : "";
-        return `<div class="quad${on ? " hv" : ""}${was ? " done" : ""}${a.steps ? ` fragment fade-up" data-fragment-index="${f}` : ""}"><span class="q-label">${label}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ""}${svg}</div>`;
+        const after = next.includes(id);
+        const badge = on && a.badge ? a.badge : was && a["done-badge"] ? a["done-badge"] : after && a["next-badge"] ? a["next-badge"] : "";
+        return `<div class="quad${on ? " hv" : ""}${was ? " done" : ""}${after ? " next" : ""}${a.steps ? ` fragment fade-up" data-fragment-index="${f}` : ""}"><span class="q-label">${label}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ""}${svg}</div>`;
       };
       const trig = (id, label, sub, icon) => `<div class="trig-item${id === (a.trigger || "explicit") ? " hv" : ""}"><svg><use href="#i-${icon}"/></svg><div><b>${label}</b><span>${sub}</span></div></div>`;
       return wrap("div", a, `c-ds${a.trigger === "none" ? " no-trig" : ""}`, `
@@ -246,7 +247,7 @@
         <div class="axis-y">World space</div>${q("world-embedded", "World · embedded", DS.we, 1)}${q("world-separated", "World · separated", DS.ws, 1)}
         <div class="trig${a.steps ? ' fragment fade-up" data-fragment-index="3' : ""}">${trig("always", "Always on", "risks Midas touch", "loop")}${trig("explicit", "Explicit", "you ask to see it", "hand")}${trig("implicit", "Implicit", "the system decides", "bolt")}</div>
         <div class="axis-y">Camera space</div>${q("camera-embedded", "Camera · embedded", DS.ce, 2)}${q("camera-separated", "Camera · separated", DS.cs, 2)}
-        ${a.steps ? '<span class="fragment step" data-fragment-index="4" data-ds-pick></span>' : ""}`, a.steps ? "" : ' data-picked');
+        ${a.steps ? '<span class="fragment step" data-fragment-index="4" data-ds-pick></span>' : ""}${next.length ? '<span class="fragment step" data-fragment-index="0" data-ds-next></span>' : ""}`, a.steps ? "" : ' data-picked');
     },
 
     caveat: (a, body) => wrap("p", a, "c-caveat", mdi((body || a.text || "").trim())),

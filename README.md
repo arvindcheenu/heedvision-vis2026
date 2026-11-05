@@ -69,6 +69,8 @@ Font, corners and palette live in one file, `shared/theme.css`. Change them ther
 
 Shared components are in `shared/hv.css`, one block each. The slides' own sizes, and what each colour means, are in `slides/css/deck.css`. Everything is flat colour, apart from the light that follows the cursor. Light, dark and system are in each page's footer and the slides' controls, and **T** cycles them.
 
+Hold ⌘ (Ctrl on Windows) on any page and each control shows a key; press it while still holding, using `shared/keys.js`. Hints wait a quarter of a second, so ordinary shortcuts are untouched, and they stay off the projected slides.
+
 `shared/tactile.js` adds that light and the sounds, which it synthesizes, so there are no audio files. The speaker button turns sounds on or off, and the choice is remembered. On the paper and script pages they start on with a mouse and off on a phone. The presenter view has its own switch, off until you turn it on, because that laptop usually feeds the room's speakers. The slides have `data-silent` on `<html>` and never make a sound.
 
 **Icons.** Font Awesome Pro duotone, in `shared/icons.svg`, which holds only the icons this site uses. Choose an icon with `data-fa="name"` on an `<svg>`, or in `shared/icons.tsv` for slides, then run `python3 tools/build-icons.py`, which fetches the full set from the private `arvindcheenu/chimistry-vendor` repository.

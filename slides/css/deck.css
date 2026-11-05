@@ -204,6 +204,13 @@
 .c-ds.picked .hv, .c-ds[data-picked] .hv { color: var(--accent); }
 .c-ds.picked .quad.hv, .c-ds[data-picked] .quad.hv { background: color-mix(in srgb, var(--both) 13%, transparent); }
 .c-ds.picked .badge, .c-ds[data-picked] .badge { opacity: 1; }
+/* a second look at the same grid: on the click, the highlight moves to the other quadrants */
+.c-ds[data-picked] .quad.next .badge { opacity: 0; }
+.c-ds[data-picked].swapped .quad.next { opacity: 1; color: var(--accent); background: color-mix(in srgb, var(--both) 13%, transparent); }
+.c-ds[data-picked].swapped .quad.next .badge { opacity: 1; }
+.c-ds[data-picked].swapped .quad.hv { opacity: 0.32; color: inherit; background: transparent; }
+.c-ds[data-picked].swapped .quad.hv .badge { opacity: 0; }
+.c-ds[data-picked].swapped .trig-item { opacity: 0.32; color: inherit; }
 
 /* clips */
 .c-clip { margin: 0; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
