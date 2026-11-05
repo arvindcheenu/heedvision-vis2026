@@ -133,7 +133,7 @@ To try all of this without touching the real room, run `npx wrangler dev --port 
 
 ## Likes and visits
 
-`shared/stats.js` shows like buttons on the paper and script pages, and on the paper page a visit count with a velocity graph of visits every six hours over the last week. They live on the relay: `GET /rooms/vis2026/stats`, `POST /hit` and `POST /like`. A visit is a number added to an hour, and nothing about the visitor is stored. A like stores a random id kept in that browser, so it can be taken back. Local work, automated browsers and anyone asking not to be tracked aren't counted. If the relay can't answer, none of this shows.
+`shared/stats.js` shows like buttons on the paper and script pages, and on the paper page a visit count with a small graph of visits: by the hour over the last day, or every six hours over the last week once there is more than a day to show. They live on the relay: `GET /rooms/vis2026/stats`, `POST /hit` and `POST /like`. A visit is a number added to an hour, and nothing about the visitor is stored. A like stores a random id kept in that browser, so it can be taken back. Local work, automated browsers and anyone asking not to be tracked aren't counted. If the relay can't answer, none of this shows.
 
 ## Tools
 

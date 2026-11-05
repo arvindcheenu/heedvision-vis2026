@@ -1,4 +1,4 @@
-// Likes, the visit count and its velocity graph, from the live relay. If the relay can't answer, none of
+// Likes, the visit count and a small graph of how fast visits are coming in, from the live relay. If the relay can't answer, none of
 // this shows and the pages work as usual. Their space is reserved from the start, so nothing moves. A visit is one number added to an hour: nothing about the visitor
 // is stored. Local work and automated browsers aren't counted, and neither is anyone asking not to be tracked.
 (function () {
@@ -45,36 +45,40 @@
   });
 
   // ------------------------------------------------------------ velocity: how fast visits are coming in
-  var BIN = 6, BINS = 28; // six hours at a time, over the last seven days
-  function bins(hours) {
-    var now = Math.floor(Date.now() / 3600000), end = now - now % BIN, out = [];
-    for (var i = BINS - 1; i >= 0; i--) out.push({ hour: end - i * BIN, n: 0 });
+  // The last day, by the hour, until there's more than a day to show; then the last week, six hours at a time.
+  function span(hours) {
+    var now = Math.floor(Date.now() / 3600000);
+    return hours.length && hours[0].hour <= now - 24 ? { size: 6, count: 28, label: "last 7 days" } : { size: 1, count: 24, label: "last 24 hours" };
+  }
+  function bins(hours, s) {
+    var now = Math.floor(Date.now() / 3600000), end = now - now % s.size, first = end - (s.count - 1) * s.size, out = [];
+    for (var i = 0; i < s.count; i++) out.push({ hour: first + i * s.size, n: 0 });
     hours.forEach(function (h) {
-      var at = Math.floor((h.hour - (end - (BINS - 1) * BIN)) / BIN);
+      var at = Math.floor((h.hour - first) / s.size);
       if (out[at]) out[at].n += h.n;
     });
     return out;
   }
   function velocity(box, hours, total) {
-    var data = bins(hours), W = 220, H = 44, T = 6, B = 4, peak = Math.max.apply(null, data.map(function (d) { return d.n; }).concat(1));
-    var x = function (i) { return 4 + i * (W - 8) / (BINS - 1); }, y = function (n) { return H - B - n * (H - T - B) / peak; };
+    var s = span(hours), data = bins(hours, s), COUNT = s.count, W = 112, H = 28, T = 4, B = 3, peak = Math.max.apply(null, data.map(function (d) { return d.n; }).concat(1));
+    var x = function (i) { return 3 + i * (W - 6) / (COUNT - 1); }, y = function (n) { return H - B - n * (H - T - B) / peak; };
     var line = data.map(function (d, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(d.n).toFixed(1); }).join(" ");
-    var last24 = data.slice(-4).reduce(function (s, d) { return s + d.n; }, 0), end = data[BINS - 1];
+    var inSpan = data.reduce(function (t, d) { return t + d.n; }, 0), end = data[COUNT - 1];
     var when = function (d) { return new Date(d.hour * 3600000).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric" }); };
     box.querySelector("[data-visits]").textContent = total.toLocaleString() + (total === 1 ? " visit" : " visits");
-    box.querySelector("[data-recent]").textContent = last24.toLocaleString() + " in the last day";
+    box.querySelector("[data-span]").textContent = s.label;
     var svg = box.querySelector(".vel svg");
-    svg.setAttribute("aria-label", "Visits every six hours over the last seven days. " + last24 + " in the last day. The busiest six hours had " + peak + ".");
-    svg.innerHTML = '<path class="vel-area" d="' + line + " L" + x(BINS - 1) + " " + (H - B) + " L" + x(0) + " " + (H - B) + ' Z"/><path class="vel-line" d="' + line + '"/><line class="vel-cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" hidden/><circle class="vel-dot" r="4" cx="' + x(BINS - 1) + '" cy="' + y(end.n) + '"/>';
+    svg.setAttribute("aria-label", inSpan + (inSpan === 1 ? " visit" : " visits") + " in the " + s.label + ". The busiest " + (s.size === 1 ? "hour" : "six hours") + " had " + peak + ".");
+    svg.innerHTML = '<path class="vel-area" d="' + line + " L" + x(COUNT - 1) + " " + (H - B) + " L" + x(0) + " " + (H - B) + ' Z"/><path class="vel-line" d="' + line + '"/><line class="vel-cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" hidden/><circle class="vel-dot" r="3" cx="' + x(COUNT - 1) + '" cy="' + y(end.n) + '"/>';
     var dot = svg.querySelector(".vel-dot"), cross = svg.querySelector(".vel-cross"), tip = box.querySelector(".vz-tip");
-    function reset() { dot.setAttribute("cx", x(BINS - 1)); dot.setAttribute("cy", y(end.n)); cross.setAttribute("hidden", ""); tip.hidden = true; }
+    function reset() { dot.setAttribute("cx", x(COUNT - 1)); dot.setAttribute("cy", y(end.n)); cross.setAttribute("hidden", ""); tip.hidden = true; }
     svg.onpointermove = function (e) {
-      var r = svg.getBoundingClientRect(), i = Math.max(0, Math.min(BINS - 1, Math.round(((e.clientX - r.left) * W / r.width - 4) * (BINS - 1) / (W - 8)))), d = data[i];
+      var r = svg.getBoundingClientRect(), i = Math.max(0, Math.min(COUNT - 1, Math.round(((e.clientX - r.left) * W / r.width - 3) * (COUNT - 1) / (W - 6)))), d = data[i];
       dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(d.n));
       cross.removeAttribute("hidden"); cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i));
       tip.hidden = false;
       tip.textContent = when(d) + ": " + d.n.toLocaleString() + (d.n === 1 ? " visit" : " visits");
-      tip.style.left = Math.max(0, Math.min(r.width - tip.offsetWidth, x(i) * r.width / W - tip.offsetWidth / 2)) + "px";
+      tip.style.left = (x(i) * r.width / W - tip.offsetWidth / 2) + "px";
     };
     svg.onpointerleave = reset;
     box.removeAttribute("aria-busy");

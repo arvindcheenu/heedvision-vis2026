@@ -318,28 +318,29 @@ mark.you, mark.partner, mark.both { color: inherit; padding: 0 0.14em; border-ra
 @media print { .edge-blur, .page-tools { display: none !important; } }
 
 /* ---------- likes, visits and how fast they're coming in ---------- */
-/* the count has room from the start, and 9 to 10 doesn't move anything */
-.like-btn .n { display: inline-block; min-width: 3ch; text-align: left; font-variant-numeric: tabular-nums; }
+.like-btn .n { display: inline-block; min-width: 1ch; text-align: left; font-variant-numeric: tabular-nums; }
+/* the button fits its count; the row keeps room for a longer one, so what follows stays put */
+.like-cell { display: inline-flex; min-width: 196px; }
 /* Font Awesome's duotone heart is all in its pale layer: make it solid */
 .like-btn svg { color: var(--accent); --fa-secondary-opacity: 1; }
 .like-btn[aria-pressed="true"] svg { color: inherit; }
 .like-btn[aria-busy] { cursor: default; }
 .like-btn[aria-busy] .n { color: transparent; border-radius: 4px; background: var(--line); animation: skel 1.1s ease-in-out infinite alternate; }
-.like-btn.off, .reach.off > p, .reach.off > .vel { visibility: hidden; }
+.like-btn.off, .reach.off > p, .reach.off > .vel, .reach.off > .vel-span { visibility: hidden; }
 .like-row { margin: 14px 0 0; }
 .star-row { margin: 2px 0 0; }
 /* Font Awesome's duotone star, made solid */
 .star-btn svg { color: var(--title); --fa-secondary-opacity: 1; --fa-primary-opacity: 1; }
 .reach { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 44px; margin: 12px 0 0; font-size: 14.5px; color: var(--fg-2); }
-.reach > p { width: 230px; margin: 0; white-space: nowrap; }
-.reach[aria-busy] > p b, .reach[aria-busy] > p span { display: inline-block; height: 12px; border-radius: 4px; background: var(--line); vertical-align: -1px; animation: skel 1.1s ease-in-out infinite alternate; }
+.reach > p { width: 92px; margin: 0; white-space: nowrap; }
+.reach[aria-busy] > p b, .reach[aria-busy] > .vel-span { display: inline-block; height: 12px; border-radius: 4px; background: var(--line); vertical-align: -1px; animation: skel 1.1s ease-in-out infinite alternate; }
 .reach[aria-busy] > p b { width: 58px; }
-.reach[aria-busy] > p span { width: 104px; }
+.reach[aria-busy] > .vel-span { width: 84px; }
 .reach[aria-busy] svg { border-radius: 6px; background: var(--line); animation: skel 1.1s ease-in-out infinite alternate; }
 .reach > p b { color: var(--fg); font-variant-numeric: tabular-nums; }
-.reach > p span { margin-left: 6px; }
-.vel { position: relative; width: 220px; }
-.vel svg { display: block; width: 100%; height: 44px; overflow: visible; touch-action: none; }
+.vel-span { display: inline-block; min-width: 92px; height: 1.4em; line-height: 1.4; font-size: 13.5px; color: var(--fg-3); white-space: nowrap; }
+.vel { position: relative; width: 112px; }
+.vel svg { display: block; width: 100%; height: 28px; overflow: visible; touch-action: none; }
 .vel-line { fill: none; stroke: var(--title); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .vel-area { fill: color-mix(in srgb, var(--title) 12%, transparent); }
 .vel-cross { stroke: var(--fg-3); stroke-width: 1; }
