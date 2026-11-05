@@ -163,7 +163,7 @@
       ] : [
         { transform: "translate(0, 0) rotate(0deg)", opacity: 1 },
         { transform: "translate(" + (Math.random() - 0.5) * 16 + "px, " + (46 + Math.random() * 54) + "px) rotate(" + spin + "deg)", opacity: 0 },
-      ], { duration: hearts ? 650 + Math.random() * 250 : 520 + Math.random() * 260, delay: hearts ? 0 : Math.random() * 110, fill: "backwards", easing: hearts ? "cubic-bezier(0.2, 0.7, 0.3, 1)" : "cubic-bezier(0.45, 0, 0.9, 0.6)" }).onfinish = function () { if (--left === 0) layer.remove(); };
+      ], { duration: hearts ? 650 + Math.random() * 250 : 520 + Math.random() * 260, delay: hearts ? 0 : Math.random() * 110, fill: "both", easing: hearts ? "cubic-bezier(0.2, 0.7, 0.3, 1)" : "cubic-bezier(0.45, 0, 0.9, 0.6)" }).onfinish = function () { if (--left === 0) layer.remove(); };
     }
     document.body.appendChild(layer);
     var mark = el.querySelector("svg");
