@@ -11,7 +11,7 @@ slug: Third-year PhD student, open to postdoc and industry positions
 url: https://heedvision.arvindchee.nu/talk/
 site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
 bullet: vis       # vis | triangle | dot | square | dash | none | a path to an image
-duration: 9.6     # minutes, for presenter-view pacing
+duration: 9.8     # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
 questions: on      # on | off | a link to the venue's Q&A tool
@@ -61,20 +61,20 @@ Colours and type for every slide are at the top of shared/hv.css and slides/css/
 id: title
 layout: title
 chapter: Motivation
-time: 18
+time: 21
 ---
 
 :::notes
 Hi everyone, I'm Arvind Srinivasan, and this is HeedVision, joint work with Niklas Elmqvist.
 
-When people analyze data together in augmented reality, we colour the data itself to show where each of them has already looked. And we study when that helps.
+Our paper opens with “attention is a scarce commodity”, so thank you for spending ten minutes of yours here. HeedVision shows two people, analyzing data together in augmented reality, where each has already looked.
 :::
 
 ---
 id: motivation
 layout: text-figure
 chapter: Motivation
-time: 25
+time: 26
 ---
 
 # Searching an abstract 3D space
@@ -90,18 +90,18 @@ time: 25
 ::caveat text="Example: Legetth et al., CellexalVR, iScience 2021. Image: Single Cell RNA Seq, illustrated UMAP, Ryan Kissinger, courtesy of NIAID (NIH BioArt 767), public domain, background changed."
 
 :::notes
-Picture an analyst in a headset, inside a 3D embedding of thousands of data points, looking for one rare cluster. Nothing in there is up or down.
+Picture an analyst in a headset, inside a 3D embedding of thousands of points, looking for one rare cluster. They can turn it any way they like.
 
-[click] There are few landmarks, because one cluster looks much like the next.
+[click] Which makes it hard to say where they've already been, because every cluster looks like its neighbour.
 
-[click] And it's too much to search alone, so you bring in a colleague.
+[click] So they ask a colleague to help. That brings a second problem.
 :::
 
 ---
 id: problem
 layout: figure-text
 chapter: Motivation
-time: 32
+time: 27
 ---
 
 # Who looked where?
@@ -115,11 +115,11 @@ time: 32
 :::
 
 :::notes
-Now there are two of you in the same space. These circles show where you're each looking, and neither of you can see the other's. What's missing is group awareness: the ability to perceive what your collaborators are doing.
+These circles are where each of you is looking, and neither can see the other's. You can't tell what your colleague has already checked. That's a group awareness problem.
 
-[click] In immersive 3D that's harder. Everyone has a different viewpoint, and everything happens in real time.
+[click] Immersive 3D makes it worse. You stand in different places, and you have to coordinate while you search.
 
-[click] So what if the space remembered who looked where, and coloured it like this?
+[click] So we asked: what if the space itself remembered who looked where?
 :::
 
 ---
@@ -134,7 +134,7 @@ time: 5
 ## From one viewer to many
 
 :::notes
-So we took attention-aware visualization from one viewer to many.
+For a single viewer, that idea already has a name.
 :::
 
 ---
@@ -165,13 +165,13 @@ Encode both attention intensity and user identity.
 :::
 
 :::notes
-Attention-aware visualizations measure one viewer's attention over time and change the display in response. We extend that to several analysts, and we call these collaborative attention-aware visualizations, or CAAVs.
+Attention-aware visualization: the display measures one viewer's attention over time, and changes in response. We extend it to several analysts, and call it collaborative attention-aware visualization, or CAAV.
 
-That gives us three questions. How do you capture the attention of several viewers at once, and tell them apart?
+The three parts stay, and each gets harder. Capture: attention can't be measured directly, so you need a proxy that works for everyone at once.
 
-[click] How do you record it over time? We keep attention per person.
+[click] Record: you now need a running total per person, and a way to combine them.
 
-[click] And how do you display it? You have to show how much attention, and whose, so that people can coordinate.
+[click] Display: for one viewer it supports reflection. For a team, it has to support coordination.
 :::
 
 ---
@@ -186,30 +186,30 @@ time: 31
 ::demo steps=1 snapshot bare tag="Simulated"
 
 :::items steps=1 uncover=off
-- **Count.** How many people looked.
-- **Sum.** Total coverage.
-- **Maximum.** The strongest focus.
-- **Difference.** The division of labor.
-- **Who.** <mark class="you">Blue</mark> you, <mark class="partner">orange</mark> partner, <mark class="both">pink</mark> both.
+- **Count.** Number of analysts who attended.
+- **Sum.** Total collective attention.
+- **Maximum.** Highest individual attention.
+- **Difference.** Balance of attention between members.
+- **Per user.** <mark class="you">Blue</mark> you, <mark class="partner">orange</mark> partner, <mark class="both">pink</mark> both.
 :::
 
 :::notes
-Each voxel keeps one value per person. It grows while you look and decays when you stop. Count is how many people looked.
+Here's one simulated session, combined in different ways. Each voxel keeps a value per person, which grows while they look and fades afterwards. Count shows where the two overlapped.
 
-[click] Sum is total coverage.
+[click] Sum is about coverage.
 
-[click] Maximum is the strongest focus.
+[click] Maximum picks out whoever looked hardest.
 
-[click] Difference shows the division of labor.
+[click] Difference shows how the work was divided.
 
-[click] And with colour you see whose attention it is: blue for you, orange for your partner, pink for both. That's the one HeedVision shows.
+[click] And a colour per person keeps identity visible. Where colours blend, both have looked. That's what HeedVision uses.
 :::
 
 ---
 id: design-space
 layout: full
 chapter: Idea
-time: 39
+time: 43
 ---
 
 # Display: a design space
@@ -217,22 +217,22 @@ time: 39
 ::designspace steps badge="HeedVision" highlight=world-embedded trigger=explicit
 
 :::notes
-For display, we laid out a design space.
+For display, we organized the options into a preliminary design space.
 
-[click] Attention can be embedded in the visualization, or shown in a separate view. And it can sit in world space, fixed in the room you share.
+[click] Attention is either embedded in the visualization or shown in a separate view. And it sits in world space, fixed in the room you share.
 
-[click] Or in camera space, where it follows your own view.
+[click] Or in camera space, attached to your own view: always visible, but no longer lined up with the room.
 
-[click] Then triggering: always on, explicit, where you ask for it, or implicit, where the system decides.
+[click] Then triggering: always on, on request, or decided by the system.
 
-[click] HeedVision is world-space and embedded, with explicit triggering. Because you share the world, you can say “look at that orange region.”
+[click] HeedVision is embedded, in world space, on request. That gives both people the same frame of reference, so one can say “look at that orange region.”
 :::
 
 ---
 id: part-system
 layout: section
 chapter: System
-time: 5
+time: 3
 ---
 
 # System
@@ -240,14 +240,14 @@ time: 5
 ## One corner built and evaluated
 
 :::notes
-That corner is the one we built and evaluated.
+So let's look at that corner.
 :::
 
 ---
 id: heedvision
 layout: figure-text
 chapter: System
-time: 27
+time: 33
 ---
 
 # HeedVision: colour per user
@@ -256,26 +256,26 @@ time: 27
 
 :::items steps=1
 - **WebXR.** React Three Fiber, on headsets like the Meta Quest 3.
-- **Explicit.** A controller button shows or hides attention.
+- **Explicit.** Point at a chart and press a controller button to show or hide attention.
 - **Per headset.** <mark class="you">Blue</mark> is you, <mark class="partner">orange</mark> your partner, <mark class="both">pink</mark> both.
-- **Temporal decay.** Attention fades when you look away.
+- **Opacity and decay.** More attention, more opaque. It fades when you look away.
 :::
 
 :::notes
-HeedVision runs in the browser with WebXR, on consumer headsets like the Meta Quest 3.
+HeedVision runs in the browser, on consumer headsets, with nothing to install.
 
-[click] Each of you leaves a trail of attention, and a controller button shows or hides it.
+[click] Attention stays hidden until you ask for it, so it's out of the way while you search.
 
-[click] In each headset, blue is you and orange is your partner. Pink is where you've both looked.
+[click] You are always blue and your partner orange, a pair we picked to be safe for colour-blind viewers. Where you've both looked, they blend to pink.
 
-[click] And attention fades when you look away.
+[click] And like memory, it builds while you look, and fades once you move on.
 :::
 
 ---
 id: bvh
 layout: figure-text
 chapter: System
-time: 30
+time: 31
 ---
 
 # Voxels collect the attention
@@ -289,11 +289,11 @@ time: 30
 :::
 
 :::notes
-To turn a chart into voxels, we wrap its geometry in a bounding volume hierarchy, which is just boxes inside boxes.
+Underneath, the chart becomes a grid of invisible voxels. A bounding volume hierarchy, boxes inside boxes, makes that fast.
 
-[click] Only the grid cells that touch the geometry become voxels, so attention sticks to the chart.
+[click] Only cells that touch the geometry become voxels, so attention lands on the chart and not on the empty space around it.
 
-[click] Ten times a second, a ray from each person's head hits the nearest voxel, and that voxel gains attention for that person. The details are in the paper.
+[click] The Quest 3 has no eye tracking, so we use head direction. That's coarse, but for coordination the general area matters more than the exact point.
 :::
 
 ---
@@ -308,7 +308,7 @@ time: 6
 ::designspace badge="HeedVision" highlight=world-embedded trigger=explicit next="world-separated camera-embedded camera-separated" next-badge="Prototype"
 
 :::notes
-That's HeedVision's corner.
+That was one corner.
 
 [click] The design space has three more.
 :::
@@ -317,7 +317,7 @@ That's HeedVision's corner.
 id: prototypes
 layout: three
 chapter: System
-time: 16
+time: 18
 ---
 
 # The other three quadrants
@@ -325,10 +325,10 @@ time: 16
 ::clip src="assets/video/proto-world-separated.mp4" poster="assets/video/proto-world-separated.jpg" title="World, separated" caption="A movable miniature" ratio=8/5
 ::clip src="assets/video/proto-camera-embedded.mp4" poster="assets/video/proto-camera-embedded.jpg" title="Camera, embedded" caption="Attention on the bounding box" ratio=8/5
 ::clip src="assets/video/proto-camera-separated.mp4" poster="assets/video/proto-camera-separated.jpg" title="Camera, separated" caption="A 2D panel beside the data" ratio=8/5
-::caveat text="Proofs of concept, in VR only. Not part of the study."
+::caveat text="Proofs of concept: VR only, synchronized locally between browser tabs. Not formally evaluated."
 
 :::notes
-We also built proof-of-concept prototypes of those: a miniature you can move, attention on the bounding box, and a 2D panel beside the data. They run in VR only, and they weren't part of the study.
+We built proofs of concept for those. A movable miniature, like a minimap, for cluttered scenes. A projection onto the bounding box, for a guided tour. And a flat panel, for a colleague who joins later. They aren't evaluated yet.
 :::
 
 ---
@@ -343,7 +343,7 @@ time: 3
 ## Does it help?
 
 :::notes
-So, does it help?
+Back to HeedVision. Does it help?
 :::
 
 ---
@@ -351,7 +351,7 @@ id: hunt
 layout: figure-text
 columns: 3 2
 chapter: Study
-time: 53
+time: 54
 ---
 
 # A treasure hunt, in the real system
@@ -359,30 +359,30 @@ time: 53
 ::live tag="Live demo"
 
 :::items steps
-- **8 co-located pairs.** 16 participants, shared AR, 10-minute sessions.
+- **8 co-located pairs.** 16 participants, shared AR on Meta Quest 3, 10-minute sessions.
 - **Targets.** 5% of voxels.
 - **Visible up close.** From the correct angle, within 10 cm.
 - **With CAAV.** Voxels show where each person has looked.
 :::
 
 :::notes
-We evaluated it with a treasure hunt. This is the real system running in the browser, with two headsets side by side. We had sixteen participants in eight co-located pairs, with ten minutes per session.
+To find out, we ran a treasure hunt. This is the real system, live in the browser, as two headsets side by side. Pairs shared a room, in AR, so they could see and talk to each other.
 
-[click] They searched for targets hidden in a 3D visualization. Five percent of the voxels are targets.
+[click] Targets are spread so that no region is richer than another. The pair has to search everywhere.
 
-[click] A target only shows up when you look from the correct angle, within ten centimetres.
+[click] And a target only appears when you're close, at the right angle. Somebody has to go and look.
 
-[click] And with CAAV, voxels change colour to show where each person has looked. As I move this person around, you can see the trail build up in both views.
+[click] With CAAV, voxels take on colour as each person looks. Let me move one of them, and the trail builds up in both views.
 :::
 
 ---
 id: study
 layout: figure-strip
 chapter: Study
-time: 39
+time: 37
 ---
 
-# Two sessions per pair
+# Two visualizations, with and without CAAV
 
 :::row wide
 ::image src="assets/fig/study-terrain.jpg" fit=cover caption="Terrain × CAAV" alt="From Figure 5 of the paper: a pair in headsets looking at the terrain, with attention voxels coloured blue, orange and pink."
@@ -391,20 +391,22 @@ time: 39
 
 :::row wide
 :::items
-- **Each pair.** One visualization with CAAV, the other without.
-- **Per visualization.** 4 pairs with CAAV, 4 without.
+- **2 × 2 design.** Visualization × CAAV.
+- **4 pairs per condition.** Counterbalanced.
+- **Analysis.** Bootstrap 95% CIs, Hedges' *g*.
 :::
 :::items
-- **Target discovery, coverage.** Percentage of targets found, and of space explored.
-- **Normalized redundancy.** Overlap in exploration.
+- **Discovery, coverage.** % targets, % space.
+- **Coverage efficiency.** Discovery ÷ coverage.
+- **Redundancy.** Normalized Shannon entropy.
 - **Target gain.** Pair ÷ mean individual.
 :::
 :::
 
 :::notes
-Every pair searched a terrain, which has natural landmarks, and a scatterplot of a hundred uniform points, which has none. Each pair did two sessions, one visualization with CAAV and the other without. So for each visualization, we compare four pairs with CAAV against four without.
+We chose two visualizations on purpose. The terrain is a real mountain, with peaks and valleys to navigate by. The scatterplot is a hundred uniform points, so its structure gives you nothing to split the work by. Each pair searched both, one with CAAV and one without.
 
-We measured targets found and space covered. Normalized redundancy, which is how much the two explored the same places. And target gain, which compares the pair with its two members on their own. It's an exploratory study, so we report effect sizes and confidence intervals.
+We measured what they found and covered, how much of each other's search they repeated, and how the pair's total compares with each member's. With four pairs per condition this is exploratory, so I'll be careful about what I claim.
 :::
 
 ---
@@ -419,35 +421,35 @@ time: 3
 ## It depends on the space
 
 :::notes
-Here's what we found.
+The short answer: it depends.
 :::
 
 ---
 id: scatter
 layout: full
 chapter: Results
-time: 32
+time: 27
 ---
 
 # Scatterplot: directional benefits
 
 ::plot src=assets/fig/plot-scatter.svg alt="Four panels, No-CAAV against CAAV on the scatterplot. Target discovery 62.4 versus 78.5 percent, with each pair shown as a dot. Coverage 67.1 versus 76.5 percent. Normalized redundancy 11.3 versus 3.3 percent. Target gain 1.19 versus 1.33, with each pair shown as a dot."
 
-::caveat text="Dots: pairs. Bars: means. Targets BCa 95% CI [−0.012, +0.293]. Redundancy exact *p* = 0.257: directional. Redrawn from Figs. 7, 8 and the text."
+::caveat text="Dots: pairs. Bars: means. Targets Δ = +16.1 pp, BCa 95% CI [−0.012, +0.293], *g* = 1.12. Redundancy BCa CI [−0.172, −0.002], exact *p* = 0.257: directional. Coverage efficiency 1.027 vs. 0.920. Redrawn from Figs. 7, 8 and the text."
 
 :::notes
-First the scatterplot, where there's nothing to navigate by. Each dot is a pair, and the bar is the mean.
+First the scatterplot. Each dot is a pair, each bar a mean.
 
-Pairs with CAAV found about seventy-eight percent of the targets, against sixty-two without. But the confidence interval just spans zero, so we treat that cautiously.
+With CAAV, pairs found more targets, covered more space, and repeated far less of each other's search. Without it, one participant “had to double-check everything the other person looked at.”
 
-Redundancy dropped from about eleven percent to three, and that is also only directional. Coverage and target gain point the same way, and the exact numbers are in the paper.
+Now the caution. The intervals are wide, and the one for targets just includes zero. So we call these directional.
 :::
 
 ---
 id: terrain
 layout: two
 chapter: Results
-time: 43
+time: 42
 ---
 
 # Terrain: largest gain, more redundancy
@@ -455,21 +457,21 @@ time: 43
 ::plot src=assets/fig/plot-terrain.svg alt="Two panels, No-CAAV against CAAV on the terrain. Target gain 1.19 versus 1.46, with each pair shown as a dot and all four CAAV pairs above the No-CAAV mean. Normalized redundancy 4.0 versus 14.9 percent."
 ::plot src=assets/fig/plot-terrain-maps.svg step alt="Figure 9 of the paper, redrawn. Left, the terrain's gradient, darker where it is steeper. Right, aggregated attention over all terrain conditions, brightest along the same ridge, with the steepest quarter of the terrain outlined."
 
-::caveat text="Target gain BCa 95% CI [0.112, 0.450], *p* = 0.029. Gradient and attention: Pearson *r* = 0.490, Spearman *ρ* = 0.561, both *p* < 0.0001. Redrawn from Figs. 8, 9 and the text."
+::caveat text="Target gain Δ = +0.277, BCa 95% CI [0.112, 0.450], *g* = 1.67, *p* = 0.029. Targets 26.0% vs. 19.6%, coverage 24.6% vs. 18.8%: CIs span zero. Gradient and attention: Pearson *r* = 0.490, Spearman *ρ* = 0.561, both *p* < 0.0001. Redrawn from Figs. 8, 9 and the text."
 
 :::notes
-Terrain looks different. Target gain is our strongest result: 1.46 with CAAV against 1.19 without. Here the confidence interval stays above zero, and all four CAAV pairs beat the no-CAAV mean.
+On terrain, the picture changes. Target gain is the result we trust most. Pairs with CAAV got more out of working together, the interval stays clear of zero, and every CAAV pair beat the average without it.
 
-But redundancy went up, from four percent to about fifteen. That's the reverse of the scatterplot.
+But they also overlapped more, the opposite of the scatterplot. We saw deliberate second passes over places already covered.
 
-[click] These maps help explain it. On the left is the terrain's gradient: its peaks, ridges and valleys. On the right is where attention went. The two correlate. The landmarks pull both people to the same features, and the colours show that convergence, but they don't prevent it.
+[click] These maps suggest why. Left, darker means steeper: peaks, ridges, valleys. Right is where attention went, and it follows them. Landmarks draw both people to the same places, with or without CAAV. The colours show that, but don't stop it.
 :::
 
 ---
 id: strategies
 layout: grid
 chapter: Results
-time: 25
+time: 27
 ---
 
 # Six strategies
@@ -495,7 +497,9 @@ time: 25
 ::caveat text="Top row, in pink: the coordination patterns that came with CAAV conditions."
 
 :::notes
-We identified six collaborative strategies. In pink, on top, are the three that came with the CAAV conditions: dividing the space, searching it systematically, and using the colours as feedback. Below: talking, navigating by landmarks, which terrain pairs did with or without CAAV, and lining up the charts in the room, which we saw only without it.
+We found six coordination strategies. The top row is what we saw more of with CAAV: splitting the space, searching methodically, and reading the colours. One pair made it a game, aiming for “a nice blue side and a nice orange side with very little overlap.”
+
+Below: talking it through, steering by landmarks, and, only without CAAV, lining up the charts in the room.
 :::
 
 ---
@@ -503,7 +507,7 @@ id: conditions
 columns: 3 2
 rows: 3 2
 chapter: Results
-time: 32
+time: 36
 ---
 
 # By condition, and a clear preference
@@ -525,22 +529,23 @@ we have no verbal communication during the condition where we have [CAAV]
 :::
 
 :::row wide
-::stat value="93.8%" label="preferred CAAV conditions"
-::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69. On terrain, directionally higher."
-::stat value="74.38" label="mean SUS" sub="benchmark 68"
+::stat value="93.8%" label="preferred CAAV conditions" sub="81.3% strongly agreed it improved collaboration."
+::stat value="75.2%" label="of the session with attention shown" sub="All participants used the toggle."
+::stat value="24%" label="lower overall workload" sub="NASA TLX, 2.79 vs. 3.69 of 7. On terrain, directionally higher."
+::stat value="74.38" label="mean SUS" sub="SD 19.79. Benchmark 68."
 :::
 
 :::notes
-On the scatterplot, CAAV replaced verbal coordination entirely. As one participant put it, “we have no verbal communication during the condition where we have CAAV.” That may mean a lower coordination cost, but also less joint discussion, so we read it with caution.
+Here they are by condition. On the scatterplot, verbal coordination drops to zero with CAAV. That may mean coordinating got cheaper. It may also mean less discussion and weaker common ground, so we don't count it as a win.
 
-And people liked it. Fifteen of our sixteen participants preferred the CAAV conditions. Overall workload was lower with CAAV, though on terrain it leaned higher. And usability was above the usual benchmark.
+People did like it. All but one preferred CAAV, and described it as “seeing my partner's footsteps or breadcrumbs in real time.” Workload was lower overall, though on terrain it leaned the other way. And one participant kept it off for most of their session.
 :::
 
 ---
 id: limits
 layout: two
 chapter: Takeaways
-time: 22
+time: 28
 ---
 
 # Limitations and future work
@@ -551,6 +556,7 @@ time: 22
 - **Proxy.** Head orientation is coarser than eye tracking.
 - **Scope.** Synchronous, co-located pairs, in visual search.
 - **Baseline.** Only no attention visualization.
+- **Awareness.** Measured through proxies, not directly.
 :::
 :::
 
@@ -560,20 +566,21 @@ time: 22
 - **Baselines.** Shared gaze rays, pointer trails, manual markers, minimaps.
 - **Prototypes.** The other three quadrants, in networked AR.
 - **Semantic attention.** Recording at the level of data elements.
+- **Settings.** Remote and asynchronous collaboration.
 :::
 :::
 
 :::notes
-This is an exploratory first step. We tracked heads, not eyes. We studied co-located pairs doing visual search. And our only baseline was no attention visualization.
+This is a first step, with limits. We tracked heads, not eyes. We studied pairs, in one room, on one kind of task. Our only baseline was no attention display, so we can't yet say whether the history is what helps, or any shared cue would. And we measured awareness only through behaviour.
 
-[click] Next, we want other tasks and larger teams, and baselines like shared gaze rays or pointer trails. The rest is on the slide.
+[click] So next: other tasks, larger teams, and stronger baselines.
 :::
 
 ---
 id: thanks
 layout: end
 chapter: Takeaways
-time: 53
+time: 49
 ---
 
 # Thank you for your attention
@@ -587,11 +594,11 @@ time: 53
 :::
 
 :::notes
-To wrap up. Our study gives initial evidence, in visual search, that how well CAAVs work depends on the visualization.
+So, what to take away. How well CAAV works depends on the visualization. That's initial evidence, from one kind of task.
 
-[click] On scatterplots, where there are no landmarks, pairs repeated less of each other's search, and found new ways to coordinate.
+[click] In an abstract space with no landmarks, it helped pairs split the work and stop repeating each other.
 
-[click] On terrain, pairs gained the most from working together, even though the colours sometimes got in the way of the natural cues.
+[click] On terrain, pairs gained the most from working together. But the landmarks were already coordinating them, and the colours sometimes got in the way.
 
-[click] The QR code takes you to the paper and these slides. And one last thing. I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. That means I'm looking for what comes next, and I'm open to postdoc and industry positions. So come find me. Thank you.
+[click] The QR code takes you to the paper and these slides. One last thing. I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so come find me. Thank you.
 :::
