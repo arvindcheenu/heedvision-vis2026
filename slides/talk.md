@@ -61,40 +61,40 @@ Colours and type for every slide are at the top of shared/hv.css and slides/css/
 id: title
 layout: title
 chapter: Motivation
-time: 21
+time: 15
 ---
 
 :::notes
 Hi everyone, I'm Arvind Srinivasan, and this is HeedVision, joint work with Niklas Elmqvist.
 
-Our paper opens with “attention is a scarce commodity”, so thank you for spending ten minutes of yours here. HeedVision shows two people, analyzing data together in augmented reality, where each has already looked.
+HeedVision shows two people, analyzing data together in augmented reality, where each has already looked. And we studied when that helps.
 :::
 
 ---
 id: motivation
 layout: text-figure
 chapter: Motivation
-time: 26
+time: 27
 ---
 
-# Searching an abstract 3D space
+# Searching a 3D space together
 
 :::items steps
-- **No up.** A 3D embedding has no natural orientation.
-- **Few landmarks.** One cluster looks much like the next.
+- **Few reference points.** One bump looks much like the next.
+- **Hard to describe.** Positions are difficult to put into words.
 - **Too much for one person.** So you bring in a colleague.
 :::
 
-::image src="assets/fig/motiv-cells.jpg" fit=cover alt="A UMAP embedding of single-cell data: thousands of points in coloured clusters, with a few green points scattered between them."
+::image src="assets/fig/motiv-molecule.jpg" fit=cover alt="The grey molecular surface of the CHK2 kinase on black, with a small red inhibitor sitting in a pocket."
 
-::caveat text="Example: Legetth et al., CellexalVR, iScience 2021. Image: Single Cell RNA Seq, illustrated UMAP, Ryan Kissinger, courtesy of NIAID (NIH BioArt 767), public domain, background changed."
+::caveat text="Example: O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018. Image: Human CHK2 in complex with benzimidazole carboxamide inhibitor, BaptisteGrandGrand, Wikimedia Commons, CC BY-SA 4.0. Adapted: labels removed, background changed; adaptation CC BY-SA 4.0."
 
 :::notes
-Picture an analyst in a headset, inside a 3D embedding of thousands of points, looking for one rare cluster. They can turn it any way they like.
+Picture a chemist in a headset, walking around a protein, looking for the pocket where a drug could fit. That's the red part. Every bump looks like the next.
 
-[click] Which makes it hard to say where they've already been, because every cluster looks like its neighbour.
+[click] So it's hard to say where they've already been, even to themselves.
 
-[click] So they ask a colleague to help. That brings a second problem.
+[click] And it's too much to search alone, so they bring in a colleague. That brings a second problem.
 :::
 
 ---
@@ -247,7 +247,7 @@ So let's look at that corner.
 id: heedvision
 layout: figure-text
 chapter: System
-time: 33
+time: 28
 ---
 
 # HeedVision: colour per user
@@ -266,7 +266,7 @@ HeedVision runs in the browser, on consumer headsets, with nothing to install.
 
 [click] Attention stays hidden until you ask for it, so it's out of the way while you search.
 
-[click] You are always blue and your partner orange, a pair we picked to be safe for colour-blind viewers. Where you've both looked, they blend to pink.
+[click] You are always blue and your partner orange. Where you've both looked, they blend to pink.
 
 [click] And like memory, it builds while you look, and fades once you move on.
 :::
@@ -580,7 +580,7 @@ This is a first step, with limits. We tracked heads, not eyes. We studied pairs,
 id: thanks
 layout: end
 chapter: Takeaways
-time: 49
+time: 60
 ---
 
 # Thank you for your attention
@@ -599,6 +599,8 @@ So, what to take away. How well CAAV works depends on the visualization. That's 
 [click] In an abstract space with no landmarks, it helped pairs split the work and stop repeating each other.
 
 [click] On terrain, pairs gained the most from working together. But the landmarks were already coordinating them, and the colours sometimes got in the way.
+
+So, back to our two chemists. A protein's surface has few reference points, so we'd expect this to help there. That still needs testing on real tasks.
 
 [click] The QR code takes you to the paper and these slides. One last thing. I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so come find me. Thank you.
 :::
