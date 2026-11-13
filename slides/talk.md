@@ -67,7 +67,7 @@ time: 17
 ---
 
 :::notes
-Hello everyone, I'm Arvind Srinivasan, a third year PhD candidate at the Center for Anytime Anywhere Analytics, in Aarhus University under Prof. Niklas Elmqvist, and in this talk, I’ll be presenting HeedVision, Attention Awareness in Collaborative Immersive Analytics Environments.
+Hello everyone, I'm Arvind Srinivasan, a third-year PhD candidate at the Center for Anytime Anywhere Analytics at Aarhus University, under Prof. Niklas Elmqvist. In this talk, I'll be presenting HeedVision: Attention Awareness in Collaborative Immersive Analytics Environments.
 :::
 
 ---
@@ -90,9 +90,9 @@ time: 36
 ::caveat text="Example: O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018. Image: Human CHK2 in complex with benzimidazole carboxamide inhibitor, BaptisteGrandGrand, Wikimedia Commons, CC BY-SA 4.0. Adapted: labels removed, background changed; adaptation CC BY-SA 4.0."
 
 :::notes
-Imagine yourself in the shoes of a chemist in a headset, walking around a protein, looking for the right pocket where a drug could fit. Unless you know where to look (the annotated spot), for an untrained eye, every bump looks like the next.
+Imagine yourself in the shoes of a chemist in a headset, walking around a protein, looking for the right pocket where a drug could fit. Unless you know where to look, which here is the annotated spot, every bump looks like the next to an untrained eye.
 
-[click] In scenarios like these, it's hard to say where they've already been, even to themselves.
+[click] In scenarios like these, it's hard to say where you've already been, even to yourself.
 
 [click] So with too many candidates to search alone, you bring in a colleague. And that brings us to the second problem.
 :::
@@ -119,7 +119,7 @@ time: 31
 :::notes
 Say these circles represent where each of you is looking, and neither can see the other's. You can't tell what your colleague has already checked. That's a group awareness problem.
 
-[click] Immersive 3D makes it worse thanks to the added need of synchronizing viewpoints as you and your partner could stand in different places, making coordination difficult.
+[click] Immersive 3D makes it worse. You and your partner could stand in different places, so you also need to synchronize viewpoints, and that makes coordination difficult.
 
 [click] So we asked: what if the space itself remembered who looked where?
 :::
@@ -167,7 +167,7 @@ Encode both attention intensity and user identity.
 :::
 
 :::notes
-Our prior work, Attention-aware visualization, captured, recorded and revisualized one viewer's attention over time. And with this paper, we extend it to more than one, and we call it collaborative attention-aware visualization, or CAAV. The three parts stay, though each a bit more specified guiding the questions we wanted to ask.
+Our prior work, attention-aware visualization, captured, recorded and revisualized one viewer's attention over time. And with this paper, we extend it to more than one, and we call it collaborative attention-aware visualization, or CAAV. The three parts stay, though each becomes a bit more specific, and they guided the questions we wanted to ask.
 
 [click] In the Capture phase, since attention can't be measured directly, you need a proxy that works for everyone at once.
 
@@ -253,15 +253,15 @@ time: 50
 ::designspace steps badge="HeedVision" highlight=world-embedded trigger=explicit
 
 :::notes
-For display, we organized the options into a preliminary design space based on where the attention was situated with respect to the headset.
+For display, we organized the options into a preliminary design space based on where the attention is situated with respect to the headset.
 
 [click] Attention is either embedded over the visualization or shown in a separate view. And it could be in world space, placed in the room you share.
 
 [click] Or in camera space, attached to your own view: always visible, but only to you, and no longer lined up with the room.
 
-[click] Of course, how much control you could offer also matters with triggering: which can be always on, on request, or decided by the system.
+[click] Of course, how much control you offer also matters. That's triggering, which can be always on, on request, or decided by the system.
 
-[click] Our evaluated system HeedVision is embedded, in world space, triggerable on request.
+[click] Our evaluated system, HeedVision, is embedded, in world space, and triggered on request.
 :::
 
 ---
@@ -298,7 +298,7 @@ time: 35
 :::
 
 :::notes
-HeedVision runs in the browser, on consumer headsets, with nothing to install. We built this system over Spatialstrates, which allows for seamless collaboration on headsets using open WebXR technologies.
+HeedVision runs in the browser, on consumer headsets, with nothing to install. We built this system on top of Spatialstrates, which allows for seamless collaboration on headsets using open WebXR technologies.
 
 [click] Attention stays hidden until you ask for it, so it's out of the way while you search.
 
@@ -402,11 +402,11 @@ time: 64
 :::
 
 :::notes
-To find out, we ran a treasure hunt. This is a close visualization to the real system that participants interacted with, live in the browser, shown as two headsets side by side. Pairs shared a room, in AR, so they could see and talk to each other.
+To find out, we ran a treasure hunt. This is a close recreation of the real system that participants used, running live in the browser, shown as two headsets side by side. Pairs shared a room, in AR, so they could see and talk to each other.
 
-[click] Targets were spread so that no region is richer than another. The pair has to search everywhere.
+[click] Targets were spread so that no region was richer than another. The pair had to search everywhere.
 
-[click] And a target only appears when you're close, at the right angle. Somebody has to go and look. We did this to mimic the ephemeral nature of insights that need close scrutiny.
+[click] And a target only appeared when you were close, at the right angle. Somebody had to go and look. We did this to mimic the ephemeral nature of insights that need close scrutiny.
 
 [click] With CAAV, voxels take on colour as each person looks. Let me move one of them, and the trail builds up in both views.
 :::
@@ -535,7 +535,7 @@ time: 34
 :::notes
 We found six coordination strategies. The top row is what we saw more of with CAAV: splitting the space, searching methodically, and reading the colours. One pair made it a game, aiming for “a nice blue side and a nice orange side with very little overlap.”
 
-Without the cues, we observed that they navigated the problem by usually talking it through with fewer or no deictic references, steering by landmarks, and, interestingly, lining up the visualizations in the room.
+Without the cues, we observed that pairs usually talked it through, with fewer or no deictic references, steered by landmarks, and, interestingly, lined up the visualizations in the room.
 :::
 
 ---
@@ -609,7 +609,7 @@ time: 36
 :::notes
 As this is a first step, it of course has a lot of limitations. We tracked heads, not eyes. We studied pairs, in one room, on one kind of controlled task. Our only baseline was no attention display, so we can't yet say whether the history is what helps, or any shared cue would. And we measured awareness only through behaviour.
 
-[click] So we believe future work could benefit more from: other tasks, larger teams, stronger baselines, and evaluating against other proof-of-concepts.
+[click] So we believe future work should look at other tasks, larger teams, stronger baselines, and evaluating the other proofs of concept.
 :::
 
 ---
@@ -630,11 +630,11 @@ time: 40
 :::
 
 :::notes
-If there is one thing I want you to take away, it's this: How well CAAV works depends on the visualization. That's initial evidence, from one kind of task.
+If there is one thing I want you to take away, it's this: how well CAAV works depends on the visualization. That's initial evidence, from one kind of task.
 
 [click] In an abstract space with no landmarks, it helped pairs split the work and stop repeating each other.
 
-[click] On a terrain, pairs gained the most from working together. But the landmarks were already coordinating them, and the colours sometimes got in the way.
+[click] On terrain, pairs gained the most from working together. But the landmarks were already coordinating them, and the colours sometimes got in the way.
 
 [click] Thanks for your attention! The QR code takes you to the paper and these slides.
 :::
@@ -660,5 +660,5 @@ time: 29
 :::notes
 Oh! And before I conclude, one more thing. If you want these techniques in your own WebXR system, I've open sourced them as a small library called caav.
 
-Being in the third year of my PhD, if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so please feel free to strike up a conversation online or offline. Thank you.
+I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so please feel free to strike up a conversation, online or offline. Thank you.
 :::
