@@ -49,6 +49,7 @@ Blocks (`step` shows one on a click, `step=2` fixes its click number, `wide` spa
   :::quote who="…" … :::                 a quote
   :::heat … :::                          a table whose numbers tint their cells
   ::caveat text="…"                      a footnote
+  ::glyph type=joint|distributed|sequential|cumulative   a small drawing of one kind of collective attention
   :::stack … :::  :::row … :::  :::grid cols=3 … :::    under, beside, or in a grid
   ::demo  ::bvh  ::hv  ::live  ::designspace            the animations
   ::designspace next="world-separated" next-badge="…"   on a click, moves the highlight to these quadrants
@@ -114,6 +115,8 @@ time: 27
 - **What if the space remembered?**
 :::
 
+::caveat text="Gutwin and Greenberg call this workspace awareness: an up-to-the-moment understanding of others' interaction with a shared workspace (CSCW 1998, CHI 1998)."
+
 :::notes
 These circles are where each of you is looking, and neither can see the other's. You can't tell what your colleague has already checked. That's a group awareness problem.
 
@@ -175,13 +178,47 @@ The three parts stay, and each gets harder. Capture: attention can't be measured
 :::
 
 ---
+id: kinds
+layout: full
+columns: 1 1 1 1
+chapter: Idea
+time: 20
+---
+
+# Kinds of collective attention
+
+:::card title="Joint"
+::glyph type=joint
+Both look at the same thing.
+:::
+
+:::card title="Distributed"
+::glyph type=distributed
+They split up the space.
+:::
+
+:::card title="Sequential"
+::glyph type=sequential
+One builds on where the other looked.
+:::
+
+:::card title="Cumulative"
+::glyph type=cumulative
+Everything the team has covered.
+:::
+
+:::notes
+With several people, attention comes in kinds a single viewer never has. Joint, when both look at the same thing. Distributed, when they split up. Sequential, when one builds on the other. And cumulative, everything the team has covered.
+:::
+
+---
 id: record
 layout: figure-text
 chapter: Idea
 time: 31
 ---
 
-# Record: one session, five views
+# Recording collective attention
 
 ::demo steps=1 snapshot bare tag="Simulated"
 
@@ -194,13 +231,13 @@ time: 31
 :::
 
 :::notes
-Here's one simulated session, combined in different ways. Each voxel keeps a value per person, which grows while they look and fades afterwards. Count shows where the two overlapped.
+How you combine each person's record decides which kinds you see. Count shows joint attention.
 
-[click] Sum is about coverage.
+[click] Sum shows the cumulative.
 
-[click] Maximum picks out whoever looked hardest.
+[click] Maximum, whoever looked hardest.
 
-[click] Difference shows how the work was divided.
+[click] Difference, how the work was divided.
 
 [click] And a colour per person keeps identity visible. Where colours blend, both have looked. That's what HeedVision uses.
 :::

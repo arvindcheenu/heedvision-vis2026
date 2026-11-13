@@ -250,6 +250,7 @@
         ${a.steps ? '<span class="fragment step" data-fragment-index="4" data-ds-pick></span>' : ""}${next.length ? '<span class="fragment step" data-fragment-index="0" data-ds-next></span>' : ""}`, a.steps ? "" : ' data-picked');
     },
 
+    glyph: (a) => wrap("div", a, "c-glyph", GLYPHS[a.type] || ""),
     caveat: (a, body) => wrap("p", a, "c-caveat", mdi((body || a.text || "").trim())),
     qr: (a) => wrap("div", a, "c-qr", `<div class="qr" data-qr="talk"></div>${a.label ? `<p>${mdi(a.label)}</p>` : ""}`),
     questions: (a, body, ctx) => wrap("div", a, "c-questions", `<div class="qa-board" data-qa-board></div><div class="qa-fallback">${blocks(body, ctx).join("")}</div>`),
@@ -260,6 +261,14 @@
     `<img class="logo-vis" src="${base}../shared/logos/vis2026.png" alt="IEEE VIS 2026">` +
     `<img class="logo-mono" src="${base}../shared/logos/au.svg" alt="Aarhus University">` +
     `<img class="logo-mono" src="${base}../shared/logos/ca3.svg" alt="Center for Anytime Anywhere Analytics">`;
+
+  const eye = (x, tone) => `<use href="#i-eye" x="${x}" y="120" width="40" height="40" color="var(--${tone})"/>`;
+  const GLYPHS = {
+    joint: `<svg viewBox="0 0 300 170" role="img" aria-label="Two viewers looking at the same point">${eye(30, "you")}${eye(230, "partner")}<path d="M60 130L150 46M240 130L150 46" stroke="var(--glyph-line)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="150" cy="42" r="30" fill="var(--both)" fill-opacity=".3"/><circle cx="150" cy="42" r="10" fill="var(--both)"/></svg>`,
+    distributed: `<svg viewBox="0 0 300 170" role="img" aria-label="Two viewers looking at different points">${eye(30, "you")}${eye(230, "partner")}<path d="M55 122L60 46M245 122L240 46" stroke="var(--glyph-line)" stroke-width="3" stroke-dasharray="6 8"/><circle cx="60" cy="40" r="10" fill="var(--you)"/><circle cx="240" cy="40" r="10" fill="var(--partner)"/></svg>`,
+    sequential: `<svg viewBox="0 0 300 170" role="img" aria-label="One viewer's attention followed later by the other's"><circle cx="60" cy="86" r="12" fill="var(--you)"/><path d="M84 86H200" stroke="var(--glyph-line)" stroke-width="3"/><path d="M196 74l16 12-16 12" fill="none" stroke="var(--glyph-line)" stroke-width="3"/><circle cx="240" cy="86" r="12" fill="var(--partner)"/><text x="60" y="140" text-anchor="middle" fill="currentColor" opacity=".6" font-size="22">t₁</text><text x="240" y="140" text-anchor="middle" fill="currentColor" opacity=".6" font-size="22">t₂</text></svg>`,
+    cumulative: `<svg viewBox="0 0 300 170" role="img" aria-label="A grid of cells covered by one viewer, the other, or both"><g transform="translate(38 16)">${[["you", "you", "both", "partner", ""], ["you", "both", "partner", "partner", ""], ["you", "", "", "partner", ""]].map((r, y) => r.map((c, x) => `<rect x="${x * 46}" y="${y * 46}" width="40" height="40" rx="8" fill="${c ? `var(--${c})` : "var(--dot-off)"}"/>`).join("")).join("")}</g></svg>`,
+  };
 
   const person = (x, y) => `<use href="#i-person" x="${x}" y="${y}" width="80" height="90" color="var(--person)"/>`;
   const ray = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="var(--glyph-line)" stroke-width="2.5" stroke-dasharray="5 7"/>`;
