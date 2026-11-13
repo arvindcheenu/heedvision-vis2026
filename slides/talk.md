@@ -49,7 +49,7 @@ Blocks (`step` shows one on a click, `step=2` fixes its click number, `wide` spa
   :::quote who="…" … :::                 a quote
   :::heat … :::                          a table whose numbers tint their cells
   ::caveat text="…"                      a footnote
-  ::frame src="…" title="…"              a live page in a frame
+  ::frame src="…" poster="…" title="…"   a live page in a frame; the PDF shows the poster
   ::glyph type=joint|distributed|sequential|cumulative   a small drawing of one kind of collective attention
   :::stack … :::  :::row … :::  :::grid cols=3 … :::    under, beside, or in a grid
   ::demo  ::bvh  ::hv  ::live  ::designspace            the animations
@@ -657,7 +657,7 @@ time: 25
 - **Source.** [github.com/arvindcheenu/caav](https://github.com/arvindcheenu/caav), MIT License.
 :::
 
-::frame src="../toolkit/#try-it" title="The caav toolkit playground: two people looking at one object, with their attention shown"
+::frame src="../toolkit/#try-it" poster="assets/fig/toolkit-playground.jpg" title="The caav toolkit playground: two people looking at one object, with their attention shown"
 
 :::notes
 One more thing. If you want these techniques in your own WebXR system, I've open sourced them as a small library called caav. This is its playground, running live on the slide.

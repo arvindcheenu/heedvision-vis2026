@@ -251,7 +251,10 @@
     },
 
     // a live page in a frame, for something the audience can try from the slide
-    frame: (a) => wrap("div", a, "c-frame", `<iframe src="${esc(a.src)}" title="${esc(a.title || "Live page")}" loading="lazy" allow="xr-spatial-tracking; fullscreen"></iframe>`),
+    // (print and the presenter's small previews show a picture instead: `poster`)
+    frame: (a) => wrap("div", a, "c-frame", /print/.test(new URLSearchParams(location.search).get("view") || "") || new URLSearchParams(location.search).has("receiver")
+      ? (a.poster ? `<img src="${esc(a.poster)}" alt="${esc(a.title || "")}">` : "")
+      : `<iframe src="${esc(a.src)}" title="${esc(a.title || "Live page")}" loading="lazy" allow="xr-spatial-tracking; fullscreen"></iframe>`),
     glyph: (a) => wrap("div", a, "c-glyph", GLYPHS[a.type] || ""),
     caveat: (a, body) => wrap("p", a, "c-caveat", mdi((body || a.text || "").trim())),
     qr: (a) => wrap("div", a, "c-qr", `<div class="qr" data-qr="talk"></div>${a.label ? `<p>${mdi(a.label)}</p>` : ""}`),
