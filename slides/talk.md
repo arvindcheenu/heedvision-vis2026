@@ -11,7 +11,7 @@ slug: Third-year PhD student, open to postdoc and industry positions
 url: https://heedvision.arvindchee.nu/talk/
 site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
 bullet: vis       # vis | triangle | dot | square | dash | none | a path to an image
-duration: 9.8     # minutes, for presenter-view pacing
+duration: 10.4    # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
 questions: on      # on | off | a link to the venue's Q&A tool
@@ -62,20 +62,18 @@ Colours and type for every slide are at the top of shared/hv.css and slides/css/
 id: title
 layout: title
 chapter: Motivation
-time: 15
+time: 17
 ---
 
 :::notes
-Hi everyone, I'm Arvind Srinivasan, and this is HeedVision, joint work with Niklas Elmqvist.
-
-HeedVision shows two people, analyzing data together in augmented reality, where each has already looked. And we studied when that helps.
+Hello everyone, I'm Arvind Srinivasan, a third year PhD candidate at the Center for Anytime Anywhere Analytics, in Aarhus University under Prof. Niklas Elmqvist, and in this talk, I’ll be presenting HeedVision, Attention Awareness in Collaborative Immersive Analytics Environments.
 :::
 
 ---
 id: motivation
 layout: text-figure
 chapter: Motivation
-time: 27
+time: 36
 ---
 
 # Searching a 3D space together
@@ -91,18 +89,18 @@ time: 27
 ::caveat text="Example: O'Connor et al., multi-user VR for molecular dynamics, Science Advances 2018. Image: Human CHK2 in complex with benzimidazole carboxamide inhibitor, BaptisteGrandGrand, Wikimedia Commons, CC BY-SA 4.0. Adapted: labels removed, background changed; adaptation CC BY-SA 4.0."
 
 :::notes
-Picture a chemist in a headset, walking around a protein, looking for the pocket where a drug could fit. That's the red part. Every bump looks like the next.
+Imagine yourself in the shoes of a chemist in a headset, walking around a protein, looking for the right pocket where a drug could fit. Unless you know where to look (the annotated spot), for an untrained eye, every bump looks like the next.
 
-[click] So it's hard to say where they've already been, even to themselves.
+[click] In scenarios like these, it's hard to say where they've already been, even to themselves.
 
-[click] And it's too much to search alone, so they bring in a colleague. That brings a second problem.
+[click] So with too many candidates to search alone, you bring in a colleague. And that brings us to the second problem.
 :::
 
 ---
 id: problem
 layout: figure-text
 chapter: Motivation
-time: 27
+time: 31
 ---
 
 # Who looked where?
@@ -118,9 +116,9 @@ time: 27
 ::caveat text="Gutwin and Greenberg call this workspace awareness: an up-to-the-moment understanding of others' interaction with a shared workspace (CSCW 1998, CHI 1998)."
 
 :::notes
-These circles are where each of you is looking, and neither can see the other's. You can't tell what your colleague has already checked. That's a group awareness problem.
+Say these circles represent where each of you is looking, and neither can see the other's. You can't tell what your colleague has already checked. That's a group awareness problem.
 
-[click] Immersive 3D makes it worse. You stand in different places, and you have to coordinate while you search.
+[click] Immersive 3D makes it worse thanks to the added need of synchronizing viewpoints as you and your partner could stand in different places, making coordination difficult.
 
 [click] So we asked: what if the space itself remembered who looked where?
 :::
@@ -144,37 +142,37 @@ For a single viewer, that idea already has a name.
 id: caav
 layout: three
 chapter: Idea
-time: 37
+time: 49
 ---
 
 # Collaborative attention-aware visualization
 
-:::card icon=eye title="Capture" class=col
+:::card icon=eye title="Capture" class=col step=1
 Distinguish between users while tracking attention simultaneously.
 
 <span class="rq-tag">RQ1</span><span class="rq">How should the attention of multiple viewers on a visualization be captured in real time?</span>
 :::
 
-:::card icon=layers title="Record" class=col step=1
+:::card icon=layers title="Record" class=col step=2
 Identity-aware accumulators, with sum, maximum, difference and count.
 
 <span class="rq-tag">RQ2</span><span class="rq">How should the attention of multiple viewers on a visualization be recorded over time?</span>
 :::
 
-:::card icon=palette title="Revisualize" class=col step=2
+:::card icon=palette title="Revisualize" class=col step=3
 Encode both attention intensity and user identity.
 
 <span class="rq-tag">RQ3</span><span class="rq">How should the attention of multiple viewers on a visualization be displayed?</span>
 :::
 
 :::notes
-Attention-aware visualization: the display measures one viewer's attention over time, and changes in response. We extend it to several analysts, and call it collaborative attention-aware visualization, or CAAV.
+Our prior work, Attention-aware visualization, captured, recorded and revisualized one viewer's attention over time. And with this paper, we extend it to more than one, and we call it collaborative attention-aware visualization, or CAAV. The three parts stay, though each a bit more specified guiding the questions we wanted to ask.
 
-The three parts stay, and each gets harder. Capture: attention can't be measured directly, so you need a proxy that works for everyone at once.
+[click] In the Capture phase, since attention can't be measured directly, you need a proxy that works for everyone at once.
 
-[click] Record: you now need a running total per person, and a way to combine them.
+[click] In the Record phase, you now need a running total per person, and a way to combine them.
 
-[click] Display: for one viewer it supports reflection. For a team, it has to support coordination.
+[click] In the Revisualize phase, while it supports reflection for one viewer, for a team it now has to support coordination.
 :::
 
 ---
@@ -182,7 +180,7 @@ id: kinds
 layout: full
 columns: 1 1 1 1
 chapter: Idea
-time: 20
+time: 17
 ---
 
 # Kinds of collective attention
@@ -215,7 +213,7 @@ With several people, attention comes in kinds a single viewer never has. Joint, 
 id: record
 layout: figure-text
 chapter: Idea
-time: 31
+time: 24
 ---
 
 # Recording collective attention
