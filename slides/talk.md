@@ -49,6 +49,7 @@ Blocks (`step` shows one on a click, `step=2` fixes its click number, `wide` spa
   :::quote who="…" … :::                 a quote
   :::heat … :::                          a table whose numbers tint their cells
   ::caveat text="…"                      a footnote
+  ::frame src="…" title="…"              a live page in a frame
   ::glyph type=joint|distributed|sequential|cumulative   a small drawing of one kind of collective attention
   :::stack … :::  :::row … :::  :::grid cols=3 … :::    under, beside, or in a grid
   ::demo  ::bvh  ::hv  ::live  ::designspace            the animations
@@ -637,5 +638,29 @@ So, what to take away. How well CAAV works depends on the visualization. That's 
 
 So, back to our two chemists. A protein's surface has few reference points, so we'd expect this to help there. That still needs testing on real tasks.
 
-[click] The QR code takes you to the paper and these slides. One last thing. I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so come find me. Thank you.
+[click] The QR code takes you to the paper and these slides.
+:::
+
+---
+id: toolkit
+layout: text-figure
+columns: 2 3
+chapter: Takeaways
+time: 25
+---
+
+# One more thing: the code is open source
+
+:::items
+- **caav.** A small library for adding these techniques to your own three.js and WebXR scenes.
+- **Try it.** [heedvision.arvindchee.nu/toolkit](https://heedvision.arvindchee.nu/toolkit/)
+- **Source.** [github.com/arvindcheenu/caav](https://github.com/arvindcheenu/caav), MIT License.
+:::
+
+::frame src="../toolkit/#try-it" title="The caav toolkit playground: two people looking at one object, with their attention shown"
+
+:::notes
+One more thing. If you want these techniques in your own WebXR system, I've open sourced them as a small library called caav. This is its playground, running live on the slide.
+
+And I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so come find me. Thank you.
 :::

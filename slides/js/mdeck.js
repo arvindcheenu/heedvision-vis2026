@@ -250,6 +250,8 @@
         ${a.steps ? '<span class="fragment step" data-fragment-index="4" data-ds-pick></span>' : ""}${next.length ? '<span class="fragment step" data-fragment-index="0" data-ds-next></span>' : ""}`, a.steps ? "" : ' data-picked');
     },
 
+    // a live page in a frame, for something the audience can try from the slide
+    frame: (a) => wrap("div", a, "c-frame", `<iframe src="${esc(a.src)}" title="${esc(a.title || "Live page")}" loading="lazy" allow="xr-spatial-tracking; fullscreen"></iframe>`),
     glyph: (a) => wrap("div", a, "c-glyph", GLYPHS[a.type] || ""),
     caveat: (a, body) => wrap("p", a, "c-caveat", mdi((body || a.text || "").trim())),
     qr: (a) => wrap("div", a, "c-qr", `<div class="qr" data-qr="talk"></div>${a.label ? `<p>${mdi(a.label)}</p>` : ""}`),
