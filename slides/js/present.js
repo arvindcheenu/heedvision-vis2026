@@ -184,7 +184,9 @@
       c.classList.toggle("passed", i <= state.f);
       c.classList.toggle("next", i === state.f + 1);
     });
-    const target = notesEl.querySelector(".click.next") || notesEl.querySelector(".click.passed:last-of-type");
+    // the build about to come, or after the last one, the line being said (each [click] sits in its own paragraph)
+    const passed = notesEl.querySelectorAll(".click.passed");
+    const target = notesEl.querySelector(".click.next") || passed[passed.length - 1];
     if (target && state.f >= 0) target.scrollIntoView({ block: "center", behavior: scroll ? "auto" : "smooth" });
     else if (scroll) notesEl.parentElement.scrollTop = 0;
   }

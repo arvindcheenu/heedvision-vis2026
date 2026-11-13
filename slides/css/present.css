@@ -84,7 +84,7 @@ html:not(.gated) .pv-gate { display: none; }
 .pv-notes::after { content: ""; flex: none; position: sticky; bottom: 0; height: 32px; margin-top: -32px; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--bg)); opacity: 0; transition: opacity 160ms; }
 .pv-notes.more::after { opacity: 1; }
 .pv-notes .pv-bar { flex: none; position: sticky; top: 0; z-index: 1; }
-.pv-notes .pv-bar::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--bg) 80%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); }
+.pv-notes .pv-bar::before { content: ""; position: absolute; inset: 0 0 -10px; z-index: -1; background: linear-gradient(to bottom, var(--bg) calc(100% - 10px), transparent); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); }
 .pn-state { font-size: 13.5px; color: var(--fg-3); }
 .pn-edit { margin-left: auto; min-height: 34px; padding: 0 12px; font-size: 14px; }
 .notes { font-size: 24px; line-height: 1.45; }
