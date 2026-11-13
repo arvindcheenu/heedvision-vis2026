@@ -11,7 +11,7 @@ slug: Third-year PhD student, open to postdoc and industry positions
 url: https://heedvision.arvindchee.nu/talk/
 site: https://heedvision.arvindchee.nu/   # where the QR code points when asking is off
 bullet: vis       # vis | triangle | dot | square | dash | none | a path to an image
-duration: 10.4    # minutes, for presenter-view pacing
+duration: 11.4    # minutes, for presenter-view pacing
 
 # Live layer: delete these lines to run without it.
 questions: on      # on | off | a link to the venue's Q&A tool
@@ -245,7 +245,7 @@ How you combine each person's record decides which kinds you see. Count shows jo
 id: design-space
 layout: full
 chapter: Idea
-time: 43
+time: 50
 ---
 
 # Display: a design space
@@ -253,22 +253,22 @@ time: 43
 ::designspace steps badge="HeedVision" highlight=world-embedded trigger=explicit
 
 :::notes
-For display, we organized the options into a preliminary design space.
+For display, we organized the options into a preliminary design space based on where the attention was situated with respect to the headset.
 
-[click] Attention is either embedded in the visualization or shown in a separate view. And it sits in world space, fixed in the room you share.
+[click] Attention is either embedded over the visualization or shown in a separate view. And it could be in world space, placed in the room you share.
 
-[click] Or in camera space, attached to your own view: always visible, but no longer lined up with the room.
+[click] Or in camera space, attached to your own view: always visible, but only to you, and no longer lined up with the room.
 
-[click] Then triggering: always on, on request, or decided by the system.
+[click] Of course, how much control you could offer also matters with triggering: which can be always on, on request, or decided by the system.
 
-[click] HeedVision is embedded, in world space, on request. That gives both people the same frame of reference, so one can say “look at that orange region.”
+[click] Our evaluated system HeedVision is embedded, in world space, triggerable on request.
 :::
 
 ---
 id: part-system
 layout: section
 chapter: System
-time: 3
+time: 4
 ---
 
 # System
@@ -276,14 +276,14 @@ time: 3
 ## One corner built and evaluated
 
 :::notes
-So let's look at that corner.
+So let's look at it in detail.
 :::
 
 ---
 id: heedvision
 layout: figure-text
 chapter: System
-time: 28
+time: 35
 ---
 
 # HeedVision: colour per user
@@ -298,7 +298,7 @@ time: 28
 :::
 
 :::notes
-HeedVision runs in the browser, on consumer headsets, with nothing to install.
+HeedVision runs in the browser, on consumer headsets, with nothing to install. We built this system over Spatialstrates, which allows for seamless collaboration on headsets using open WebXR technologies.
 
 [click] Attention stays hidden until you ask for it, so it's out of the way while you search.
 
@@ -336,7 +336,7 @@ Underneath, the chart becomes a grid of invisible voxels. A bounding volume hier
 id: design-space-others
 layout: full
 chapter: System
-time: 6
+time: 7
 ---
 
 # Display: a design space
@@ -346,14 +346,14 @@ time: 6
 :::notes
 That was one corner.
 
-[click] The design space has three more.
+[click] Now you might ask, what about the other quadrants?
 :::
 
 ---
 id: prototypes
 layout: three
 chapter: System
-time: 18
+time: 21
 ---
 
 # The other three quadrants
@@ -364,7 +364,7 @@ time: 18
 ::caveat text="Proofs of concept: VR only, synchronized locally between browser tabs. Not formally evaluated."
 
 :::notes
-We built proofs of concept for those. A movable miniature, like a minimap, for cluttered scenes. A projection onto the bounding box, for a guided tour. And a flat panel, for a colleague who joins later. They aren't evaluated yet.
+We built proofs of concept for those. A movable miniature, like a minimap, for cluttered scenes. A projection onto the bounding box, for a guided tour. And a flat panel, for a colleague who joins later. They aren't evaluated yet, but are a potential avenue for future work.
 :::
 
 ---
@@ -387,7 +387,7 @@ id: hunt
 layout: figure-text
 columns: 3 2
 chapter: Study
-time: 54
+time: 64
 ---
 
 # A treasure hunt, in the real system
@@ -402,11 +402,11 @@ time: 54
 :::
 
 :::notes
-To find out, we ran a treasure hunt. This is the real system, live in the browser, as two headsets side by side. Pairs shared a room, in AR, so they could see and talk to each other.
+To find out, we ran a treasure hunt. This is a close visualization to the real system that participants interacted with, live in the browser, shown as two headsets side by side. Pairs shared a room, in AR, so they could see and talk to each other.
 
-[click] Targets are spread so that no region is richer than another. The pair has to search everywhere.
+[click] Targets were spread so that no region is richer than another. The pair has to search everywhere.
 
-[click] And a target only appears when you're close, at the right angle. Somebody has to go and look.
+[click] And a target only appears when you're close, at the right angle. Somebody has to go and look. We did this to mimic the ephemeral nature of insights that need close scrutiny.
 
 [click] With CAAV, voxels take on colour as each person looks. Let me move one of them, and the trail builds up in both views.
 :::
@@ -478,7 +478,7 @@ First the scatterplot. Each dot is a pair, each bar a mean.
 
 With CAAV, pairs found more targets, covered more space, and repeated far less of each other's search. Without it, one participant “had to double-check everything the other person looked at.”
 
-Now the caution. The intervals are wide, and the one for targets just includes zero. So we call these directional.
+Do note that the intervals are wide, and the one for targets just includes zero. So we call these directional.
 :::
 
 ---
@@ -507,7 +507,7 @@ But they also overlapped more, the opposite of the scatterplot. We saw deliberat
 id: strategies
 layout: grid
 chapter: Results
-time: 27
+time: 34
 ---
 
 # Six strategies
@@ -535,7 +535,7 @@ time: 27
 :::notes
 We found six coordination strategies. The top row is what we saw more of with CAAV: splitting the space, searching methodically, and reading the colours. One pair made it a game, aiming for “a nice blue side and a nice orange side with very little overlap.”
 
-Below: talking it through, steering by landmarks, and, only without CAAV, lining up the charts in the room.
+Without the cues, we observed that they navigated the problem by usually talking it through with fewer or no deictic references, steering by landmarks, and, interestingly, lining up the visualizations in the room.
 :::
 
 ---
@@ -543,7 +543,7 @@ id: conditions
 columns: 3 2
 rows: 3 2
 chapter: Results
-time: 36
+time: 40
 ---
 
 # By condition, and a clear preference
@@ -574,14 +574,14 @@ we have no verbal communication during the condition where we have [CAAV]
 :::notes
 Here they are by condition. On the scatterplot, verbal coordination drops to zero with CAAV. That may mean coordinating got cheaper. It may also mean less discussion and weaker common ground, so we don't count it as a win.
 
-People did like it. All but one preferred CAAV, and described it as “seeing my partner's footsteps or breadcrumbs in real time.” Workload was lower overall, though on terrain it leaned the other way. And one participant kept it off for most of their session.
+People did like it. All but one preferred CAAV, and one described it as “seeing my partner's footsteps or breadcrumbs in real time.” Workload was lower overall, though on terrain it leaned the other way. And one participant kept it off for most of their session. For more details on this, please refer to the paper.
 :::
 
 ---
 id: limits
 layout: two
 chapter: Takeaways
-time: 28
+time: 36
 ---
 
 # Limitations and future work
@@ -607,16 +607,16 @@ time: 28
 :::
 
 :::notes
-This is a first step, with limits. We tracked heads, not eyes. We studied pairs, in one room, on one kind of task. Our only baseline was no attention display, so we can't yet say whether the history is what helps, or any shared cue would. And we measured awareness only through behaviour.
+As this is a first step, it of course has a lot of limitations. We tracked heads, not eyes. We studied pairs, in one room, on one kind of controlled task. Our only baseline was no attention display, so we can't yet say whether the history is what helps, or any shared cue would. And we measured awareness only through behaviour.
 
-[click] So next: other tasks, larger teams, and stronger baselines.
+[click] So we believe future work could benefit more from: other tasks, larger teams, stronger baselines, and evaluating against other proof-of-concepts.
 :::
 
 ---
 id: thanks
 layout: end
 chapter: Takeaways
-time: 60
+time: 40
 ---
 
 # Thank you for your attention
@@ -630,15 +630,13 @@ time: 60
 :::
 
 :::notes
-So, what to take away. How well CAAV works depends on the visualization. That's initial evidence, from one kind of task.
+If there is one thing I want you to take away, it's this: How well CAAV works depends on the visualization. That's initial evidence, from one kind of task.
 
 [click] In an abstract space with no landmarks, it helped pairs split the work and stop repeating each other.
 
-[click] On terrain, pairs gained the most from working together. But the landmarks were already coordinating them, and the colours sometimes got in the way.
+[click] On a terrain, pairs gained the most from working together. But the landmarks were already coordinating them, and the colours sometimes got in the way.
 
-So, back to our two chemists. A protein's surface has few reference points, so we'd expect this to help there. That still needs testing on real tasks.
-
-[click] The QR code takes you to the paper and these slides.
+[click] Thanks for your attention! The QR code takes you to the paper and these slides.
 :::
 
 ---
@@ -646,7 +644,7 @@ id: toolkit
 layout: text-figure
 columns: 2 3
 chapter: Takeaways
-time: 25
+time: 29
 ---
 
 # One more thing: the code is open source
@@ -660,7 +658,7 @@ time: 25
 ::frame src="../toolkit/#try-it" poster="assets/fig/toolkit-playground.jpg" title="The caav toolkit playground: two people looking at one object, with their attention shown"
 
 :::notes
-One more thing. If you want these techniques in your own WebXR system, I've open sourced them as a small library called caav. This is its playground, running live on the slide.
+Oh! And before I conclude, one more thing. If you want these techniques in your own WebXR system, I've open sourced them as a small library called caav.
 
-And I'm in the third year of my PhD, so if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so come find me. Thank you.
+Being in the third year of my PhD, if all goes well, Niklas will soon successfully fire me. I'm open to postdoc and industry positions, so please feel free to strike up a conversation online or offline. Thank you.
 :::
