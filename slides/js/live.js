@@ -116,7 +116,7 @@
     },
   };
 
-  let ws = null, retry = 0, signingIn = false;
+  let ws = null, retry = 0, signingIn = false, seenInit = false;
   const queue = [];
   const waiters = { auth: [], key: [] };
   function send(msg) {
@@ -156,7 +156,9 @@
         live.moderate = !!m.moderate;
         live.emit("notes");
         live.emit("questions");
-        if (m.slide) { live.slide = m.slide; live.emit("slide", m.slide); }
+        // after a dropped connection the relay's slide is old news to whoever is presenting: mark it
+        if (m.slide) { live.slide = m.slide; live.emit("slide", seenInit ? { ...m.slide, resumed: true } : m.slide); }
+        seenInit = true;
       } else if (m.t === "auth") {
         signingIn = false;
         // too many wrong guesses from this network: a remembered passphrase isn't wrong, so it waits and tries again

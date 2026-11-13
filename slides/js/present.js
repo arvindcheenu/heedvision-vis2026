@@ -65,10 +65,17 @@
 
   // ---------------------------------------------------------- link to the slides
   const channel = new BroadcastChannel(`hv-present-${set.room}`);
-  let state = null, deckSeen = 0;
+  let state = null, deckSeen = 0, leader = null;
+  const lastOf = new Map();
   channel.onmessage = (e) => {
     const m = e.data || {};
     if (m.t === "state") {
+      // The slides may be open in more than one tab. Follow one of them, and change only when another is
+      // actually moved or the first goes quiet: otherwise this view flips between them every two seconds.
+      const at = `${m.id}:${m.f}`, was = lastOf.get(m.deck);
+      lastOf.set(m.deck, at);
+      if (leader === null || Date.now() - deckSeen > 5000) leader = m.deck;
+      else if (m.deck !== leader) { if (was === undefined || was === at) return; leader = m.deck; }
       deckSeen = Date.now();
       // answers to the "are you there?" below change nothing, and shouldn't move the script
       if (!state || m.id !== state.id || m.f !== state.f || m.ask !== state.ask || m.qa !== state.qa) onState(m);
@@ -81,7 +88,7 @@
     $(".pv-link").textContent = ok ? "" : "Open the slides in this browser";
     hello();
   }, 2000);
-  const go = (msg) => channel.postMessage({ t: "go", ...msg });
+  const go = (msg) => channel.postMessage({ t: "go", to: leader, ...msg });
   live.on("slide", (s) => { if (Date.now() - deckSeen > 4000) onState({ ...s, builds: slides.get(s.id)?.clicks || 0, backup: !!slides.get(s.id)?.backup }); });
 
   // ---------------------------------------------------------- previews

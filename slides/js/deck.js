@@ -180,7 +180,7 @@
   async function renderDiagrams() {
     const blocks = [...document.querySelectorAll("code.language-mermaid")];
     if (!blocks.length) return;
-    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261244"; t.onload = t.onerror = res; document.head.appendChild(t); });
+    await new Promise((res) => { const t = document.createElement("script"); t.src = "vendor/mermaid.min.js?v=20261245"; t.onload = t.onerror = res; document.head.appendChild(t); });
     if (!window.mermaid) return;
     mermaid.initialize({ startOnLoad: false, theme: "base", fontFamily: "inherit", themeVariables: HVTheme.isDark()
       ? { primaryColor: "#33291f", primaryTextColor: "#f6efe9", primaryBorderColor: "#df6824", lineColor: "#f8a45a", fontSize: "32px" }
@@ -236,7 +236,7 @@
       explainers.set(cv, Explain.create(cv, { scale: () => deck.getScale() }));
     });
     const demos = document.querySelectorAll("[data-voxdemo]");
-    if (demos.length) import(new URL("js/hvdemo.js?v=20261244", location.href)).then((mod) => demos.forEach(async (el) => {
+    if (demos.length) import(new URL("js/hvdemo.js?v=20261245", location.href)).then((mod) => demos.forEach(async (el) => {
       try {
         lives.set(el, await mod.create(el, { scale: () => deck.getScale() }));
         syncSteppers();
@@ -374,18 +374,21 @@
   // ---------------------------------------------------------- presenter windows
   // present.html talks to this deck over a BroadcastChannel (same browser).
   const channel = !isEmbed && !isPoster && !isReceiver && "BroadcastChannel" in window ? new BroadcastChannel(`hv-present-${set.room}`) : null;
+  // with the slides open in two tabs, the presenter view steers one of them: this names which
+  const deckId = Math.random().toString(36).slice(2);
   function postConsole() {
     if (!channel) return;
     const cur = deck.getCurrentSlide();
-    channel.postMessage({ t: "state", ...currentState(), builds: builds(cur), backup: cur.hasAttribute("data-backup"), ask: askOn(), qa: qaOn() });
+    channel.postMessage({ t: "state", deck: deckId, ...currentState(), builds: builds(cur), backup: cur.hasAttribute("data-backup"), ask: askOn(), qa: qaOn() });
   }
   if (channel) {
     channel.onmessage = (e) => {
       const m = e.data || {};
       // the presenter view is open and signed in: it hands this window its passphrase, so the slides can lead
-      if (m.t === "hello") { markPresenter(); postConsole(); if (m.key && m.key !== live.presenterKey) live.signIn(m.key).then((a) => { if (a.ok) broadcast(); }); }
+      if (m.t === "hello") { markPresenter(); postConsole(); if (m.key && m.key !== live.presenterKey) live.signIn(m.key).then((a) => { if (a.ok && !document.hidden) broadcast(); }); }
       if (m.t === "signout") live.signOut();
       else if (m.t === "go") {
+        if (m.to && m.to !== deckId) return;
         if (m.dir === "next") advance();
         else if (m.dir === "prev") deck.prev();
         else if (m.id) goTo(m);
@@ -421,7 +424,7 @@
       following = on;
       if (!followBtn) return;
       followBtn.hidden = on;
-      if (on && live.slide) goTo(live.slide);
+      if (on && live.slide) followTo(live.slide);
     };
     if (followBtn) followBtn.addEventListener("click", () => setFollow(true));
     const scriptLink = fab.querySelector(".script");
@@ -475,8 +478,9 @@
     if (set.follow) {
       // an old slide left on the relay shouldn't pull someone off the link they opened
       const fresh = (s) => s && (!s.ts || Date.now() - s.ts < 3 * 3600 * 1000);
-      live.on("slide", (s) => { if (following && fresh(s)) goTo(s); });
-      if (following && fresh(live.slide)) goTo(live.slide); // the first update can arrive before the deck is ready
+      // whoever is presenting keeps their place when the connection comes back; the relay catches up with them
+      live.on("slide", (s) => { if (s.resumed && live.presenterKey) return; if (following && fresh(s)) followTo(s); });
+      if (following && fresh(live.slide)) followTo(live.slide); // the first update can arrive before the deck is ready
       deck.on("slidechanged", () => {
         if (!applyingRemote && following && live.slide && live.status === "open" && deck.getCurrentSlide().id !== live.slide.id) setFollow(false);
       });
@@ -527,7 +531,18 @@
     if (it) live.hide(it.dataset.id);
   });
 
-  function broadcast() { if (live.presenter && set.follow) live.broadcast(currentState()); }
+  // A slide that came from the relay is never sent back to it. Without this, two signed-in windows
+  // (a second tab, another laptop) echo each other's moves and the slides start changing by themselves.
+  let fromRelay = null;
+  let applyingRelay = false;
+  function followTo(s) { fromRelay = { id: s.id, f: s.f == null ? -1 : s.f }; applyingRelay = true; try { goTo(s); } finally { applyingRelay = false; } }
+  function broadcast() {
+    if (!live.presenter || !set.follow || applyingRelay) return;
+    const c = currentState();
+    if (fromRelay && fromRelay.id === c.id && fromRelay.f === c.f) return;
+    fromRelay = null;
+    live.broadcast(c);
+  }
 
   // ---------------------------------------------------------- embed bridge
   // The host page steps through builds with {hv:"go", dir} or jumps with {hv:"go", id, f},
@@ -599,7 +614,8 @@
       await Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]);
       print();
     }, 3000);
-    live.on("auth", (a) => { if (a.ok) broadcast(); });
+    // a second copy of the slides, open in a tab nobody is looking at, doesn't move the audience when it signs in
+    live.on("auth", (a) => { if (a.ok && !document.hidden) broadcast(); });
     live.on("error", (m) => console.warn("[live]", m));
     renderBoard();
     // the canvases drew their labels before the font had arrived
